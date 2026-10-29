@@ -1,0 +1,1386 @@
+<!doctype html>
+<html lang="sl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="AI osebni trener: načrt vadbe, jedilnik iz slovenskih trgovin, napredek in priprava na fizični test.">
+<meta name="theme-color" content="#0B0C0A">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%278%27 fill=%27%23C9F23D%27/%3E%3Ctext x=%2716%27 y=%2721%27 font-family=%27Arial%27 font-weight=%27900%27 font-size=%2713%27 text-anchor=%27middle%27 fill=%27%230B0C0A%27%3EAI%3C/text%3E%3C/svg%3E">
+<style>:root{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>AI osebni trener</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Manrope:wght@400;500;600;700;800&display=swap">
+<style>
+/* Layout: phone-first single column with a bottom tab bar; from 960px a fixed left rail and a centred 880px column */
+:root{
+  --bg:#0B0C0A; --surface:#151713; --surface-2:#1E211B; --line:#2A2E26; --fg:#F3F5EF; --muted:#8D9488;
+  --accent:#C9F23D; --accent-dim:rgba(201,242,61,.14); --ink:#0B0C0A; --warn:#F2B544; --bad:#FF7A66;
+  --display:'Archivo','Arial Narrow',system-ui,sans-serif;
+  --body:'Manrope',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --r-lg:26px; --r-md:18px; --r-sm:12px;
+  --tabbar:72px;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{background:var(--bg);color:var(--fg)}
+body{font-family:var(--body);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:40;background:var(--bg)}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none;padding:0}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:8px}
+h1,h2,h3{font-family:var(--display);font-stretch:112%;font-weight:800;letter-spacing:-.01em;margin:0;text-wrap:balance}
+h1{font-size:30px;line-height:1.05}
+h2{font-size:21px;line-height:1.15}
+h3{font-size:17px;line-height:1.2;font-weight:700}
+p{margin:0}
+.num{font-family:var(--display);font-stretch:118%;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.02em;white-space:nowrap}
+.eyebrow{font-size:11.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+.acc{color:var(--accent)}
+.stack{display:flex;flex-direction:column;gap:16px}
+.stack-s{display:flex;flex-direction:column;gap:8px}
+.row{display:flex;align-items:center;gap:12px}
+.row.wrap{flex-wrap:wrap}
+.between{justify-content:space-between}
+.grow{flex:1;min-width:0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+
+/* Shell */
+.side{display:none}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  padding-block:12px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:10px;font-family:var(--display);font-stretch:120%;font-weight:900;font-size:18px;letter-spacing:-.01em}
+.logo-mark{width:30px;height:30px;border-radius:10px;background:var(--accent);color:var(--ink);display:grid;place-items:center;font-size:12px;font-weight:900;font-stretch:100%}
+.avatar{width:40px;height:40px;border-radius:50%;background:var(--surface-2);border:1px solid var(--line);display:grid;place-items:center;font-weight:800;font-size:14px}
+.view{max-width:880px;margin:0 auto;padding-block:8px calc(var(--tabbar) + 40px + env(safe-area-inset-bottom,0px));
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:20px}
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:30;display:grid;grid-template-columns:repeat(6,1fr);
+  background:color-mix(in srgb,var(--bg) 94%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);
+  padding-bottom:env(safe-area-inset-bottom,0px);padding-left:max(4px,env(safe-area-inset-left,0px));padding-right:max(4px,env(safe-area-inset-right,0px))}
+.tab{height:var(--tabbar);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--muted);font-size:10.5px;font-weight:700;letter-spacing:.01em}
+.tab svg{width:23px;height:23px}
+.tab[aria-current="page"]{color:var(--fg)}
+.tab[aria-current="page"] svg{color:var(--accent)}
+.ico{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+@media (min-width:960px){
+  .top{display:none}
+  .tabbar{display:none}
+  .side{display:flex;flex-direction:column;gap:28px;position:fixed;top:0;bottom:0;left:0;width:248px;padding:28px 18px;padding-left:max(18px,env(safe-area-inset-left,0px));border-right:1px solid var(--line);background:var(--bg);z-index:20}
+  .side nav{display:flex;flex-direction:column;gap:4px}
+  .side .tab{flex-direction:row;justify-content:flex-start;height:46px;padding:0 14px;gap:14px;font-size:14.5px;border-radius:14px;color:var(--muted)}
+  .side .tab:hover{background:var(--surface)}
+  .side .tab[aria-current="page"]{background:var(--surface-2);color:var(--fg)}
+  .side .tab svg{width:21px;height:21px}
+  .side-foot{margin-top:auto;font-size:12.5px;color:var(--muted);display:flex;flex-direction:column;gap:6px}
+  .view{margin-left:max(248px, calc(248px + (100vw - 248px - 880px)/2));margin-right:auto;padding-block:36px 64px;padding-left:32px;padding-right:max(32px,env(safe-area-inset-right,0px))}
+  h1{font-size:38px}
+}
+
+/* Cards and controls */
+.card{background:var(--surface);border-radius:var(--r-lg);padding:20px;display:flex;flex-direction:column;gap:16px;min-width:0}
+.card.tight{padding:16px;gap:12px}
+.card.outline{background:transparent;border:1px solid var(--line)}
+.card.hero{background:var(--fg);color:var(--ink)}
+.card.hero .muted,.card.hero .eyebrow{color:#4E5449}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:50px;padding:0 22px;border-radius:999px;font-weight:800;font-size:15px;background:var(--surface-2);color:var(--fg);border:1px solid var(--line);transition:transform .12s ease,background .15s}
+.btn:active{transform:scale(.98)}
+.btn.primary{background:var(--accent);color:var(--ink);border-color:var(--accent)}
+.btn.dark{background:var(--ink);color:var(--fg);border-color:var(--ink)}
+.btn.small{height:38px;padding:0 16px;font-size:13.5px}
+.btn.block{width:100%}
+.btn.ghost{background:transparent}
+.btn[disabled]{opacity:.45;pointer-events:none}
+.iconbtn{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:var(--surface-2);border:1px solid var(--line);flex:none}
+.chip{height:36px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:transparent;font-size:13.5px;font-weight:700;color:var(--fg);display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--fg);color:var(--ink);border-color:var(--fg)}
+.chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.chips::-webkit-scrollbar{display:none}
+.pill{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 10px;border-radius:999px;font-size:12px;font-weight:800;background:var(--surface-2);color:var(--muted);white-space:nowrap}
+.pill.ok{background:var(--accent-dim);color:var(--accent)}
+.pill.warn{background:rgba(242,181,68,.14);color:var(--warn)}
+.pill.store{background:transparent;border:1px solid var(--line);color:var(--fg)}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;background:var(--surface);border-radius:999px;padding:4px;gap:4px}
+.seg button{height:40px;border-radius:999px;font-weight:800;font-size:14px;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--fg);color:var(--ink)}
+.bar{height:8px;border-radius:99px;background:var(--surface-2);overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--accent);border-radius:99px}
+.divider{height:1px;background:var(--line)}
+input.field,select.field,textarea.field{width:100%;height:48px;border-radius:14px;border:1px solid var(--line);background:var(--surface-2);padding:0 14px;font-size:16px;outline:none}
+input.field:focus,textarea.field:focus{border-color:var(--accent)}
+.banner{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:12px 16px;border-radius:var(--r-md);border:1px dashed var(--line);font-size:13.5px}
+
+/* Home */
+.greet{display:flex;flex-direction:column;gap:6px;padding-top:8px}
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;text-align:center}
+.week .d{display:flex;flex-direction:column;align-items:center;gap:8px;font-size:12px;font-weight:700;color:var(--muted)}
+.dot{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;border:1.5px dashed var(--line)}
+.dot.plan{border:1.5px solid var(--muted)}
+.dot.done{background:var(--accent);border-color:var(--accent);color:var(--ink)}
+.dot.today{box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--fg)}
+.ring{position:relative;width:76px;height:76px;flex:none}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring .lbl{position:absolute;inset:0;display:grid;place-items:center;font-size:15px}
+.statrow{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stat{background:var(--surface-2);border-radius:var(--r-md);padding:14px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.stat .num{font-size:22px}
+.stat .small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.meal-line{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+.meal-line:first-child{border-top:0;padding-top:0}
+.tick{width:30px;height:30px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;flex:none;color:transparent;transition:background .15s,border-color .15s}
+.tick svg{width:16px;height:16px}
+.tick[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--ink)}
+
+/* Workout */
+.daystrip{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.daybtn{height:64px;border-radius:16px;background:var(--surface);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;font-weight:800;font-size:13px;color:var(--muted)}
+.daybtn i{width:6px;height:6px;border-radius:50%;background:transparent}
+.daybtn.has i{background:var(--muted)}
+.daybtn.done i{background:var(--accent)}
+.daybtn.today{color:var(--fg)}
+.daybtn[aria-pressed="true"]{background:var(--fg);color:var(--ink)}
+.daybtn[aria-pressed="true"].has i{background:var(--ink)}
+.ex{background:var(--surface);border-radius:var(--r-lg);padding:16px;display:flex;flex-direction:column;gap:14px}
+.ex-head{display:flex;gap:14px;align-items:center}
+.thumb{width:84px;height:68px;border-radius:16px;background:var(--surface-2);flex:none;position:relative;overflow:hidden;display:block}
+.thumb svg{width:100%;height:100%}
+.thumb .play{position:absolute;right:6px;bottom:6px;width:22px;height:22px;border-radius:50%;background:var(--accent);color:var(--ink);display:grid;place-items:center}
+.thumb .play svg{width:10px;height:10px;fill:currentColor;stroke:none}
+.sets{display:grid;grid-template-columns:28px 1fr 1fr 44px;gap:8px;align-items:center}
+.sets.nokg{grid-template-columns:28px 1fr 44px}
+.sets.cardio{grid-template-columns:28px 1fr 44px}
+.sets .h{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.sets .n{font-weight:800;color:var(--muted);font-variant-numeric:tabular-nums}
+.sets input{height:44px;border-radius:12px;border:1px solid var(--line);background:var(--surface-2);text-align:center;font-weight:800;font-size:16px;width:100%;min-width:0;font-variant-numeric:tabular-nums;outline:none}
+.sets input:focus{border-color:var(--accent)}
+.sets input:disabled{opacity:.5}
+.sets .tick{width:44px;height:44px}
+.sets input[data-done]{border-color:transparent;background:var(--accent-dim);color:var(--accent)}
+.sets .lbl{font-weight:700;font-size:14px}
+.fig line{stroke:var(--fg);stroke-width:6;stroke-linecap:round}
+.fig line.back{stroke:var(--muted)}
+.fig .head{fill:var(--fg)}
+.fig .ground{stroke:var(--line);stroke-width:3}
+.fig .prop{stroke:var(--muted);stroke-width:4;stroke-linecap:round;fill:none}
+.thumb .fig line{stroke-width:7}
+
+.rest{position:fixed;z-index:35;left:max(12px,env(safe-area-inset-left,0px));right:max(12px,env(safe-area-inset-right,0px));bottom:calc(var(--tabbar) + 10px + env(safe-area-inset-bottom,0px));
+  background:var(--fg);color:var(--ink);border-radius:22px;padding:12px 12px 12px 18px;display:flex;align-items:center;gap:12px;box-shadow:0 12px 40px rgba(0,0,0,.5)}
+.rest .num{font-size:28px;min-width:76px}
+.rest .bar{background:#D7DBD0;flex:1}
+.rest .bar>i{background:var(--ink)}
+.rest .iconbtn{background:#E4E8DD;border-color:transparent;color:var(--ink);font-weight:800;font-size:12.5px;width:42px;height:42px}
+.rest.finished{background:var(--accent)}
+@media (min-width:960px){.rest{left:auto;right:28px;bottom:28px;width:400px}}
+
+/* Nutrition */
+.macro{display:flex;flex-direction:column;gap:6px}
+.ing{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:14px;padding:6px 0}
+.ing .grow{overflow-wrap:anywhere}
+.shop-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+.shop-item.checked .grow{color:var(--muted);text-decoration:line-through}
+.tablewrap{overflow-x:auto}
+table.week-t{width:100%;border-collapse:collapse;font-size:14px;min-width:520px}
+.week-t th,.week-t td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.week-t th{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.week-t td.r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+
+/* Chat */
+.chat{display:flex;flex-direction:column;gap:12px;min-height:40vh}
+.msg{max-width:88%;padding:12px 16px;border-radius:20px;font-size:15px;line-height:1.55;overflow-wrap:anywhere}
+.msg.user{align-self:flex-end;background:var(--fg);color:var(--ink);border-bottom-right-radius:6px}
+.msg.assistant{align-self:flex-start;background:var(--surface);border-bottom-left-radius:6px}
+.msg.assistant ul{margin:6px 0;padding-left:18px}
+.msg.assistant p+p{margin-top:8px}
+.msg.note{align-self:center;background:var(--accent-dim);color:var(--accent);font-size:13px;font-weight:700;padding:8px 14px;border-radius:999px}
+.msg.thinking{color:var(--muted)}
+.composer{position:sticky;bottom:calc(var(--tabbar) + 8px + env(safe-area-inset-bottom,0px));display:flex;gap:8px;align-items:flex-end;background:var(--surface);border:1px solid var(--line);border-radius:26px;padding:6px 6px 6px 16px;z-index:5}
+.composer textarea{flex:1;border:0;background:transparent;resize:none;min-height:40px;max-height:140px;padding:9px 0;font-size:16px;outline:none;line-height:1.4}
+.composer .btn{height:42px;width:42px;padding:0}
+@media (min-width:960px){.composer{bottom:20px}}
+
+/* Progress */
+.chart{width:100%;height:auto;max-height:250px;display:block}
+.chart text{fill:var(--muted);font-size:11px;font-family:var(--body);font-weight:600}
+.chart .grid{stroke:var(--line);stroke-width:1}
+.chart .ln{stroke:var(--accent);stroke-width:2.5;fill:none;stroke-linejoin:round;stroke-linecap:round}
+.chart .pt{fill:var(--accent)}
+.chart .pt-end{fill:var(--bg);stroke:var(--accent);stroke-width:3}
+.chart .endlbl{fill:var(--fg);font-weight:800;font-size:12px}
+.chart-empty{padding:28px 16px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:var(--r-md);font-size:14px}
+.photos{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px}
+.photo{position:relative;border-radius:14px;overflow:hidden;aspect-ratio:3/4;background:var(--surface-2);max-width:100%}
+.photo img{width:100%;height:100%;object-fit:cover;display:block}
+.photo span{position:absolute;left:6px;bottom:6px;background:rgba(0,0,0,.65);color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px}
+.photo[aria-pressed="true"]{outline:3px solid var(--accent);outline-offset:-3px}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.compare figure{margin:0;display:flex;flex-direction:column;gap:6px}
+.compare img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:16px;background:var(--surface-2);max-width:100%}
+
+/* Tests */
+.test-pick{display:grid;grid-template-columns:1fr;gap:12px}
+@media (min-width:640px){.test-pick{grid-template-columns:1fr 1fr}}
+.pick{text-align:left;background:var(--surface);border-radius:var(--r-lg);padding:22px;display:flex;flex-direction:column;gap:12px;border:1px solid transparent}
+.pick:hover{border-color:var(--line)}
+.countdown{display:flex;align-items:flex-end;gap:10px}
+.countdown .num{font-size:76px;line-height:.85}
+.disc{display:flex;align-items:center;gap:12px;padding:14px 0;border-top:1px solid var(--line)}
+.disc:first-child{border-top:0}
+.timerbox{background:var(--surface-2);border-radius:var(--r-md);padding:16px;display:flex;flex-direction:column;gap:12px;align-items:center}
+.timerbox .num{font-size:48px}
+
+/* Profile / subscription */
+.kv{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid var(--line);font-size:14.5px}
+.kv:first-child{border-top:0;padding-top:0}
+.kv b{font-weight:700;text-align:right}
+.plans{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.plan{border:1.5px solid var(--line);border-radius:var(--r-md);padding:16px;text-align:left;display:flex;flex-direction:column;gap:6px;position:relative}
+.plan[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-dim)}
+.plan .num{font-size:24px}
+.plan .badge{position:absolute;top:-10px;right:12px;background:var(--accent);color:var(--ink);font-size:11px;font-weight:800;padding:2px 8px;border-radius:99px}
+
+/* Onboarding */
+.ob{min-height:100%;max-width:560px;margin:0 auto;padding-block:20px 32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:24px}
+.ob-top{display:flex;align-items:center;gap:12px}
+.ob-q{display:flex;flex-direction:column;gap:10px;padding-top:8px}
+.ob-q h1{font-size:32px}
+.opts{display:flex;flex-direction:column;gap:10px}
+.opt{text-align:left;background:var(--surface);border:1.5px solid transparent;border-radius:20px;padding:18px 20px;display:flex;align-items:center;gap:14px;transition:border-color .15s,background .15s}
+.opt .grow b{display:block;font-size:16.5px;font-weight:800}
+.opt .grow span{font-size:13.5px;color:var(--muted)}
+.opt[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-dim)}
+.opt .tick{width:26px;height:26px}
+.opt[aria-pressed="true"] .tick{background:var(--accent);border-color:var(--accent);color:var(--ink)}
+.bignum{display:flex;align-items:center;justify-content:center;gap:18px;padding:24px 0}
+.bignum .num{font-size:84px;line-height:1;min-width:3ch;text-align:center}
+.bignum .u{font-size:18px;font-weight:700;color:var(--muted);align-self:flex-end;padding-bottom:12px}
+.bignum .iconbtn{width:56px;height:56px}
+input[type=range]{width:100%;accent-color:var(--accent);height:28px}
+.daygrid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.daygrid button{height:84px;border-radius:20px;background:var(--surface);font-family:var(--display);font-stretch:118%;font-weight:800;font-size:30px;border:1.5px solid transparent}
+.daygrid button[aria-pressed="true"]{background:var(--accent);color:var(--ink)}
+.ob-foot{margin-top:auto;display:flex;flex-direction:column;gap:10px}
+.welcome{display:flex;flex-direction:column;gap:22px;padding-top:6vh}
+.welcome h1{font-size:46px;line-height:.98;font-stretch:122%}
+@media (min-width:640px){.welcome h1{font-size:60px}}
+.welcome .fig-hero{background:var(--surface);border-radius:var(--r-lg);height:200px;display:flex;align-items:center;justify-content:center;max-width:100%}
+.welcome .fig-hero svg{height:100%;width:auto}
+
+/* Sheet */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:50;display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--surface);width:100%;max-width:560px;max-height:92vh;overflow-y:auto;border-radius:28px 28px 0 0;padding:20px;padding-bottom:calc(24px + env(safe-area-inset-bottom,0px));
+  padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:16px}
+@media (min-width:700px){.overlay{align-items:center}.sheet{border-radius:28px;max-height:86vh}}
+.sheet .demo{background:var(--surface-2);border-radius:var(--r-md);height:220px;display:flex;justify-content:center;max-width:100%}
+.sheet .demo svg{height:100%;width:auto;max-width:100%}
+.cues{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--tabbar) + 24px + env(safe-area-inset-bottom,0px));background:var(--fg);color:var(--ink);font-weight:800;font-size:14px;padding:12px 18px;border-radius:999px;z-index:60;box-shadow:0 10px 30px rgba(0,0,0,.4);max-width:calc(100% - 32px);text-align:center}
+@media (min-width:960px){.toast{bottom:32px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div id="app"></div>
+
+<script>
+'use strict';
+/* ---------- helpers ---------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmtEur = n => (Math.round(n * 100) / 100).toFixed(2).replace('.', ',') + ' €';
+const fmtN = (n, d = 0) => Number(n).toLocaleString('sl-SI', {minimumFractionDigits: d, maximumFractionDigits: d});
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const pad2 = n => String(n).padStart(2, '0');
+const dkey = (d = new Date()) => d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate());
+const parseD = k => { const [y, m, d] = k.split('-').map(Number); return new Date(y, m - 1, d); };
+const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
+const dow = (d = new Date()) => (d.getDay() + 6) % 7;
+const monday = (d = new Date()) => addDays(new Date(d.getFullYear(), d.getMonth(), d.getDate()), -dow(d));
+const dateOfWd = wd => addDays(monday(), wd);
+const shortDate = k => { const d = parseD(k); return d.getDate() + '. ' + (d.getMonth() + 1) + '.'; };
+const daysBetween = (a, b) => Math.round((parseD(b) - parseD(a)) / 864e5);
+const fmtTime = s => { s = Math.max(0, Math.round(s)); return Math.floor(s / 60) + ':' + pad2(s % 60); };
+const parseTime = v => { v = String(v).trim().replace(',', '.'); if (!v) return null; if (v.includes(':')) { const [m, s] = v.split(':'); const r = Number(m) * 60 + Number(s); return isFinite(r) ? r : null; } const n = Number(v); return isFinite(n) ? Math.round(n * 60) : null; };
+const DAYS = ['Pon', 'Tor', 'Sre', 'Čet', 'Pet', 'Sob', 'Ned'];
+const DAYS_FULL = ['Ponedeljek', 'Torek', 'Sreda', 'Četrtek', 'Petek', 'Sobota', 'Nedelja'];
+const DAYS_IN = ['ponedeljek', 'torek', 'sredo', 'četrtek', 'petek', 'soboto', 'nedeljo'];
+const MONTHS = ['januar', 'februar', 'marec', 'april', 'maj', 'junij', 'julij', 'avgust', 'september', 'oktober', 'november', 'december'];
+const longDate = k => { const d = parseD(k); return d.getDate() + '. ' + MONTHS[d.getMonth()] + ' ' + d.getFullYear(); };
+const plural = (n, a, b, c, d) => { const m = Math.abs(n) % 100; return m === 1 ? a : m === 2 ? b : (m === 3 || m === 4) ? c : d; };
+const dni = n => n + ' ' + plural(n, 'dan', 'dneva', 'dnevi', 'dni');
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const I = {
+  home: '<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
+  dumbbell: '<path d="M6.5 6v12M3.5 9v6M17.5 6v12M20.5 9v6M6.5 12h11"/>',
+  bowl: '<path d="M3 11h18a9 9 0 0 1-18 0Z"/><path d="M9 7.5c0-2 1.2-3.5 3-3.5M14 8c.6-2 2.2-3.5 4.5-3.5"/>',
+  chat: '<path d="M4 5.5A1.5 1.5 0 0 1 5.5 4h13A1.5 1.5 0 0 1 20 5.5v9a1.5 1.5 0 0 1-1.5 1.5H10l-5 4v-4.2A1.5 1.5 0 0 1 4 14.5z"/><path d="M12 7.5l.9 1.8 1.8.9-1.8.9-.9 1.8-.9-1.8-1.8-.9 1.8-.9z"/>',
+  chart: '<path d="M4 4v16h16"/><path d="m7.5 15 4-5 3 3 5-6.5"/>',
+  target: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r=".8"/>',
+  user: '<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/>',
+  check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  minus: '<path d="M5 12h14"/>',
+  x: '<path d="M6 6l12 12M18 6 6 18"/>',
+  left: '<path d="M15 5l-7 7 7 7"/>',
+  right: '<path d="M9 5l7 7-7 7"/>',
+  send: '<path d="M5 12h13M13 6l6 6-6 6"/>',
+  stop: '<rect x="7" y="7" width="10" height="10" rx="2"/>',
+  camera: '<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>',
+  play: '<path d="M8 5v14l11-7z"/>',
+  timer: '<circle cx="12" cy="13" r="7.5"/><path d="M12 9v4l2.5 2M10 3h4"/>',
+  swap: '<path d="M7 7h12l-3-3M17 17H5l3 3"/>',
+  ext: '<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>'
+};
+const ic = (n, cls = 'ico') => `<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">${I[n]}</svg>`;
+
+/* ---------- exercise library ---------- */
+const EX = {
+  pocep: {n: 'Počep z lastno težo', p: 'squat', m: 'Noge, zadnjica', eq: 'both', avoid: ['koleno'], alt: 'most', w: false, cues: ['Stopala v širini ramen, prsti rahlo navzven', 'Boki gredo nazaj in dol, kolena sledijo prstom', 'Pete ostanejo na tleh, hrbet nevtralen']},
+  goblet: {n: 'Goblet počep', p: 'squat', m: 'Noge, zadnjica', eq: 'gym', avoid: ['koleno'], alt: 'hip_thrust', w: true, cues: ['Ročko drži ob prsnici, komolci navzdol', 'Spusti se med kolena, trup pokonci', 'Odrini se skozi celo stopalo']},
+  pocep_drog: {n: 'Počep z drogom', p: 'squat', m: 'Noge, zadnjica, trup', eq: 'gym', avoid: ['koleno', 'hrbet'], alt: 'nozna_presa', w: true, cues: ['Drog na zgornjem delu hrbta, lopatice skupaj', 'Vdihni in napni trebuh pred spustom', 'Spusti se vsaj do vzporednice, kolena ven']},
+  nozna_presa: {n: 'Nožna preša', p: 'squat', m: 'Noge, zadnjica', eq: 'gym', avoid: ['koleno'], alt: 'hip_thrust', w: true, cues: ['Stopala na sredini plošče v širini bokov', 'Križ ostane prislonjen na naslon', 'Kolen na vrhu ne zakleni']},
+  izpadni: {n: 'Izpadni koraki', p: 'lunge', m: 'Noge, zadnjica', eq: 'both', avoid: ['koleno'], alt: 'most', w: false, cues: ['Dolg korak naprej, trup pokonci', 'Zadnje koleno se skoraj dotakne tal', 'Odrini se s sprednjo peto']},
+  izpadni_rocke: {n: 'Izpadni koraki z ročkami', p: 'lunge', m: 'Noge, zadnjica', eq: 'gym', avoid: ['koleno'], alt: 'hip_thrust', w: true, cues: ['Ročki ob telesu, ramena sproščena', 'Sprednje koleno nad stopalom', 'Nadzorovan spust, eksploziven dvig']},
+  most: {n: 'Glutealni most', p: 'bridge', m: 'Zadnjica, zadnja loža', eq: 'both', avoid: [], w: false, cues: ['Stopala blizu zadnjice', 'Dvigni boke, da so kolena, boki in ramena v liniji', 'Na vrhu stisni zadnjico 1 sekundo']},
+  most_eno: {n: 'Enonožni glutealni most', p: 'bridge', m: 'Zadnjica, zadnja loža', eq: 'both', avoid: [], w: false, cues: ['Ena noga iztegnjena v zraku', 'Boki ostanejo poravnani', 'Počasen spust']},
+  hip_thrust: {n: 'Hip thrust z drogom', p: 'bridge', m: 'Zadnjica', eq: 'gym', avoid: [], w: true, cues: ['Lopatice na klopi, drog na bokih z blazinico', 'Brado drži rahlo navzdol', 'Na vrhu poln izteg bokov']},
+  rdl_eno: {n: 'Enonožni mrtvi dvig', p: 'hinge', m: 'Zadnja loža, zadnjica', eq: 'both', avoid: ['hrbet'], alt: 'most_eno', w: false, cues: ['Rahlo pokrčeno stojno koleno', 'Trup in zadnja noga se gibljeta kot ena linija', 'Boki ostanejo vzporedni s tlemi']},
+  rdl: {n: 'Romunski mrtvi dvig', p: 'hinge', m: 'Zadnja loža, zadnjica', eq: 'gym', avoid: ['hrbet'], alt: 'hip_thrust', w: true, cues: ['Drog drsi tik ob stegnih', 'Boki nazaj, hrbet raven, kolena rahlo pokrčena', 'Spusti se do občutka raztega zadnje lože']},
+  sklece: {n: 'Sklece', p: 'pushup', m: 'Prsi, tricepsi, ramena', eq: 'both', avoid: ['zapestje', 'rama'], alt: 'sklece_klop', w: false, cues: ['Dlani malo širše od ramen', 'Telo v ravni liniji od glave do pet', 'Prsi do tal, komolci pod kotom okoli 45°']},
+  sklece_klop: {n: 'Sklece z rokami na povišanem', p: 'pushup', m: 'Prsi, tricepsi', eq: 'both', avoid: [], w: false, cues: ['Roke na klopi, stolu ali robu mize', 'Telo v liniji, trebuh napet', 'Višja opora pomeni lažjo izvedbo']},
+  bench: {n: 'Potisk s prsi', p: 'bench', m: 'Prsi, tricepsi, ramena', eq: 'gym', avoid: ['rama'], alt: 'bench_rocke', w: true, cues: ['Lopatice skupaj in navzdol', 'Drog spusti na spodnji del prsnice', 'Stopala trdno na tleh']},
+  bench_rocke: {n: 'Potisk ročk z nevtralnim prijemom', p: 'bench', m: 'Prsi, tricepsi', eq: 'gym', avoid: [], w: true, cues: ['Dlani obrnjeni ena proti drugi', 'Komolci blizu telesa', 'Nadzorovan spust do prsi']},
+  pike: {n: 'Pike sklece', p: 'pushup', m: 'Ramena, tricepsi', eq: 'both', avoid: ['rama', 'zapestje'], alt: 'sklece_klop', w: false, cues: ['Boki visoko, telo v obliki črke V', 'Glavo spusti med dlani', 'Odrini se nazaj gor']},
+  ohp: {n: 'Potisk nad glavo', p: 'press', m: 'Ramena, tricepsi', eq: 'gym', avoid: ['rama', 'hrbet'], alt: 'landmine', w: true, cues: ['Napni zadnjico in trebuh', 'Drog potiskaj navpično, glava se umakne nazaj', 'Na vrhu drog nad sredino stopal']},
+  landmine: {n: 'Enoročni potisk landmine', p: 'press', m: 'Ramena, prsi', eq: 'gym', avoid: [], w: true, cues: ['Konec droga drži ob rami', 'Potisni naprej in gor', 'Trup ostane miren']},
+  zgibe: {n: 'Zgibe', p: 'pullup', m: 'Hrbet, bicepsi', eq: 'both', avoid: ['rama'], alt: 'veslanje_miza', w: false, cues: ['Začni iz polne vese', 'Lopatice najprej navzdol, nato vleci komolce k rebrom', 'Brada nad drog, nadzorovan spust']},
+  latpull: {n: 'Poteg na prsi', p: 'pullup', m: 'Hrbet, bicepsi', eq: 'gym', avoid: [], w: true, cues: ['Prijem malo širši od ramen', 'Drog vleci do zgornjega dela prsi', 'Ne zibaj se s trupom']},
+  veslanje_miza: {n: 'Inverzno veslanje pod mizo', p: 'row', m: 'Hrbet, bicepsi', eq: 'home', avoid: [], w: false, cues: ['Uleži se pod trdno mizo in primi rob', 'Telo v liniji, prsi vleci k robu', 'Na vrhu stisni lopatice']},
+  veslanje_kabel: {n: 'Veslanje na kablu sede', p: 'row', m: 'Hrbet, bicepsi', eq: 'gym', avoid: [], w: true, cues: ['Hrbet pokonci, prsi naprej', 'Ročaj vleci proti popku', 'Lopatice skupaj, nato počasi izteg']},
+  veslanje_drog: {n: 'Veslanje z drogom v predklonu', p: 'row', m: 'Hrbet, bicepsi', eq: 'gym', avoid: ['hrbet'], alt: 'veslanje_kabel', w: true, cues: ['Trup naklonjen okoli 45°', 'Drog vleci proti spodnjim rebrom', 'Hrbet raven ves čas']},
+  biceps: {n: 'Upogib za biceps z ročkami', p: 'curl', m: 'Bicepsi', eq: 'gym', avoid: [], w: true, cues: ['Komolci ob telesu', 'Brez zibanja trupa', 'Počasen spust v 2 sekundah']},
+  deska: {n: 'Deska na podlahteh', p: 'plank', m: 'Trup', eq: 'both', avoid: [], w: false, type: 'time', rx: {s: 3, r: '30–45 s', rest: 45}, cues: ['Komolci pod rameni', 'Stisni zadnjico in trebuh', 'Boki ne smejo pasti ali štrleti']},
+  trup: {n: 'Dviganje trupa', p: 'situp', m: 'Trebušne mišice', eq: 'both', avoid: ['hrbet'], alt: 'mrtvi_hrosc', w: false, rx: {s: 3, r: '15–20', rest: 45}, cues: ['Kolena pokrčena, stopala na tleh', 'Dvigni trup do pokončnega položaja', 'Nadzorovano nazaj do lopatic']},
+  mrtvi_hrosc: {n: 'Mrtvi hrošč', p: 'deadbug', m: 'Globoke trebušne mišice', eq: 'both', avoid: [], w: false, rx: {s: 3, r: '8–10 na stran', rest: 45}, cues: ['Križ pritisnjen v tla', 'Iztegni nasprotno roko in nogo', 'Počasi, z izdihom']},
+  intervali: {n: 'Tekaški intervali', p: 'run', m: 'Kondicija', eq: 'both', avoid: ['koleno'], alt: 'hitra_hoja', w: false, type: 'cardio', rx: {s: 6, r: '1 min hitro + 1 min hoje', rest: 0}, cues: ['5 minut lahkotnega ogrevanja', 'Hitri del pri 8/10 napora', 'Med intervali hodi, ne stoj']},
+  hitra_hoja: {n: 'Hitra hoja v klanec', p: 'run', m: 'Kondicija', eq: 'both', avoid: [], w: false, type: 'cardio', rx: {s: 4, r: '5 min hitro', rest: 60}, cues: ['Pokončna drža', 'Tempo, pri katerem težko govoriš v povedih', 'Roke aktivno nihajo']},
+  sprint: {n: 'Šprinti na 60 m', p: 'run', m: 'Hitrost', eq: 'both', avoid: ['koleno'], alt: 'hitra_hoja', w: false, type: 'cardio', rx: {s: 6, r: '60 m s polno hitrostjo', rest: 150}, cues: ['Temeljito ogrevanje in nekaj stopnjevanj', 'Nizek start, prvi koraki kratki in hitri', 'Polni odmor med ponovitvami']},
+  skok: {n: 'Skok v daljino z mesta', p: 'squat', m: 'Eksplozivna moč nog', eq: 'both', avoid: ['koleno'], alt: 'most', w: false, rx: {s: 4, r: '4 skoki', rest: 90}, cues: ['Zamah z rokami nazaj, nato močno naprej', 'Odriv z obema nogama hkrati', 'Pristani mehko, ne pade nazaj']},
+  ovire: {n: 'Tek nazaj in agilnost', p: 'run', m: 'Agilnost', eq: 'both', avoid: ['koleno'], alt: 'hitra_hoja', w: false, type: 'cardio', rx: {s: 6, r: '15 m tek nazaj + plazenje pod oviro', rest: 60}, cues: ['Težišče nizko, pogled čez ramo', 'Kratki hitri koraki', 'Vadi prehode čez in pod oviro']},
+  cooper: {n: 'Tempo tek za 2400 m', p: 'run', m: 'Vzdržljivost', eq: 'both', avoid: ['koleno'], alt: 'hitra_hoja', w: false, type: 'cardio', rx: {s: 3, r: '800 m v ciljnem tempu', rest: 120}, cues: ['Tempo izračunaj iz ciljnega časa', 'Prvih 200 m ne začni prehitro', 'Enakomerno dihanje']},
+  tek3200: {n: 'Tempo tek za 3200 m', p: 'run', m: 'Vzdržljivost', eq: 'both', avoid: ['koleno'], alt: 'hitra_hoja', w: false, type: 'cardio', rx: {s: 4, r: '1000 m v ciljnem tempu', rest: 120}, cues: ['Ogrevanje 10 minut', 'Ciljni tempo: čas ÷ 3,2 km', 'Zadnjo ponovitev pospeši']}
+};
+const ROLE = {
+  squat: {home: 'pocep', gym: 'pocep_drog'}, hinge: {home: 'rdl_eno', gym: 'rdl'}, lunge: {home: 'izpadni', gym: 'izpadni_rocke'},
+  bridge: {home: 'most', gym: 'hip_thrust'}, pushH: {home: 'sklece', gym: 'bench'}, pushV: {home: 'pike', gym: 'ohp'},
+  pullV: {home: 'zgibe', gym: 'latpull'}, pullH: {home: 'veslanje_miza', gym: 'veslanje_kabel'}, core: {home: 'deska', gym: 'deska'},
+  core2: {home: 'trup', gym: 'trup'}, arms: {home: 'sklece_klop', gym: 'biceps'}, cond: {home: 'intervali', gym: 'intervali'}, deadbug: {home: 'mrtvi_hrosc', gym: 'mrtvi_hrosc'}
+};
+const TPL = {
+  fullA: {n: 'Celo telo A', roles: ['squat', 'pushH', 'pullH', 'bridge', 'core']},
+  fullB: {n: 'Celo telo B', roles: ['hinge', 'pushV', 'pullV', 'lunge', 'core2']},
+  fullC: {n: 'Celo telo C', roles: ['lunge', 'pushH', 'pullV', 'bridge', 'deadbug']},
+  upper: {n: 'Zgornji del', roles: ['pushH', 'pullH', 'pushV', 'pullV', 'arms', 'core']},
+  lower: {n: 'Spodnji del', roles: ['squat', 'hinge', 'lunge', 'bridge', 'core2']},
+  cond: {n: 'Kondicija in trup', roles: ['cond', 'core', 'deadbug', 'core2']}
+};
+const SPLIT = {2: ['fullA', 'fullB'], 3: ['fullA', 'fullB', 'fullC'], 4: ['upper', 'lower', 'upper', 'lower'], 5: ['upper', 'lower', 'cond', 'upper', 'lower'], 6: ['upper', 'lower', 'cond', 'upper', 'lower', 'fullC']};
+const SCHED = {2: [1, 4], 3: [0, 2, 4], 4: [0, 1, 3, 4], 5: [0, 1, 2, 3, 4], 6: [0, 1, 2, 3, 4, 5]};
+const GOALRX = {hujsanje: {s: 3, r: '12–15', rest: 60}, misice: {s: 4, r: '8–12', rest: 90}, moc: {s: 4, r: '4–6', rest: 150}, kondicija: {s: 3, r: '12–15', rest: 45}, test: {s: 3, r: '8–12', rest: 75}};
+const TEST_RX = {sklece: {s: 4, r: '60 % maksimuma', rest: 60}, trup: {s: 4, r: '60 % maksimuma', rest: 60}, zgibe: {s: 5, r: '2 manj od maksimuma', rest: 120}};
+const GOALS = {hujsanje: 'Izguba maščobe', misice: 'Pridobivanje mišic', moc: 'Več moči', kondicija: 'Boljša kondicija', test: 'Priprava na fizični test'};
+const EXPS = {zacetnik: 'Začetnik', srednji: 'Srednje izkušen', izkusen: 'Izkušen'};
+const INJ = {koleno: 'Koleno', rama: 'Rama', hrbet: 'Spodnji del hrbta', zapestje: 'Zapestje'};
+
+/* ---------- foods (approximate shelf prices, October 2026) ---------- */
+const PR = {
+  ovseni: {n: 'Ovseni kosmiči', s: 'Lidl', pack: 500, price: 0.99, k: 372, p: 13, c: 59, f: 7},
+  skyr: {n: 'Skyr naravni', s: 'Lidl', pack: 450, price: 1.49, k: 63, p: 11, c: 4, f: 0.2},
+  piscanec: {n: 'Piščančji file', s: 'Lidl', pack: 1000, price: 8.99, k: 110, p: 23, c: 0, f: 1.5},
+  jajca: {n: 'Jajca M, 10 kosov', s: 'Lidl', pack: 600, price: 2.49, k: 143, p: 12.6, c: 0.7, f: 9.5, per: 60, unit: 'jajce'},
+  riz: {n: 'Riž basmati', s: 'Lidl', pack: 1000, price: 2.19, k: 352, p: 8, c: 78, f: 0.8},
+  banane: {n: 'Banane', s: 'Lidl', pack: 1000, price: 1.29, k: 89, p: 1.1, c: 23, f: 0.3},
+  tuna: {n: 'Tuna v lastnem soku', s: 'Lidl', pack: 120, price: 1.29, k: 116, p: 26, c: 0, f: 1},
+  toast: {n: 'Polnozrnati toast', s: 'Lidl', pack: 500, price: 1.19, k: 247, p: 9, c: 41, f: 4},
+  arasidi: {n: 'Arašidovo maslo', s: 'Lidl', pack: 350, price: 2.49, k: 600, p: 25, c: 14, f: 49},
+  zelenjava: {n: 'Zamrznjena zelenjavna mešanica', s: 'Lidl', pack: 750, price: 1.79, k: 40, p: 2, c: 6, f: 0.5},
+  olje: {n: 'Oljčno olje', s: 'Lidl', pack: 750, price: 7.99, k: 884, p: 0, c: 0, f: 100},
+  mleko: {n: 'Mleko 1,5 %', s: 'Mercator', pack: 1000, price: 1.15, k: 46, p: 3.4, c: 4.8, f: 1.5},
+  testenine: {n: 'Polnozrnate testenine', s: 'Mercator', pack: 500, price: 1.49, k: 350, p: 13, c: 64, f: 2.5},
+  puran: {n: 'Mleto puranje meso', s: 'Mercator', pack: 500, price: 4.99, k: 150, p: 20, c: 0, f: 8},
+  cicerika: {n: 'Čičerika v pločevinki', s: 'Mercator', pack: 240, price: 0.99, k: 120, p: 7, c: 17, f: 2.5},
+  jabolka: {n: 'Jabolka', s: 'Mercator', pack: 1000, price: 1.69, k: 52, p: 0.3, c: 14, f: 0.2},
+  zrnati: {n: 'Zrnati sir', s: 'Mercator', pack: 200, price: 1.49, k: 98, p: 11, c: 3, f: 4.5},
+  krompir: {n: 'Krompir', s: 'Mercator', pack: 2000, price: 1.99, k: 77, p: 2, c: 17, f: 0.1},
+  losos: {n: 'Losos file, zamrznjen', s: 'Spar', pack: 250, price: 5.49, k: 200, p: 20, c: 0, f: 13},
+  ajda: {n: 'Ajdova kaša', s: 'Spar', pack: 500, price: 1.89, k: 343, p: 13, c: 72, f: 3.4},
+  grski: {n: 'Grški jogurt', s: 'Spar', pack: 500, price: 1.99, k: 73, p: 9, c: 4, f: 2},
+  borovnice: {n: 'Borovnice, zamrznjene', s: 'Spar', pack: 300, price: 2.79, k: 57, p: 0.7, c: 14, f: 0.3},
+  tortilje: {n: 'Polnozrnate tortilje', s: 'Spar', pack: 370, price: 1.79, k: 300, p: 9, c: 48, f: 7},
+  paradiznik: {n: 'Paradižnik', s: 'Spar', pack: 1000, price: 2.49, k: 18, p: 0.9, c: 3.9, f: 0.2},
+  fizol: {n: 'Rdeči fižol v pločevinki', s: 'Spar', pack: 240, price: 0.89, k: 110, p: 7.5, c: 15, f: 0.5},
+  mandlji: {n: 'Mandlji', s: 'Spar', pack: 200, price: 3.29, k: 600, p: 21, c: 10, f: 50}
+};
+const MEALS = {
+  zajtrk: [{n: 'Ovsena kaša s skyrom in borovnicami', i: {ovseni: 70, mleko: 250, skyr: 150, borovnice: 80}}, {n: 'Omleta s toastom in paradižnikom', i: {jajca: 180, toast: 70, paradiznik: 120}}, {n: 'Grški jogurt z ovsenimi kosmiči in banano', i: {grski: 250, ovseni: 50, banane: 120, arasidi: 15}}],
+  kosilo: [{n: 'Piščanec z rižem in zelenjavo', i: {piscanec: 160, riz: 80, zelenjava: 200, olje: 8}}, {n: 'Polnozrnate testenine s puranjo bolonjsko', i: {puran: 140, testenine: 90, paradiznik: 150, olje: 6}}, {n: 'Losos s pečenim krompirjem in zelenjavo', i: {losos: 125, krompir: 300, zelenjava: 200, olje: 5}}, {n: 'Ajdova kaša s piščancem in zelenjavo', i: {ajda: 80, piscanec: 150, zelenjava: 200, olje: 8}}],
+  malica: [{n: 'Zrnati sir z jabolkom', i: {zrnati: 200, jabolka: 150}}, {n: 'Toast z arašidovim maslom in banano', i: {toast: 60, arasidi: 20, banane: 100}}, {n: 'Skyr z mandlji', i: {skyr: 200, mandlji: 20}}],
+  vecerja: [{n: 'Tortilje s tuno in fižolom', i: {tortilje: 125, tuna: 120, fizol: 120, paradiznik: 100}}, {n: 'Čičerikina skleda z jajci', i: {cicerika: 200, jajca: 120, zelenjava: 150, olje: 8}}, {n: 'Omleta z zrnatim sirom', i: {jajca: 180, zrnati: 100, toast: 50, paradiznik: 100}}]
+};
+const SLOTS = [['zajtrk', 'Zajtrk'], ['kosilo', 'Kosilo'], ['malica', 'Malica'], ['vecerja', 'Večerja']];
+const STORES = ['Lidl', 'Mercator', 'Spar'];
+
+/* ---------- tests ---------- */
+const TESTS = {
+  policija: {n: 'Policija', full: 'Preizkus telesnih zmogljivosti za kandidate za policiste', src: 'https://www.gov.si/zbirke/delovna-mesta/ministrstvo-za-notranje-zadeve-policija-objavlja-javno-objavo-za-sklenitev-delovnega-razmerja-s-kandidati-za-policiste-in-vpis-na-izobrazevanje-v-visjesolski-studijski-program-policist-7/', srcN: 'javna objava MNZ na gov.si',
+    ex: ['sprint', 'skok', 'zgibe', 'ovire', 'cooper'],
+    d: [{id: 't60', n: 'Tek na 60 m', u: 's', lower: true, m: 8.6, z: 9.8, dec: 1}, {id: 'skok', n: 'Skok v daljino z mesta', u: 'cm', m: 220, z: 175}, {id: 'ovire', n: 'Premagovanje ovir nazaj', u: 's', lower: true, m: 14, z: 17, dec: 1}, {id: 'zgibe', n: 'Zgibe', u: 'pon.', m: 8, z: 3}, {id: 'cooper', n: 'Tek na 2400 m', u: 'min', lower: true, time: true, m: 660, z: 780}]},
+  vojska: {n: 'Slovenska vojska', full: 'Test gibalnih sposobnosti: sklece, dviganje trupa in tek na 3200 m', src: 'https://postanivojak.si/', srcN: 'postanivojak.si',
+    ex: ['sklece', 'trup', 'tek3200'],
+    d: [{id: 'sklece', n: 'Sklece v 2 minutah', u: 'pon.', m: 45, z: 20}, {id: 'trup', n: 'Dviganje trupa v 2 minutah', u: 'pon.', m: 55, z: 50}, {id: 'tek', n: 'Tek na 3200 m', u: 'min', lower: true, time: true, m: 900, z: 1080}]}
+};
+
+/* ---------- state ---------- */
+const LS_KEY = 'aitrener:v1', LS_PHOTOS = 'aitrener:photos:v1';
+const lsGet = k => { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } };
+const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } };
+const freshState = () => ({v: 1, onboarded: false, profile: {goal: null, sex: null, age: 28, height: 175, weight: 75, exp: null, equip: null, days: 3, injuries: []},
+  startDate: null, logs: {}, weights: [], eaten: {}, shop: {}, chat: [], overrides: {}, test: {type: null, date: null, targets: {}, mocks: []}, sub: {plan: 'trial'}, example: false, updatedAt: 0});
+const migrate = s => Object.assign(freshState(), s || {});
+let S = migrate(lsGet(LS_KEY));
+let photos = lsGet(LS_PHOTOS) || [];
+
+/* ---------- cloud sync (Supabase) ---------- */
+const SB_URL = 'https://ztvyxybjvehmvctulztm.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp0dnl4eWJqdmVobXZjdHVsenRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMzMDQ1NTEsImV4cCI6MjEwODg4MDU1MX0.gyUWUuGb829fofx57EcXB4ddO3rcaf46-3jagv4Wrtw';
+const SB_H = {apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json'};
+const LS_CODE = 'aitrener:code';
+let syncCode = (() => { try { return localStorage.getItem(LS_CODE) || ''; } catch (e) { return ''; } })();
+let remoteTimer = null, writing = false, pendingWrite = false, syncState = 'local', showCodeForm = false;
+const normCode = v => String(v || '').toUpperCase().replace(/[^A-Z0-9]/g, '').replace(/(.{4})(?=.)/g, '$1-');
+function newCode() { const A = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789', b = crypto.getRandomValues(new Uint8Array(16)); return normCode(Array.from(b, x => A[x % 32]).join('')); }
+function setCode(c) { syncCode = c; try { c ? localStorage.setItem(LS_CODE, c) : localStorage.removeItem(LS_CODE); } catch (e) {} }
+async function rpc(fn, args) {
+  const r = await fetch(SB_URL + '/rest/v1/rpc/' + fn, {method: 'POST', headers: SB_H, body: JSON.stringify(args)});
+  if (!r.ok) throw new Error('rpc ' + r.status);
+  const t = await r.text(); return t ? JSON.parse(t) : null;
+}
+function save() { S.updatedAt = Date.now(); lsSet(LS_KEY, S); queueRemote(); }
+function queueRemote(delay = 1500) { if (!S.onboarded) return; clearTimeout(remoteTimer); remoteTimer = setTimeout(pushRemote, delay); }
+async function pushRemote() {
+  if (writing) { pendingWrite = true; return; }
+  if (!syncCode) setCode(newCode());
+  writing = true;
+  try {
+    const st = JSON.parse(JSON.stringify(S));
+    st.chat = st.chat.slice(-40);
+    await rpc('trener_save', {p_code: syncCode, p_state: st, p_updated_at: S.updatedAt});
+    syncState = 'cloud';
+  } catch (e) { syncState = 'error'; }
+  writing = false;
+  if (pendingWrite) { pendingWrite = false; queueRemote(800); }
+}
+async function initRemote() {
+  if (!syncCode) { if (S.onboarded) queueRemote(0); return; }
+  try {
+    const r = await rpc('trener_load', {p_code: syncCode});
+    if (r && r.state && (r.updated_at || 0) > (S.updatedAt || 0)) {
+      S = migrate(r.state); lsSet(LS_KEY, S);
+      if (S.onboarded && ob && !ob.edit) ob = null;
+      render();
+    } else if (S.onboarded && (!r || (S.updatedAt || 0) > (r.updated_at || 0))) queueRemote(0);
+    syncState = 'cloud';
+    if (route === 'profil') render();
+  } catch (e) { syncState = 'error'; }
+}
+async function restoreFromCode(raw) {
+  const code = normCode(raw);
+  if (code.replace(/-/g, '').length !== 16) { toast('Koda ima 16 znakov, npr. ABCD-EFGH-JKLM-NPQR'); return; }
+  try {
+    const r = await rpc('trener_load', {p_code: code});
+    if (!r || !r.state) { toast('Te kode ni v bazi. Preveri, ali je pravilno prepisana.'); return; }
+    setCode(code); S = migrate(r.state); lsSet(LS_KEY, S); syncState = 'cloud';
+    ob = S.onboarded ? null : {step: 0, data: {...S.profile}}; showCodeForm = false;
+    go('domov'); toast('Podatki so preneseni');
+  } catch (e) { toast('Povezava z bazo ni uspela. Poskusi znova.'); }
+}
+
+/* ---------- AI coach (Supabase Edge Function) ---------- */
+const FN_URL = SB_URL + '/functions/v1/trener';
+let sampleState = 'ready', chatCtl = null, chatBusy = false, chatNote = '';
+async function callCoach(context, messages, signal) {
+  const r = await fetch(FN_URL, {method: 'POST', headers: SB_H, body: JSON.stringify({context, messages}), signal});
+  let data = null; try { data = await r.json(); } catch (e) {}
+  if (!r.ok) { const err = new Error('coach'); err.code = (data && data.error) || 'upstream_error'; throw err; }
+  return data;
+}
+
+/* ---------- derived ---------- */
+function targets(p = S.profile, w = latestWeight()) {
+  const bmr = 10 * w + 6.25 * p.height - 5 * p.age + (p.sex === 'z' ? -161 : 5);
+  const tdee = bmr * (1.2 + 0.075 * p.days);
+  const adj = {hujsanje: -0.2, misice: 0.1, moc: 0.05}[p.goal] || 0;
+  const kcal = Math.round(tdee * (1 + adj) / 10) * 10;
+  const prot = Math.round(w * (p.goal === 'hujsanje' ? 2.0 : 1.8));
+  const fat = Math.round(kcal * 0.27 / 9);
+  const carb = Math.max(0, Math.round((kcal - prot * 4 - fat * 9) / 4));
+  return {kcal, prot, fat, carb, tdee: Math.round(tdee)};
+}
+function latestWeight() { const ws = sortedWeights(); return ws.length ? ws[ws.length - 1].kg : S.profile.weight; }
+function sortedWeights() { return [...S.weights].sort((a, b) => a.d < b.d ? -1 : 1); }
+function resolveEx(id, inj) { let guard = 0; while (EX[id].avoid.some(a => inj.includes(a)) && EX[id].alt && guard++ < 4) id = EX[id].alt; return id; }
+function rxFor(id, goal, exp, testDay) {
+  const e = EX[id];
+  if (testDay && TEST_RX[id]) return {...TEST_RX[id]};
+  if (e.rx) return {...e.rx};
+  const g = GOALRX[goal] || GOALRX.kondicija;
+  let s = Math.max(2, g.s - (exp === 'zacetnik' ? 1 : 0));
+  let r = g.r;
+  if (!e.w && (goal === 'moc' || goal === 'misice')) r = '8–15';
+  return {s, r, rest: g.rest};
+}
+function plan() {
+  const p = S.profile, eq = p.equip || 'home', inj = p.injuries || [];
+  const days = clamp(p.days || 3, 2, 6);
+  const sched = SCHED[days], split = SPLIT[days];
+  const out = Array(7).fill(null);
+  const testType = S.test.type;
+  sched.forEach((wd, i) => {
+    let tpl = TPL[split[i]], roles = [...tpl.roles], name = tpl.n, testDay = false, ids;
+    if (testType && i === sched.length - 1) {
+      testDay = true; name = 'Priprava na test: ' + TESTS[testType].n;
+      ids = [...TESTS[testType].ex];
+    } else {
+      if ((p.goal === 'hujsanje' || p.goal === 'kondicija' || p.goal === 'test') && split[i].startsWith('full') && !roles.includes('cond')) roles.push('cond');
+      ids = roles.map(r => { let id = ROLE[r][eq]; if (r === 'squat' && eq === 'gym' && p.exp === 'zacetnik') id = 'goblet'; if (r === 'pushH' && eq === 'home' && p.exp === 'zacetnik') id = 'sklece_klop'; return id; });
+    }
+    const items = ids.map((id, k) => {
+      const ov = S.overrides[wd + ':' + k];
+      const rid = ov && EX[ov] ? ov : resolveEx(id, inj);
+      return {id: rid, rx: rxFor(rid, p.goal, p.exp, testDay)};
+    });
+    const mins = Math.round(items.reduce((a, it) => a + it.rx.s * ((EX[it.id].type === 'cardio' ? 75 : 40) + it.rx.rest), 0) / 60) + 8;
+    out[wd] = {wd, name, items, mins, testDay};
+  });
+  return out;
+}
+function sessionDone(k) { const s = S.logs[k]; if (!s) return false; if (s.done) return true; return Object.values(s.items || {}).some(it => it.sets.some(x => x.d)); }
+function weekStats() {
+  const P = plan(); let planned = 0, done = 0;
+  for (let wd = 0; wd < 7; wd++) { const k = dkey(dateOfWd(wd)); if (P[wd]) planned++; if (sessionDone(k)) done++; }
+  return {planned, done};
+}
+function prevSet(id, beforeKey) {
+  const keys = Object.keys(S.logs).filter(k => k < beforeKey).sort().reverse();
+  for (const k of keys) { for (const it of Object.values(S.logs[k].items || {})) { if (it.id === id) { const d = it.sets.filter(x => x.d && (x.w || x.r)); if (d.length) return d[d.length - 1]; } } }
+  return null;
+}
+function streak() {
+  let n = 0, d = new Date();
+  const P = plan();
+  for (let i = 0; i < 60; i++) {
+    const k = dkey(d), wd = dow(d);
+    if (sessionDone(k)) n++;
+    else if (P[wd] && k !== dkey()) break;
+    d = addDays(d, -1);
+  }
+  return n;
+}
+
+/* ---------- nutrition ---------- */
+function mealCalc(i) { let k = 0, p = 0, c = 0, f = 0, cost = 0; for (const [id, g] of Object.entries(i)) { const x = PR[id]; k += x.k * g / 100; p += x.p * g / 100; c += x.c * g / 100; f += x.f * g / 100; cost += x.price * g / x.pack; } return {k, p, c, f, cost}; }
+function dayMenu(wd) {
+  const picks = [MEALS.zajtrk[wd % 3], MEALS.kosilo[wd % 4], MEALS.malica[(wd + 1) % 3], MEALS.vecerja[(wd + 2) % 3]];
+  const base = picks.reduce((a, m) => a + mealCalc(m.i).k, 0);
+  const factor = clamp(targets().kcal / base, 0.7, 1.8);
+  const meals = picks.map((m, idx) => {
+    const i = {};
+    for (const [id, g] of Object.entries(m.i)) { const x = PR[id]; i[id] = x.per ? Math.max(1, Math.round(g * factor / x.per)) * x.per : (id === 'olje' ? Math.max(5, Math.round(g * Math.min(factor, 1.2))) : Math.max(10, Math.round(g * factor / 5) * 5)); }
+    return {slot: SLOTS[idx][0], label: SLOTS[idx][1], n: m.n, i, ...mealCalc(i)};
+  });
+  const tot = meals.reduce((a, m) => ({k: a.k + m.k, p: a.p + m.p, c: a.c + m.c, f: a.f + m.f, cost: a.cost + m.cost}), {k: 0, p: 0, c: 0, f: 0, cost: 0});
+  return {meals, tot};
+}
+function gramsLabel(id, g) { const x = PR[id]; if (x.per) { const n = Math.round(g / x.per); return n + ' ' + plural(n, 'jajce', 'jajci', 'jajca', 'jajc'); } if (id === 'olje') return g + ' ml'; return g + ' g'; }
+function shoppingList() {
+  const tot = {};
+  for (let wd = 0; wd < 7; wd++) for (const m of dayMenu(wd).meals) for (const [id, g] of Object.entries(m.i)) tot[id] = (tot[id] || 0) + g;
+  const list = Object.entries(tot).map(([id, g]) => { const x = PR[id]; const packs = Math.ceil(g / x.pack - 0.05) || 1; return {id, g, packs, cost: packs * x.price, store: x.s}; });
+  return list;
+}
+
+/* ---------- stick-figure demos ---------- */
+const STAND = {H: [102, 18], S: [100, 32], P: [100, 70], K: [100, 97], A: [100, 125]};
+const POSE = {
+  squat: [{H: [100, 18], S: [100, 32], E: [114, 40], W: [132, 38], P: [100, 70], K: [100, 97], A: [100, 125]}, {H: [112, 52], S: [106, 64], E: [122, 66], W: [140, 62], P: [84, 98], K: [112, 101], A: [100, 125]}],
+  pushup: [{W: [60, 125], E: [60, 108], S: [60, 91], H: [49, 83], P: [97, 101], K: [123, 109], A: [150, 117], T: [153, 126]}, {W: [60, 125], E: [76, 115], S: [62, 112], H: [49, 108], P: [100, 116], K: [127, 119], A: [153, 122], T: [156, 126]}],
+  plank: [{E: [62, 125], W: [80, 125], S: [62, 108], H: [50, 102], P: [100, 111], K: [127, 115], A: [154, 120], T: [156, 126]}, {E: [62, 125], W: [80, 125], S: [62, 107], H: [50, 101], P: [100, 107], K: [127, 113], A: [154, 120], T: [156, 126]}],
+  bridge: [{H: [34, 117], S: [48, 120], E: [62, 124], W: [78, 124], P: [86, 120], K: [107, 102], A: [118, 121], T: [129, 125]}, {H: [34, 114], S: [48, 116], E: [62, 124], W: [78, 124], P: [86, 100], K: [110, 96], A: [118, 121], T: [129, 125]}],
+  situp: [{H: [34, 117], S: [48, 120], E: [58, 114], W: [66, 116], P: [86, 120], K: [106, 100], A: [122, 121], T: [132, 125]}, {H: [58, 77], S: [64, 89], E: [74, 98], W: [80, 96], P: [86, 120], K: [106, 100], A: [122, 121], T: [132, 125]}],
+  deadbug: [{H: [34, 117], S: [48, 120], E: [50, 104], W: [52, 88], P: [86, 120], K: [86, 94], A: [112, 94], T: [114, 86]}, {H: [34, 117], S: [48, 120], E: [36, 112], W: [22, 106], P: [86, 120], K: [112, 116], A: [138, 114], T: [141, 106]}],
+  hinge: [{...STAND, E: [100, 50], W: [100, 68]}, {H: [130, 48], S: [118, 54], E: [118, 71], W: [118, 89], P: [84, 72], K: [96, 98], A: [100, 125]}],
+  lunge: [{...STAND, E: [100, 50], W: [100, 68], K2: [100, 97], A2: [100, 125]}, {H: [99, 40], S: [98, 54], E: [99, 72], W: [99, 90], P: [98, 92], K: [122, 96], A: [124, 125], K2: [90, 118], A2: [64, 122], T2: [56, 126]}],
+  pullup: [{W: [100, 6], E: [100, 22], S: [100, 38], H: [106, 28], P: [100, 76], K: [102, 103], A: [98, 128], T: [102, 136]}, {W: [100, 6], E: [90, 20], S: [100, 30], H: [106, 17], P: [100, 68], K: [102, 95], A: [98, 120], T: [102, 128]}],
+  row: [{H: [130, 48], S: [118, 54], E: [118, 71], W: [118, 89], P: [84, 72], K: [96, 98], A: [100, 125]}, {H: [130, 48], S: [118, 54], E: [100, 60], W: [110, 76], P: [84, 72], K: [96, 98], A: [100, 125]}],
+  press: [{...STAND, E: [112, 42], W: [110, 26]}, {...STAND, E: [102, 16], W: [102, -2]}],
+  curl: [{...STAND, E: [100, 50], W: [100, 68]}, {...STAND, E: [100, 50], W: [114, 38]}],
+  bench: [{H: [48, 90], S: [62, 94], E: [62, 77], W: [62, 60], P: [100, 94], K: [126, 96], A: [132, 124], T: [143, 125]}, {H: [48, 90], S: [62, 94], E: [50, 100], W: [60, 84], P: [100, 94], K: [126, 96], A: [132, 124], T: [143, 125]}],
+  run: [{H: [106, 20], S: [104, 32], E: [92, 48], W: [100, 60], P: [100, 70], K: [118, 86], A: [110, 110], T: [120, 108], K2: [94, 96], A2: [80, 114], T2: [86, 121]}, {H: [106, 20], S: [104, 32], E: [114, 46], W: [124, 36], P: [100, 70], K: [94, 96], A: [80, 114], T: [86, 121], K2: [118, 86], A2: [110, 110], T2: [120, 108]}]
+};
+const SPEED = {run: 700, pullup: 2600, plank: 3200};
+const SEGS = [['S', 'P'], ['P', 'K2'], ['K2', 'A2'], ['A2', 'T2'], ['S', 'E'], ['E', 'W'], ['P', 'K'], ['K', 'A'], ['A', 'T'], ['S', 'H']];
+function figSVG(pat, cls = '') {
+  let props = '<line class="ground" x1="16" y1="128" x2="184" y2="128"/>';
+  if (pat === 'pullup') props = '<line class="prop" x1="62" y1="6" x2="138" y2="6"/>';
+  if (pat === 'bench') props += '<path class="prop" d="M40 99h76M50 99v28M106 99v28"/>';
+  const lines = SEGS.map((s, i) => `<line data-s="${i}"${s[0].endsWith('2') || s[1].endsWith('2') ? ' class="back"' : ''}/>`).join('');
+  return `<svg class="fig ${cls}" data-pat="${pat}" viewBox="0 -22 200 156" aria-hidden="true">${props}${lines}<circle class="head" r="9"/></svg>`;
+}
+function poseAt(pat, t) {
+  const [a, b] = POSE[pat], o = {};
+  for (const k of new Set([...Object.keys(a), ...Object.keys(b)])) { const pa = a[k] || b[k], pb = b[k] || a[k]; o[k] = [pa[0] + (pb[0] - pa[0]) * t, pa[1] + (pb[1] - pa[1]) * t]; }
+  if (!o.T && o.A) o.T = [o.A[0] + 11, o.A[1] + 1];
+  if (o.A2 && !o.T2) o.T2 = [o.A2[0] + 11, o.A2[1] + 1];
+  return o;
+}
+function drawFig(svg, t) {
+  const p = poseAt(svg.dataset.pat, t);
+  svg.querySelectorAll('line[data-s]').forEach(l => {
+    const [x, y] = SEGS[l.dataset.s], a = p[x], b = p[y];
+    if (!a || !b) { l.setAttribute('visibility', 'hidden'); return; }
+    l.removeAttribute('visibility');
+    l.setAttribute('x1', a[0]); l.setAttribute('y1', a[1]); l.setAttribute('x2', b[0]); l.setAttribute('y2', b[1]);
+  });
+  const h = svg.querySelector('.head'); h.setAttribute('cx', p.H[0]); h.setAttribute('cy', p.H[1]);
+}
+function animLoop(now) {
+  document.querySelectorAll('svg.fig').forEach(svg => {
+    if (REDUCED) { if (!svg.dataset.drawn) { drawFig(svg, svg.classList.contains('still') ? 0 : 0.5); svg.dataset.drawn = 1; } return; }
+    const per = SPEED[svg.dataset.pat] || 2200;
+    const t = (1 - Math.cos((now % per) / per * Math.PI * 2)) / 2;
+    drawFig(svg, t);
+  });
+  requestAnimationFrame(animLoop);
+}
+
+/* ---------- charts ---------- */
+let chartN = 0;
+function lineChart(pts, o = {}) {
+  if (pts.length < 2) return `<div class="chart-empty">${esc(o.empty || 'Za graf potrebujemo vsaj dva vnosa.')}</div>`;
+  const id = 'g' + (++chartN), W = 340, H = o.h || 180, pl = 38, pr = 22, pt = 16, pb = 28, dec = o.dec ?? 1;
+  const xs = pts.map(p => parseD(p.d).getTime()), ys = pts.map(p => p.y);
+  let y0 = Math.min(...ys), y1 = Math.max(...ys); const padY = (y1 - y0) * 0.2 || Math.max(1, y1 * 0.02); y0 -= padY; y1 += padY;
+  const x0 = Math.min(...xs), x1 = Math.max(...xs);
+  const X = t => pl + (t - x0) / (x1 - x0 || 1) * (W - pl - pr), Y = v => pt + (1 - (v - y0) / (y1 - y0)) * (H - pt - pb);
+  const line = pts.map((p, i) => (i ? 'L' : 'M') + X(xs[i]).toFixed(1) + ' ' + Y(p.y).toFixed(1)).join(' ');
+  const area = line + ` L${X(xs[xs.length - 1]).toFixed(1)} ${H - pb} L${X(xs[0]).toFixed(1)} ${H - pb} Z`;
+  const ticks = [0, 0.5, 1].map(f => y0 + (y1 - y0) * (0.1 + f * 0.8));
+  const last = pts[pts.length - 1];
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(o.label || 'Graf')}">
+    <defs><linearGradient id="${id}" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="var(--accent)" stop-opacity=".28"/><stop offset="1" stop-color="var(--accent)" stop-opacity="0"/></linearGradient></defs>
+    ${ticks.map(v => `<line class="grid" x1="${pl}" x2="${W - pr}" y1="${Y(v).toFixed(1)}" y2="${Y(v).toFixed(1)}"/><text x="${pl - 6}" y="${(Y(v) + 4).toFixed(1)}" text-anchor="end">${fmtN(v, dec)}</text>`).join('')}
+    <path d="${area}" fill="url(#${id})"/>
+    <path class="ln" d="${line}"/>
+    ${pts.slice(0, -1).map((p, i) => `<circle class="pt" cx="${X(xs[i]).toFixed(1)}" cy="${Y(p.y).toFixed(1)}" r="2.5"/>`).join('')}
+    <circle class="pt-end" cx="${X(xs[xs.length - 1]).toFixed(1)}" cy="${Y(last.y).toFixed(1)}" r="5"/>
+    <text class="endlbl" x="${Math.min(X(xs[xs.length - 1]), W - pr).toFixed(1)}" y="${(Y(last.y) - 11).toFixed(1)}" text-anchor="end">${fmtN(last.y, dec)}${o.unit ? ' ' + o.unit : ''}</text>
+    <text x="${pl}" y="${H - 8}">${shortDate(pts[0].d)}</text><text x="${W - pr}" y="${H - 8}" text-anchor="end">${shortDate(last.d)}</text>
+  </svg>`;
+}
+function ring(frac, label, size = 76) {
+  const r = 32, c = 2 * Math.PI * r, f = clamp(frac, 0, 1);
+  return `<div class="ring" style="width:${size}px;height:${size}px"><svg viewBox="0 0 76 76"><circle cx="38" cy="38" r="${r}" fill="none" stroke="var(--surface-2)" stroke-width="8"/><circle cx="38" cy="38" r="${r}" fill="none" stroke="var(--accent)" stroke-width="8" stroke-linecap="round" stroke-dasharray="${(c * f).toFixed(1)} ${c.toFixed(1)}"/></svg><div class="lbl num">${label}</div></div>`;
+}
+
+/* ---------- UI state ---------- */
+const ROUTES = ['domov', 'trening', 'prehrana', 'trener', 'napredek', 'testi', 'profil'];
+let route = ROUTES.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'domov';
+let ob = S.onboarded ? null : {step: 0, data: {...S.profile}};
+let selDay = dow(), nutTab = 'dan', nutDay = dow(), strengthEx = null, cmpSel = [], confirmReset = false, confirmPlan = null;
+let rest = null, restTimer = null, audioCtx = null, toastTimer = null;
+const NAV = [['domov', 'Domov', 'home'], ['trening', 'Trening', 'dumbbell'], ['prehrana', 'Prehrana', 'bowl'], ['trener', 'AI trener', 'chat'], ['napredek', 'Napredek', 'chart'], ['testi', 'Testi', 'target'], ['profil', 'Profil', 'user']];
+
+function toast(msg) { let t = $('#toast'); if (!t) { t = document.createElement('div'); t.id = 'toast'; t.className = 'toast'; t.setAttribute('role', 'status'); document.body.appendChild(t); } t.textContent = msg; t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true; }, 2600); }
+function go(r) { route = r; try { history.replaceState(null, '', '#' + r); } catch (e) {} render(); window.scrollTo(0, 0); }
+
+/* ---------- render ---------- */
+function render() {
+  chartN = 0;
+  const app = $('#app');
+  if (ob) { app.innerHTML = vOnboarding(); return; }
+  const initials = S.profile.sex === 'z' ? 'Ž' : S.profile.sex === 'm' ? 'M' : 'T';
+  const navBtn = ([r, l, i]) => `<button class="tab" data-a="nav" data-r="${r}" ${route === r ? 'aria-current="page"' : ''}>${ic(i)}<span>${l}</span></button>`;
+  const views = {domov: vHome, trening: vTrening, prehrana: vPrehrana, trener: vTrener, napredek: vNapredek, testi: vTesti, profil: vProfil};
+  app.innerHTML = `
+    <aside class="side"><div class="logo"><span class="logo-mark">AI</span>osebni trener</div><nav>${NAV.map(navBtn).join('')}</nav>
+      <div class="side-foot"><span>${syncState === 'cloud' ? 'Podatki so shranjeni v oblaku.' : 'Podatki so shranjeni na tej napravi.'}</span></div></aside>
+    <header class="top"><div class="logo"><span class="logo-mark">AI</span>osebni trener</div><button class="avatar" data-a="nav" data-r="profil" aria-label="Profil">${initials}</button></header>
+    <main class="view" id="view">${S.example ? `<div class="banner"><span>Ogleduješ primer z izmišljenimi podatki.</span><button class="btn small primary" data-a="ex-leave">Ustvari svoj načrt</button></div>` : ''}${views[route]()}</main>
+    <nav class="tabbar" aria-label="Glavni meni">${NAV.slice(0, 6).map(navBtn).join('')}</nav>
+    <div id="rest" class="rest" hidden></div>`;
+  renderRest();
+  if (route === 'trener') { const log = $('#chatlog'); if (log) log.lastElementChild?.scrollIntoView({block: 'end'}); }
+}
+
+/* --- onboarding --- */
+const Q = [
+  {k: 'goal', t: 'Kaj je tvoj glavni cilj?', type: 'choice', o: [['hujsanje', 'Izguba maščobe', 'Manj kilogramov in več energije'], ['misice', 'Pridobivanje mišic', 'Večja mišična masa'], ['moc', 'Več moči', 'Težje uteži pri osnovnih vajah'], ['kondicija', 'Boljša kondicija', 'Vzdržljivost in splošno zdravje'], ['test', 'Priprava na fizični test', 'Policija ali Slovenska vojska']]},
+  {k: 'sex', t: 'Spol', sub: 'Potrebujemo ga za izračun dnevne porabe energije.', type: 'choice', o: [['m', 'Moški'], ['z', 'Ženska']]},
+  {k: 'age', t: 'Koliko let imaš?', type: 'num', u: 'let', min: 15, max: 80, step: 1},
+  {k: 'height', t: 'Tvoja višina', type: 'num', u: 'cm', min: 140, max: 215, step: 1},
+  {k: 'weight', t: 'Tvoja trenutna teža', type: 'num', u: 'kg', min: 40, max: 200, step: 0.5},
+  {k: 'exp', t: 'Koliko izkušenj imaš s treningom?', type: 'choice', o: [['zacetnik', 'Začetnik', 'Manj kot 6 mesecev'], ['srednji', 'Srednje izkušen', '6 mesecev do 2 leti'], ['izkusen', 'Izkušen', 'Več kot 2 leti rednega treninga']]},
+  {k: 'equip', t: 'Kje želiš trenirati?', type: 'choice', o: [['home', 'Doma', 'Lastna teža, po želji drog za zgibe'], ['gym', 'V fitnesu', 'Drogovi, ročke in naprave']]},
+  {k: 'days', t: 'Koliko dni na teden lahko treniraš?', sub: 'Priporočamo 3 do 4 dni s počitkom vmes.', type: 'days'},
+  {k: 'injuries', t: 'Imaš kakšno poškodbo ali bolečino?', sub: 'Vaje, ki ta del obremenjujejo, bomo zamenjali z varnejšimi.', type: 'multi', o: Object.entries(INJ)}
+];
+function vOnboarding() {
+  const st = ob.step, d = ob.data;
+  if (st === 0) {
+    return `<div class="ob"><div class="logo"><span class="logo-mark">AI</span>osebni trener</div>
+      <div class="welcome"><div class="fig-hero">${figSVG('squat')}</div>
+        <h1>Trening, prehrana in priprava na test. Na enem mestu.</h1>
+        <p class="muted" style="font-size:17px">Odgovori na 9 kratkih vprašanj. Pripravimo ti tedenski načrt vadbe, jedilnik iz izdelkov iz Lidla, Mercatorja in Spara ter odštevanje do fizičnega testa.</p></div>
+      <div class="ob-foot"><button class="btn primary block" data-a="ob-next">Začni</button><button class="btn ghost block" data-a="ob-example">Najprej poglej primer</button>
+      ${showCodeForm ? `<form id="codeform" class="row"><input class="field" id="code-in" placeholder="ABCD-EFGH-JKLM-NPQR" autocomplete="off" aria-label="Koda z druge naprave"><button class="btn" type="submit">Prenesi</button></form>` : `<button class="btn ghost block small" data-a="ob-code">Imam že kodo z druge naprave</button>`}
+      <p class="small muted" style="text-align:center">7 dni brezplačno, nato 9,99 € na mesec ali 79,99 € na leto.</p></div></div>`;
+  }
+  if (st > Q.length) {
+    const t = targets(d, Number(d.weight)), P = SCHED[d.days];
+    return `<div class="ob"><div class="ob-top"><button class="iconbtn" data-a="ob-back" aria-label="Nazaj">${ic('left')}</button><div class="bar grow"><i style="width:100%"></i></div></div>
+      <div class="ob-q"><span class="eyebrow">Tvoj načrt je pripravljen</span><h1>${esc(GOALS[d.goal])}</h1></div>
+      <div class="card"><div class="row between"><div><div class="eyebrow">Dnevni cilj</div><div class="num" style="font-size:40px">${fmtN(t.kcal)} <span class="small muted">kcal</span></div></div>${ring(1, d.days + '×')}</div>
+        <div class="grid3"><div class="stat"><span class="num">${t.prot} g</span><span class="small muted">beljakovin</span></div><div class="stat"><span class="num">${t.carb} g</span><span class="small muted">ogljikovih hidratov</span></div><div class="stat"><span class="num">${t.fat} g</span><span class="small muted">maščob</span></div></div></div>
+      <div class="card"><div class="eyebrow">Tedenski razpored</div><div class="week">${DAYS.map((n, i) => `<div class="d">${n}<span class="dot ${P.includes(i) ? 'plan' : ''}">${P.includes(i) ? ic('dumbbell') : ''}</span></div>`).join('')}</div>
+        <p class="small muted">${d.equip === 'gym' ? 'Vadba v fitnesu' : 'Vadba doma'}${(d.injuries || []).length ? ', prilagojeno za: ' + d.injuries.map(x => INJ[x].toLowerCase()).join(', ') : ''}.</p></div>
+      <div class="ob-foot"><button class="btn primary block" data-a="ob-finish">${ob.edit ? 'Shrani spremembe' : 'Začni 7-dnevni brezplačni preizkus'}</button></div></div>`;
+  }
+  const q = Q[st - 1], pct = Math.round(st / (Q.length + 1) * 100);
+  let body = '', canNext = true;
+  if (q.type === 'choice') {
+    body = `<div class="opts">${q.o.map(([v, l, s]) => `<button class="opt" data-a="ob-pick" data-v="${v}" aria-pressed="${d[q.k] === v}"><div class="grow"><b>${l}</b>${s ? `<span>${s}</span>` : ''}</div><span class="tick">${ic('check')}</span></button>`).join('')}</div>`;
+    canNext = !!d[q.k];
+  } else if (q.type === 'num') {
+    body = `<div class="bignum"><button class="iconbtn" data-a="ob-num" data-dir="-1" aria-label="Manj">${ic('minus')}</button><span class="num" id="obnum">${fmtN(d[q.k], q.step < 1 ? 1 : 0)}</span><span class="u">${q.u}</span><button class="iconbtn" data-a="ob-num" data-dir="1" aria-label="Več">${ic('plus')}</button></div>
+      <input type="range" id="ob-range" data-in="ob-range" min="${q.min}" max="${q.max}" step="${q.step}" value="${d[q.k]}" aria-label="${esc(q.t)}">`;
+  } else if (q.type === 'days') {
+    body = `<div class="daygrid">${[2, 3, 4, 5, 6].map(n => `<button data-a="ob-days" data-v="${n}" aria-pressed="${d.days === n}">${n}</button>`).join('')}</div>
+      <p class="muted small">${d.days} ${plural(d.days, 'dan', 'dneva', 'dnevi', 'dni')}: ${SCHED[d.days].map(i => DAYS[i]).join(', ')}</p>`;
+  } else if (q.type === 'multi') {
+    const inj = d.injuries || [];
+    body = `<div class="opts">${q.o.map(([v, l]) => `<button class="opt" data-a="ob-toggle" data-v="${v}" aria-pressed="${inj.includes(v)}"><div class="grow"><b>${l}</b></div><span class="tick">${ic('check')}</span></button>`).join('')}
+      <button class="opt" data-a="ob-noinj" aria-pressed="${!inj.length}"><div class="grow"><b>Nimam poškodb</b></div><span class="tick">${ic('check')}</span></button></div>`;
+  }
+  return `<div class="ob"><div class="ob-top"><button class="iconbtn" data-a="ob-back" aria-label="Nazaj">${ic('left')}</button><div class="bar grow"><i style="width:${pct}%"></i></div><span class="small muted num" style="font-size:13px">${st}/${Q.length}</span></div>
+    <div class="ob-q"><h1>${q.t}</h1>${q.sub ? `<p class="muted">${q.sub}</p>` : ''}</div>${body}
+    <div class="ob-foot"><button class="btn primary block" data-a="ob-next" ${canNext ? '' : 'disabled'}>Naprej</button></div></div>`;
+}
+
+/* --- home --- */
+function vHome() {
+  const h = new Date().getHours(), greet = h < 10 ? 'Dobro jutro' : h < 18 ? 'Dober dan' : 'Dober večer';
+  const P = plan(), today = dow(), tk = dkey();
+  const todaysWd = S.logs[tk]?.wd ?? today, w = P[todaysWd];
+  const ws = weekStats(), t = targets(), menu = dayMenu(today);
+  const eaten = S.eaten[tk] || {}, kEaten = menu.meals.filter(m => eaten[m.slot]).reduce((a, m) => a + m.k, 0), pEaten = menu.meals.filter(m => eaten[m.slot]).reduce((a, m) => a + m.p, 0);
+  const wsort = sortedWeights(), wDelta = wsort.length > 1 ? wsort[wsort.length - 1].kg - wsort[0].kg : 0;
+  let next = null; for (let i = 1; i <= 7; i++) { const wd = (today + i) % 7; if (P[wd]) { next = {wd, ...P[wd]}; break; } }
+  const done = sessionDone(tk);
+  const workoutCard = w ? `
+    <div class="card hero">
+      <div class="row between"><span class="eyebrow">Današnji trening</span>${done ? `<span class="pill" style="background:var(--ink);color:var(--accent)">${ic('check')} Opravljeno</span>` : `<span class="small muted">~${w.mins} min</span>`}</div>
+      <div class="stack-s"><h2 style="font-size:28px">${esc(w.name)}</h2><p class="muted">${w.items.length} ${plural(w.items.length, 'vaja', 'vaji', 'vaje', 'vaj')}: ${w.items.slice(0, 3).map(i => esc(EX[i.id].n)).join(', ')}${w.items.length > 3 ? ' …' : ''}</p></div>
+      <button class="btn dark block" data-a="nav" data-r="trening">${done ? 'Poglej trening' : 'Začni trening'} ${ic('right')}</button>
+    </div>` : `
+    <div class="card outline">
+      <span class="eyebrow">Danes</span><h2>Dan počitka</h2>
+      <p class="muted">Lahkotna hoja ali raztezanje pospešita regeneracijo.${next ? ` Naslednji trening: <b style="color:var(--fg)">${esc(next.name)}</b> v ${DAYS_IN[next.wd]}.` : ''}</p>
+      <button class="btn small" data-a="nav" data-r="trening" style="align-self:flex-start">Vseeno treniraj danes</button>
+    </div>`;
+  const tst = S.test.type ? TESTS[S.test.type] : null;
+  const testCard = tst ? (S.test.date ? (() => { const left = daysBetween(tk, S.test.date); return `<button class="card tight" data-a="nav" data-r="testi" style="text-align:left"><div class="row between"><div class="stack-s"><span class="eyebrow">Test ${esc(tst.n)}</span><span class="small muted">${longDate(S.test.date)}</span></div><div class="num acc" style="font-size:36px">${left >= 0 ? left : 0}<span class="small muted" style="font-size:13px"> ${plural(left, 'dan', 'dneva', 'dnevi', 'dni')}</span></div></div></button>`; })()
+    : `<button class="card tight" data-a="nav" data-r="testi" style="text-align:left"><div class="row between"><span>Vpiši datum testa (${esc(tst.n)})</span>${ic('right')}</div></button>`)
+    : S.profile.goal === 'test' ? `<button class="card tight" data-a="nav" data-r="testi" style="text-align:left"><div class="row between"><div class="stack-s"><span class="eyebrow">Fizični test</span><span>Izberi policijo ali Slovensko vojsko</span></div>${ic('right')}</div></button>` : '';
+  return `
+    <div class="greet"><span class="eyebrow">${DAYS_FULL[today]}, ${longDate(tk)}</span><h1>${greet}.</h1></div>
+    ${workoutCard}
+    ${testCard}
+    <div class="card">
+      <div class="row between"><div class="stack-s"><span class="eyebrow">Ta teden</span><h2>${ws.done} od ${ws.planned} ${plural(ws.planned, 'treninga', 'treningov', 'treningov', 'treningov')}</h2></div>${ring(ws.planned ? ws.done / ws.planned : 0, Math.round(ws.planned ? ws.done / ws.planned * 100 : 0) + '%')}</div>
+      <div class="week">${DAYS.map((n, i) => { const k = dkey(dateOfWd(i)), dn = sessionDone(k); return `<div class="d">${n}<span class="dot ${dn ? 'done' : P[i] ? 'plan' : ''} ${i === today ? 'today' : ''}">${dn ? ic('check') : ''}</span></div>`; }).join('')}</div>
+      <div class="statrow"><div class="stat"><span class="num">${streak()}</span><span class="small muted">v nizu</span></div><div class="stat"><span class="num">${fmtN(latestWeight(), 1)}</span><span class="small muted">kg zdaj</span></div><div class="stat"><span class="num">${wDelta > 0 ? '+' : ''}${fmtN(wDelta, 1)}</span><span class="small muted">kg od začetka</span></div></div>
+    </div>
+    <div class="card">
+      <div class="row between"><div class="stack-s"><span class="eyebrow">Današnji obroki</span><h2>${fmtN(kEaten)} <span class="muted" style="font-size:16px">/ ${fmtN(t.kcal)} kcal</span></h2></div><button class="btn small" data-a="nav" data-r="prehrana">Jedilnik</button></div>
+      <div class="bar"><i style="width:${clamp(kEaten / t.kcal * 100, 0, 100)}%"></i></div>
+      <p class="small muted">${Math.round(pEaten)} g od ${t.prot} g beljakovin</p>
+      <div>${menu.meals.map(m => `<div class="meal-line"><button class="tick" data-a="eat" data-slot="${m.slot}" aria-pressed="${!!eaten[m.slot]}" aria-label="Označi ${m.label.toLowerCase()} kot pojeden">${ic('check')}</button><div class="grow"><div class="eyebrow">${m.label}</div><div style="font-weight:700">${esc(m.n)}</div></div><span class="small muted num" style="font-size:14px;white-space:nowrap">${Math.round(m.k)} kcal</span></div>`).join('')}</div>
+    </div>`;
+}
+
+/* --- workout --- */
+function workoutCtx(wd) {
+  const P = plan(), date = dateOfWd(wd), k = dkey(date), tk = dkey();
+  const log = S.logs[k];
+  const wWd = log?.wd ?? wd;
+  return {P, date, k, isToday: k === tk, isFuture: k > tk, w: P[wWd], wWd, log};
+}
+function vTrening() {
+  const c = workoutCtx(selDay), P = c.P;
+  const strip = `<div class="daystrip">${DAYS.map((n, i) => { const k = dkey(dateOfWd(i)); return `<button class="daybtn ${P[i] ? 'has' : ''} ${sessionDone(k) ? 'done' : ''} ${i === dow() ? 'today' : ''}" data-a="tr-day" data-wd="${i}" aria-pressed="${i === selDay}">${n}<i></i></button>`; }).join('')}</div>`;
+  if (!c.w) {
+    const opts = P.map((w, i) => w ? `<button class="chip" data-a="tr-today" data-wd="${i}">${esc(w.name)}</button>` : '').join('');
+    return `<div class="greet"><span class="eyebrow">Trening</span><h1>${DAYS_FULL[selDay]}</h1></div>${strip}
+      <div class="card outline"><h2>Dan počitka</h2><p class="muted">Mišice rastejo med počitkom. Če imaš energijo, pojdi na 30-minutni sprehod.</p>
+      ${c.isToday ? `<div class="stack-s"><span class="eyebrow">Vseeno treniraj danes</span><div class="chips">${opts}</div></div>` : ''}</div>`;
+  }
+  const w = c.w, ro = c.isFuture;
+  const total = w.items.reduce((a, it) => a + it.rx.s, 0);
+  const doneN = w.items.reduce((a, it, i) => a + (c.log?.items?.[i]?.sets || []).filter(x => x.d).length, 0);
+  const cards = w.items.map((it, i) => {
+    const e = EX[it.id], logIt = c.log?.items?.[i], prev = prevSet(it.id, c.k);
+    const kind = e.type === 'cardio' ? 'cardio' : e.w ? '' : 'nokg';
+    const rows = Array.from({length: Math.max(it.rx.s, logIt?.sets.length || 0)}, (_, si) => {
+      const st = logIt?.sets[si] || {w: '', r: '', d: false};
+      const tick = `<button class="tick" data-a="set-done" data-i="${i}" data-si="${si}" aria-pressed="${!!st.d}" aria-label="Serija ${si + 1} opravljena" ${ro ? 'disabled' : ''}>${ic('check')}</button>`;
+      if (kind === 'cardio') return `<span class="n">${si + 1}</span><span class="lbl ${st.d ? 'acc' : ''}">${esc(it.rx.r)}</span>${tick}`;
+      const m = String(it.rx.r).match(/^(\d+)(–\d+)?( s)?$/);
+      const rIn = `<input inputmode="numeric" id="r-${c.k}-${i}-${si}" data-in="set" data-f="r" data-i="${i}" data-si="${si}" value="${esc(st.r)}" placeholder="${esc(prev?.r || (m ? m[1] : 'pon.'))}" aria-label="${e.type === 'time' ? 'Sekunde' : 'Ponovitve'}, serija ${si + 1}" ${ro ? 'disabled' : ''}>`;
+      const wIn = e.w ? `<input inputmode="decimal" id="w-${c.k}-${i}-${si}" data-in="set" data-f="w" data-i="${i}" data-si="${si}" value="${esc(st.w)}" placeholder="${esc(prev?.w || 'kg')}" aria-label="Kilogrami, serija ${si + 1}" ${ro ? 'disabled' : ''}>` : '';
+      return `<span class="n">${si + 1}</span>${wIn}${rIn}${tick}`.replace(/<input/g, st.d ? '<input data-done="1"' : '<input');
+    }).join('');
+    const head = kind === 'cardio' ? '<span class="h">#</span><span class="h">Naloga</span><span></span>' : `<span class="h">#</span>${e.w ? '<span class="h">kg</span>' : ''}<span class="h">${e.type === 'time' ? 'sek' : 'pon.'}</span><span></span>`;
+    return `<article class="ex">
+      <div class="ex-head"><button class="thumb" data-a="ex-demo" data-id="${it.id}" data-i="${i}" aria-label="Prikaz izvedbe: ${esc(e.n)}">${figSVG(e.p)}<span class="play">${ic('play')}</span></button>
+        <div class="grow stack-s" style="gap:4px"><h3>${esc(e.n)}</h3><span class="small muted">${it.rx.s} × ${esc(it.rx.r)}${it.rx.rest ? ` · odmor ${it.rx.rest} s` : ''}</span>${prev && e.w ? `<span class="small muted">Zadnjič: ${esc(String(prev.w).replace('.', ','))} kg × ${esc(prev.r)}</span>` : ''}</div></div>
+      <div class="sets ${kind}">${head}${rows}</div>
+    </article>`;
+  }).join('');
+  return `<div class="greet"><span class="eyebrow">Trening · ${DAYS_FULL[selDay]}</span><h1>${esc(w.name)}</h1><p class="muted">${w.items.length} ${plural(w.items.length, 'vaja', 'vaji', 'vaje', 'vaj')} · ~${w.mins} min · ${doneN}/${total} serij</p></div>
+    ${strip}
+    ${c.log && c.log.wd !== selDay && P[c.log.wd] ? `<p class="small muted">Ta dan si opravil(-a) trening z dne ${DAYS_IN[c.log.wd]}.</p>` : ''}
+    ${ro ? `<div class="banner"><span>Ta trening je na vrsti v ${DAYS_IN[selDay]}.</span><button class="btn small primary" data-a="tr-today" data-wd="${selDay}">Opravi ga danes</button></div>` : `<div class="bar"><i style="width:${total ? doneN / total * 100 : 0}%"></i></div>`}
+    ${cards}
+    ${ro ? '' : c.log?.done ? `<div class="card outline" style="align-items:center;text-align:center"><span class="pill ok">${ic('check')} Trening shranjen</span><p class="muted small">Odlično. Rezultati so vidni v zavihku Napredek.</p></div>` : `<button class="btn primary block" data-a="tr-finish">Zaključi trening</button>`}`;
+}
+function ensureItem(wdForLog, i, it) {
+  const k = dkey(dateOfWd(selDay));
+  if (!S.logs[k]) S.logs[k] = {wd: wdForLog, name: plan()[wdForLog]?.name || '', items: {}, done: false};
+  const log = S.logs[k];
+  if (!log.items[i] || log.items[i].id !== it.id) log.items[i] = {id: it.id, sets: Array.from({length: it.rx.s}, () => ({w: '', r: '', d: false}))};
+  return log.items[i];
+}
+
+/* rest timer */
+function startRest(sec) { if (!sec) return; rest = {end: Date.now() + sec * 1000, total: sec, finished: false}; clearInterval(restTimer); restTimer = setInterval(tickRest, 250); renderRest(); }
+function tickRest() {
+  if (!rest) return;
+  const left = (rest.end - Date.now()) / 1000;
+  if (left <= 0 && !rest.finished) {
+    rest.finished = true; beep(); try { navigator.vibrate && navigator.vibrate([200, 100, 200]); } catch (e) {}
+    setTimeout(() => { if (rest && rest.finished) { rest = null; clearInterval(restTimer); renderRest(); } }, 3500);
+  }
+  renderRest();
+}
+function renderRest() {
+  const el = $('#rest'); if (!el) return;
+  if (!rest) { el.hidden = true; return; }
+  const left = Math.max(0, (rest.end - Date.now()) / 1000);
+  el.hidden = false; el.classList.toggle('finished', rest.finished);
+  el.innerHTML = `${ic('timer')}<span class="num" aria-live="off">${rest.finished ? 'Gremo!' : fmtTime(Math.ceil(left))}</span><div class="bar"><i style="width:${(1 - left / rest.total) * 100}%"></i></div>
+    <button class="iconbtn" data-a="rest-adj" data-v="-15" aria-label="15 sekund manj">−15</button><button class="iconbtn" data-a="rest-adj" data-v="15" aria-label="15 sekund več">+15</button><button class="iconbtn" data-a="rest-skip" aria-label="Preskoči odmor">${ic('x')}</button>`;
+}
+function beep() {
+  try {
+    if (!audioCtx) return;
+    [0, 0.25].forEach(off => { const o = audioCtx.createOscillator(), g = audioCtx.createGain(); o.frequency.value = 880; g.gain.setValueAtTime(0.0001, audioCtx.currentTime + off); g.gain.exponentialRampToValueAtTime(0.3, audioCtx.currentTime + off + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + off + 0.18); o.connect(g).connect(audioCtx.destination); o.start(audioCtx.currentTime + off); o.stop(audioCtx.currentTime + off + 0.2); });
+  } catch (e) {}
+}
+
+/* --- nutrition --- */
+function vPrehrana() {
+  const t = targets();
+  const seg = `<div class="seg" role="group" aria-label="Pogled">${[['dan', 'Dan'], ['teden', 'Teden'], ['nakup', 'Nakup']].map(([v, l]) => `<button data-a="nut-tab" data-v="${v}" aria-pressed="${nutTab === v}">${l}</button>`).join('')}</div>`;
+  const head = `<div class="greet"><span class="eyebrow">Prehrana</span><h1>${fmtN(t.kcal)} kcal na dan</h1><p class="muted">${t.prot} g beljakovin · ${t.carb} g ogljikovih hidratov · ${t.fat} g maščob</p></div>`;
+  let body = '';
+  if (nutTab === 'dan') {
+    const m = dayMenu(nutDay), eaten = nutDay === dow() ? (S.eaten[dkey()] || {}) : {};
+    body = `<div class="chips">${DAYS.map((n, i) => `<button class="chip" data-a="nut-day" data-v="${i}" aria-pressed="${i === nutDay}">${n}</button>`).join('')}</div>
+      <div class="statrow"><div class="stat"><span class="num">${fmtN(m.tot.k)}</span><span class="small muted">kcal</span></div><div class="stat"><span class="num">${Math.round(m.tot.p)} g</span><span class="small muted">beljakovin</span></div><div class="stat"><span class="num">${fmtEur(m.tot.cost)}</span><span class="small muted">približno</span></div></div>
+      ${m.meals.map(ml => `<article class="card">
+        <div class="row between" style="align-items:flex-start"><div class="stack-s grow"><span class="eyebrow">${ml.label}</span><h3>${esc(ml.n)}</h3><span class="small muted">${Math.round(ml.k)} kcal · B ${Math.round(ml.p)} g · OH ${Math.round(ml.c)} g · M ${Math.round(ml.f)} g · ${fmtEur(ml.cost)}</span></div>
+        ${nutDay === dow() ? `<button class="tick" data-a="eat" data-slot="${ml.slot}" aria-pressed="${!!eaten[ml.slot]}" aria-label="Označi kot pojedeno" style="width:40px;height:40px">${ic('check')}</button>` : ''}</div>
+        <div>${Object.entries(ml.i).map(([id, g]) => `<div class="ing"><span class="grow">${esc(PR[id].n)}</span><span class="pill store">${PR[id].s}</span><span class="num" style="font-size:14px;min-width:64px;text-align:right">${gramsLabel(id, g)}</span></div>`).join('')}</div>
+      </article>`).join('')}`;
+  } else if (nutTab === 'teden') {
+    let wk = 0;
+    const rows = DAYS_FULL.map((n, i) => { const m = dayMenu(i); wk += m.tot.cost; return `<tr><td><b>${n}</b></td><td>${m.meals.map(x => esc(x.n)).join('<br>')}</td><td class="r">${fmtN(m.tot.k)}</td><td class="r">${Math.round(m.tot.p)} g</td><td class="r">${fmtEur(m.tot.cost)}</td></tr>`; }).join('');
+    body = `<div class="card"><div class="row between"><div class="stack-s"><span class="eyebrow">Teden skupaj</span><h2>${fmtEur(wk)}</h2></div><span class="small muted">≈ ${fmtEur(wk / 7)} na dan</span></div>
+      <div class="tablewrap"><table class="week-t"><thead><tr><th>Dan</th><th>Obroki</th><th style="text-align:right">kcal</th><th style="text-align:right">Belj.</th><th style="text-align:right">Cena</th></tr></thead><tbody>${rows}</tbody></table></div></div>
+      <p class="small muted">Cena upošteva porabljeno količino izdelkov. Pri nakupu celih pakiranj je račun višji, ostanek pa porabiš naslednji teden.</p>`;
+  } else {
+    const list = shoppingList(), tot = list.reduce((a, x) => a + x.cost, 0), left = list.filter(x => !S.shop[x.id]).reduce((a, x) => a + x.cost, 0);
+    body = `<div class="card hero"><div class="row between"><div class="stack-s"><span class="eyebrow">Seznam za nakup · 7 dni</span><div class="num" style="font-size:34px">${fmtEur(tot)}</div></div><div style="text-align:right"><div class="small muted">Še za nakup</div><div class="num" style="font-size:20px">${fmtEur(left)}</div></div></div></div>
+      ${STORES.map(st => { const items = list.filter(x => x.store === st); if (!items.length) return ''; const sum = items.reduce((a, x) => a + x.cost, 0);
+        return `<section class="card"><div class="row between"><h2>${st}</h2><span class="num" style="font-size:18px">${fmtEur(sum)}</span></div><div>${items.map(x => { const p = PR[x.id]; return `<div class="shop-item ${S.shop[x.id] ? 'checked' : ''}"><button class="tick" data-a="shop" data-id="${x.id}" aria-pressed="${!!S.shop[x.id]}" aria-label="Kupljeno: ${esc(p.n)}">${ic('check')}</button><div class="grow"><div style="font-weight:700">${esc(p.n)}</div><div class="small muted">${x.packs} × ${p.per ? '10 kosov' : p.pack >= 1000 ? fmtN(p.pack / 1000, 1) + (x.id === 'olje' ? ' l' : ' kg') : p.pack + (x.id === 'olje' ? ' ml' : ' g')} · potrebuješ ${p.per ? Math.round(x.g / p.per) + ' kos' : x.g >= 1000 ? fmtN(x.g / 1000, 1) + ' kg' : x.g + ' g'}</div></div><span class="num" style="font-size:15px">${fmtEur(x.cost)}</span></div>`; }).join('')}</div></section>`; }).join('')}
+      <div class="row wrap between"><p class="small muted grow">Cene so približne (oktober 2026) in se razlikujejo med poslovalnicami in akcijami.</p><button class="btn small" data-a="shop-clear">Počisti kljukice</button></div>`;
+  }
+  return head + seg + body;
+}
+
+/* --- AI coach --- */
+const COACH_RULES = `Si "AI osebni trener" v slovenski fitnes aplikaciji. Odgovarjaj VEDNO v slovenščini, prijazno, konkretno in kratko (praviloma do 150 besed). Uporabljaj kratke odstavke ali alineje z "- ". Ne uporabljaj naslovov ali tabel.
+Pravila:
+- Upoštevaj uporabnikov profil, cilj, poškodbe, načrt in zadnje treninge spodaj.
+- Ne postavljaj diagnoz. Pri ostri ali vztrajni bolečini svetuj posvet z zdravnikom ali fizioterapevtom.
+- Prehranski nasveti naj bodo praktični in vezani na izdelke iz slovenskih trgovin (Lidl, Mercator, Spar).
+- Pri vprašanjih o policijskem testu ali testu Slovenske vojske povej, da uradne kriterije objavita policija (gov.si) in Slovenska vojska (postanivojak.si).
+TOOLS_LINE`;
+function coachContext() {
+  const p = S.profile, t = targets(), P = plan(), eq = p.equip || 'home';
+  const lines = [];
+  lines.push(`Danes: ${DAYS_FULL[dow()]}, ${dkey()}.`);
+  lines.push(`Profil: ${p.sex === 'z' ? 'ženska' : 'moški'}, ${p.age} let, ${p.height} cm, ${fmtN(latestWeight(), 1)} kg. Cilj: ${GOALS[p.goal] || '-'}. Izkušnje: ${EXPS[p.exp] || '-'}. Vadba: ${eq === 'gym' ? 'fitnes' : 'doma'}, ${p.days} dni na teden. Poškodbe: ${(p.injuries || []).map(x => INJ[x]).join(', ') || 'brez'}.`);
+  lines.push(`Prehranski cilj: ${t.kcal} kcal, ${t.prot} g beljakovin, ${t.carb} g OH, ${t.fat} g maščob.`);
+  if (S.test.type) { const T = TESTS[S.test.type]; lines.push(`Fizični test: ${T.full}${S.test.date ? ', datum ' + S.test.date + ' (čez ' + daysBetween(dkey(), S.test.date) + ' dni)' : ''}. Discipline: ${T.d.map(x => x.n).join(', ')}.`); const lm = S.test.mocks[S.test.mocks.length - 1]; if (lm) lines.push('Zadnji poskusni test (' + lm.d + '): ' + T.d.map(x => x.n + ' ' + (lm.r[x.id] != null ? (x.time ? fmtTime(lm.r[x.id]) : lm.r[x.id]) + ' ' + x.u : '-')).join('; ') + '.'); }
+  lines.push('Tedenski načrt (weekday 0 = ponedeljek):');
+  P.forEach((w, wd) => { if (w) lines.push(`- weekday ${wd} (${DAYS_FULL[wd]}): ${w.name} — ` + w.items.map((it, i) => `${i + 1}) ${it.id} "${EX[it.id].n}" ${it.rx.s}×${it.rx.r}`).join(', ')); });
+  const recent = Object.keys(S.logs).sort().reverse().slice(0, 5);
+  if (recent.length) { lines.push('Zadnji treningi:'); recent.forEach(k => { const l = S.logs[k]; const parts = Object.values(l.items || {}).map(it => { const d = it.sets.filter(x => x.d); if (!d.length) return null; const top = d[d.length - 1]; return `${EX[it.id]?.n || it.id} ${top.w ? top.w + ' kg × ' : ''}${top.r || ''} (${d.length} ser.)`; }).filter(Boolean); lines.push(`- ${k}: ${l.name || ''} ${parts.join('; ')}`); }); }
+  const ws = sortedWeights().slice(-5); if (ws.length) lines.push('Teža: ' + ws.map(w => `${w.d} ${w.kg} kg`).join(', ') + '.');
+  lines.push('Knjižnica vaj (id: ime, vzorec, oprema): ' + Object.entries(EX).filter(([, e]) => e.eq === 'both' || e.eq === eq).map(([id, e]) => `${id}: ${e.n} [${e.p}]`).join('; '));
+  return lines.join('\n');
+}
+function coachTools() {
+  const eq = S.profile.equip || 'home';
+  return [
+    {name: 'zamenjaj_vajo', description: 'Zamenja vajo v uporabnikovem tedenskem načrtu. Vrne potrditev. Uporabi, ko uporabnik želi drugo vajo (npr. zaradi bolečine, opreme ali želje).', inputSchema: {type: 'object', properties: {weekday: {type: 'integer', description: '0 = ponedeljek … 6 = nedelja'}, iz: {type: 'string', description: 'id obstoječe vaje na ta dan'}, v: {type: 'string', description: 'id nove vaje iz knjižnice'}}, required: ['weekday', 'iz', 'v']},
+      execute: (inp) => {
+        const wd = Number(inp.weekday), from = String(inp.iz), to = String(inp.v), P = plan();
+        if (!P[wd]) throw new Error('Na ta dan ni treninga.');
+        if (!EX[to]) throw new Error('Neznan id vaje: ' + to);
+        if (!(EX[to].eq === 'both' || EX[to].eq === eq)) throw new Error('Vaja ni primerna za izbrano opremo.');
+        const idx = P[wd].items.findIndex(x => x.id === from);
+        if (idx < 0) throw new Error('Vaje ' + from + ' ni na ta dan.');
+        S.overrides[wd + ':' + idx] = to; save();
+        pushNote(`Načrt posodobljen: ${DAYS_FULL[wd]} · ${EX[from].n} → ${EX[to].n}`);
+        return 'Zamenjano.';
+      }},
+    {name: 'nastavi_dni_treninga', description: 'Spremeni število trening dni na teden (2 do 6) in ponovno sestavi načrt. Vrne nov razpored.', inputSchema: {type: 'object', properties: {dni: {type: 'integer', minimum: 2, maximum: 6}}, required: ['dni']},
+      execute: (inp) => { const n = clamp(Math.round(Number(inp.dni)), 2, 6); S.profile.days = n; S.overrides = {}; save(); pushNote(`Načrt posodobljen: ${n} dni treninga na teden`); return 'Nov razpored: ' + SCHED[n].map(i => DAYS_FULL[i]).join(', '); }},
+    {name: 'dodaj_poskodbo', description: 'Doda poškodbo ali bolečino v profil, da se obremenjujoče vaje samodejno zamenjajo. Dovoljene vrednosti: koleno, rama, hrbet, zapestje.', inputSchema: {type: 'object', properties: {poskodba: {type: 'string', enum: ['koleno', 'rama', 'hrbet', 'zapestje']}}, required: ['poskodba']},
+      execute: (inp) => { const v = String(inp.poskodba); if (!INJ[v]) throw new Error('Neznana poškodba.'); if (!S.profile.injuries.includes(v)) S.profile.injuries.push(v); S.overrides = {}; save(); pushNote(`Profil posodobljen: upoštevamo ${INJ[v].toLowerCase()}`); return 'Dodano. Načrt je prilagojen.'; }}
+  ];
+}
+function pushNote(t) { S.chat.push({role: 'note', content: t}); const log = $('#chatlog'); if (log) { const d = document.createElement('div'); d.className = 'msg note'; d.textContent = t; const last = log.querySelector('.msg.pending'); log.insertBefore(d, last || null); } }
+function fmtMsg(t) {
+  const lines = esc(t).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').split('\n');
+  let html = '', inList = false;
+  for (const l of lines) {
+    const m = l.match(/^\s*[-•*]\s+(.*)/);
+    if (m) { if (!inList) { html += '<ul>'; inList = true; } html += '<li>' + m[1] + '</li>'; continue; }
+    if (inList) { html += '</ul>'; inList = false; }
+    if (l.trim()) html += '<p>' + l + '</p>';
+  }
+  if (inList) html += '</ul>';
+  return html;
+}
+const CHIPS = ['Boli me koleno pri počepih. Kaj naj zamenjam?', 'Kaj naj pojem pred treningom?', 'Imam samo 30 minut. Kako skrajšam današnji trening?', 'Kako napredujem pri zgibah?', 'Ali lahko treniram samo 3-krat na teden?'];
+function vTrener() {
+  const msgs = S.chat.map(m => m.role === 'note' ? `<div class="msg note">${esc(m.content)}</div>` : `<div class="msg ${m.role}">${m.role === 'assistant' ? fmtMsg(m.content) : esc(m.content)}</div>`).join('');
+  const off = sampleState === 'off';
+  return `<div class="greet"><span class="eyebrow">AI trener</span><h1>Vprašaj karkoli o treningu in prehrani.</h1>
+      <p class="muted">Trener pozna tvoj profil, načrt in zadnje treninge ter lahko sam prilagodi načrt.</p></div>
+    ${off ? `<div class="card outline"><h3>AI trener trenutno ni na voljo</h3><p class="muted">Načrt, prehrana, napredek in testi delujejo normalno. Poskusi znova kasneje.</p></div>` : ''}
+    <div class="chat" id="chatlog">${msgs || `<div class="msg assistant"><p>Živjo! Sem tvoj AI trener. Vprašaj me o tehniki, prehrani ali pripravi na test, ali pa mi povej, kaj želiš spremeniti v načrtu.</p></div>`}${chatBusy ? '<div class="msg assistant thinking pending">Razmišljam …</div>' : ''}</div>
+    ${!S.chat.length && !off ? `<div class="chips" style="flex-wrap:wrap">${CHIPS.map(c => `<button class="chip" data-a="chat-chip" data-t="${esc(c)}">${esc(c)}</button>`).join('')}</div>` : ''}
+    ${chatNote ? `<p class="small" style="color:var(--warn)">${esc(chatNote)}</p>` : ''}
+    <form class="composer" id="composer" autocomplete="off"><textarea id="chat-in" rows="1" placeholder="Napiši vprašanje …" aria-label="Sporočilo trenerju" ${off ? 'disabled' : ''}></textarea>
+      ${chatBusy ? `<button type="button" class="btn" data-a="chat-stop" aria-label="Ustavi">${ic('stop')}</button>` : `<button type="submit" class="btn primary" aria-label="Pošlji" ${off ? 'disabled' : ''}>${ic('send')}</button>`}</form>`;
+}
+async function sendChat(text) {
+  text = text.trim(); if (!text || chatBusy) return;
+  if (sampleState === 'off') return;
+  chatNote = '';
+  S.chat.push({role: 'user', content: text}); save();
+  chatBusy = true; render();
+  const ctl = new AbortController(); chatCtl = ctl;
+  // Context is built once per question so every round of a tool loop sends the same prefix.
+  const context = coachContext();
+  const execs = Object.fromEntries(coachTools().map(t => [t.name, t.execute]));
+  const msgs = S.chat.filter(m => m.role !== 'note').slice(-14).map(m => ({role: m.role, content: m.content}));
+  while (msgs.length && msgs[0].role !== 'user') msgs.shift();
+  let answer = '';
+  const show = () => { const b = $('#chatlog .msg.pending'); if (b) { b.classList.remove('thinking'); b.innerHTML = fmtMsg(answer); b.scrollIntoView({block: 'end'}); } };
+  try {
+    for (let round = 0; round < 5; round++) {
+      const res = await callCoach(context, msgs, ctl.signal);
+      const blocks = res.content || [];
+      const txt = blocks.filter(b => b.type === 'text').map(b => b.text).join('\n\n').trim();
+      if (txt) { answer = answer ? answer + '\n\n' + txt : txt; show(); }
+      if (res.stop_reason === 'refusal') { chatNote = 'Na to vprašanje trener ne more odgovoriti. Poskusi ga zastaviti drugače.'; break; }
+      if (res.stop_reason !== 'tool_use') break;
+      msgs.push({role: 'assistant', content: blocks});
+      const results = blocks.filter(b => b.type === 'tool_use').map(u => {
+        try {
+          if (!execs[u.name]) throw new Error('Neznano orodje.');
+          return {type: 'tool_result', tool_use_id: u.id, content: String(execs[u.name](u.input || {}))};
+        } catch (er) { return {type: 'tool_result', tool_use_id: u.id, content: 'Napaka: ' + er.message, is_error: true}; }
+      });
+      msgs.push({role: 'user', content: results});
+    }
+    if (answer) S.chat.push({role: 'assistant', content: answer});
+    else if (!chatNote) chatNote = 'Trener ni odgovoril. Pošlji sporočilo znova.';
+  } catch (e) {
+    if (answer) S.chat.push({role: 'assistant', content: answer});
+    if (e && e.name === 'AbortError') {}
+    else if (e && e.code === 'not_configured') sampleState = 'off';
+    else if (e && e.code === 'rate_limited') chatNote = 'Preveč vprašanj naenkrat. Poskusi znova čez nekaj minut.';
+    else chatNote = 'Povezava je bila prekinjena. Pošlji sporočilo znova.';
+  }
+  chatBusy = false; chatCtl = null; save();
+  if (route === 'trener') { render(); setTimeout(() => $('#chat-in')?.focus(), 0); }
+}
+
+/* --- progress --- */
+function strengthSeries() {
+  const series = {};
+  for (const k of Object.keys(S.logs).sort()) {
+    for (const it of Object.values(S.logs[k].items || {})) {
+      const e = EX[it.id]; if (!e || e.type === 'cardio') continue;
+      const done = it.sets.filter(x => x.d && Number(String(x.r).replace(',', '.')) > 0);
+      if (!done.length) continue;
+      const best = Math.max(...done.map(x => { const r = Number(String(x.r).replace(',', '.')), w = Number(String(x.w).replace(',', '.')) || 0; return e.w ? w * (1 + r / 30) : r; }));
+      (series[it.id] = series[it.id] || []).push({d: k, y: Math.round(best * 10) / 10});
+    }
+  }
+  return series;
+}
+function vNapredek() {
+  const ws = sortedWeights().map(w => ({d: w.d, y: w.kg}));
+  const ser = strengthSeries(), ids = Object.keys(ser).sort((a, b) => ser[b].length - ser[a].length);
+  if (!strengthEx || !ser[strengthEx]) strengthEx = ids[0] || null;
+  const first = ws[0]?.y, last = ws[ws.length - 1]?.y;
+  const sel = strengthEx ? ser[strengthEx] : [];
+  const gain = sel.length > 1 ? sel[sel.length - 1].y - sel[0].y : 0;
+  const ph = [...photos].sort((a, b) => a.d < b.d ? -1 : 1);
+  if (cmpSel.length !== 2 || !cmpSel.every(id => ph.some(p => p.id === id))) cmpSel = ph.length >= 2 ? [ph[0].id, ph[ph.length - 1].id] : [];
+  const A = ph.find(p => p.id === cmpSel[0]), B = ph.find(p => p.id === cmpSel[1]);
+  return `<div class="greet"><span class="eyebrow">Napredek</span><h1>Vsak trening šteje.</h1></div>
+    <section class="card">
+      <div class="row between" style="align-items:flex-start"><div class="stack-s"><span class="eyebrow">Telesna teža</span><h2>${fmtN(latestWeight(), 1)} kg</h2>${ws.length > 1 ? `<span class="small muted">${last - first > 0 ? '+' : ''}${fmtN(last - first, 1)} kg od ${shortDate(ws[0].d)}</span>` : ''}</div></div>
+      ${lineChart(ws, {unit: 'kg', label: 'Graf telesne teže', empty: 'Vpiši težo še enkrat čez nekaj dni in pokazal se bo graf.'})}
+      <form class="row" id="wform"><input class="field" id="w-in" inputmode="decimal" placeholder="Današnja teža v kg" aria-label="Današnja teža v kg"><button class="btn primary" type="submit">Shrani</button></form>
+    </section>
+    <section class="card">
+      <div class="stack-s"><span class="eyebrow">Moč</span><h2>${strengthEx ? esc(EX[strengthEx].n) : 'Ni še podatkov'}</h2>${strengthEx ? `<span class="small muted">${EX[strengthEx].w ? 'Ocenjeni maksimum za 1 ponovitev (kg)' : 'Največ ponovitev v seriji'}${sel.length > 1 ? ` · ${gain >= 0 ? '+' : ''}${fmtN(gain, 1)} od začetka` : ''}</span>` : ''}</div>
+      ${ids.length ? `<div class="chips">${ids.map(id => `<button class="chip" data-a="str-ex" data-id="${id}" aria-pressed="${id === strengthEx}">${esc(EX[id].n)}</button>`).join('')}</div>` : ''}
+      ${strengthEx ? lineChart(sel, {unit: EX[strengthEx].w ? 'kg' : 'pon.', dec: EX[strengthEx].w ? 1 : 0, label: 'Graf moči', empty: 'Za graf potrebuješ vsaj dva treninga s to vajo.'}) : `<div class="chart-empty">Odkljukaj serije na treningu in tu se bo izrisal napredek moči.</div>`}
+    </section>
+    <section class="card">
+      <div class="row between"><div class="stack-s"><span class="eyebrow">Fotografije pred in po</span><span class="small muted">Shranjene so samo na tej napravi in se ne pošiljajo nikamor.</span></div>
+        <label class="btn small primary" for="photo-in" style="cursor:pointer">${ic('camera')} Dodaj</label><input type="file" id="photo-in" accept="image/*" data-in="photo" hidden></div>
+      ${A && B ? `<div class="compare"><figure><img src="${A.src}" alt="Fotografija z dne ${shortDate(A.d)}"><figcaption class="small muted">Pred · ${shortDate(A.d)}</figcaption></figure><figure><img src="${B.src}" alt="Fotografija z dne ${shortDate(B.d)}"><figcaption class="small muted">Po · ${shortDate(B.d)}</figcaption></figure></div><p class="small muted">Tapni dve fotografiji spodaj, da ju primerjaš.</p>` : ''}
+      ${ph.length ? `<div class="photos">${ph.map(p => `<button class="photo" data-a="ph-sel" data-id="${p.id}" aria-pressed="${cmpSel.includes(p.id)}" aria-label="Fotografija z dne ${shortDate(p.d)}"><img src="${p.src}" alt=""><span>${shortDate(p.d)}</span></button>`).join('')}</div>${ph.length ? `<button class="btn small ghost" data-a="ph-del" style="align-self:flex-start">Izbriši izbrane</button>` : ''}`
+        : `<div class="chart-empty">Dodaj prvo fotografijo zdaj in naslednjo čez 4 tedne. Fotografiraj se ob isti svetlobi in v isti pozi.</div>`}
+    </section>`;
+}
+
+/* --- tests --- */
+let testTimer = {mode: 'sw', start: 0, acc: 0, run: false, iv: null};
+function bestFor(dsc) { const vals = S.test.mocks.map(m => m.r[dsc.id]).filter(v => v != null && v !== ''); if (!vals.length) return null; return dsc.lower ? Math.min(...vals) : Math.max(...vals); }
+function targetFor(dsc) { const t = S.test.targets[dsc.id]; return t != null ? t : (S.profile.sex === 'z' ? dsc.z : dsc.m); }
+const fmtVal = (dsc, v) => v == null ? '–' : dsc.time ? fmtTime(v) : fmtN(v, dsc.dec || 0);
+function vTesti() {
+  if (!S.test.type) {
+    return `<div class="greet"><span class="eyebrow">Testi</span><h1>Na kateri test se pripravljaš?</h1><p class="muted">Dodali bomo trening za discipline testa, poskusni test in odštevanje do datuma.</p></div>
+      <div class="test-pick">${Object.entries(TESTS).map(([k, T]) => `<button class="pick" data-a="test-pick" data-v="${k}"><span class="eyebrow">${T.d.length} discipline</span><h2>${T.n}</h2><p class="muted small">${esc(T.full)}</p><span class="small" style="font-weight:700">${T.d.map(x => x.n).join(' · ')}</span></button>`).join('')}</div>`;
+  }
+  const T = TESTS[S.test.type], tk = dkey();
+  const left = S.test.date ? daysBetween(tk, S.test.date) : null;
+  const ready = T.d.map(dsc => { const b = bestFor(dsc), t = targetFor(dsc); if (b == null) return 0; return clamp(dsc.lower ? t / b : b / t, 0, 1); });
+  const readiness = Math.round(ready.reduce((a, b) => a + b, 0) / T.d.length * 100);
+  const mocks = [...S.test.mocks].reverse();
+  return `<div class="greet"><span class="eyebrow">Priprava na test</span><h1>${T.n}</h1><p class="muted">${esc(T.full)}</p></div>
+    <div class="card hero">
+      ${S.test.date ? `<div class="row between" style="align-items:flex-end"><div class="countdown"><span class="num">${Math.max(0, left)}</span><span style="font-weight:800;padding-bottom:6px">${plural(Math.max(0, left), 'dan', 'dneva', 'dnevi', 'dni')} do testa</span></div>${ring(readiness / 100, readiness + '%')}</div>
+        <div class="row between"><span class="muted small">${longDate(S.test.date)} · ${Math.max(0, Math.ceil(left / 7))} ${plural(Math.max(0, Math.ceil(left / 7)), 'teden', 'tedna', 'tedni', 'tednov')} priprav</span><button class="btn small dark" data-a="test-date-edit">Spremeni datum</button></div>`
+      : `<div class="stack-s"><span class="eyebrow">Datum testa</span><h2>Kdaj imaš test?</h2></div>`}
+      <div class="row" ${S.test.date ? 'hidden id="date-row"' : 'id="date-row"'}><input type="date" class="field" id="test-date" value="${S.test.date || ''}" min="${tk}" style="background:#fff;color:var(--ink);border-color:#cfd3c8" aria-label="Datum testa"><button class="btn dark" data-a="test-date-save">Shrani</button></div>
+    </div>
+    <section class="card">
+      <div class="row between"><div class="stack-s"><span class="eyebrow">Pripravljenost</span><h2>${readiness}% ciljev</h2></div><button class="btn small primary" data-a="mock-open">Poskusni test</button></div>
+      <div>${T.d.map(dsc => { const b = bestFor(dsc), t = targetFor(dsc); const ok = b != null && (dsc.lower ? b <= t : b >= t); const diff = b == null ? null : Math.abs(b - t);
+        return `<div class="disc"><div class="grow stack-s" style="gap:2px"><b>${dsc.n}</b><span class="small muted">Najboljše: <b style="color:var(--fg)">${fmtVal(dsc, b)}</b> ${b != null && !dsc.time ? dsc.u : ''} · cilj ${fmtVal(dsc, t)} ${dsc.time ? '' : dsc.u}</span></div>
+          ${b == null ? '<span class="pill">Ni meritve</span>' : ok ? `<span class="pill ok">${ic('check')} Dosežen</span>` : `<span class="pill warn">${dsc.lower ? '−' : '+'}${dsc.time ? fmtTime(diff) : fmtN(diff, dsc.dec || 0) + ' ' + dsc.u}</span>`}
+          <button class="iconbtn" data-a="target-edit" data-id="${dsc.id}" aria-label="Uredi cilj za ${esc(dsc.n)}" style="width:34px;height:34px;font-size:12px;font-weight:800">cilj</button></div>`; }).join('')}</div>
+      <p class="small muted">Cilji so orientacijski in jih lahko urediš. Uradne kriterije preveri v zadnji objavi: <a href="${T.src}" target="_blank" rel="noopener">${T.srcN}</a>.</p>
+    </section>
+    <section class="card">
+      <span class="eyebrow">Trening za test</span>
+      <p>Zadnji trening v tednu (${DAYS_IN[SCHED[S.profile.days][SCHED[S.profile.days].length - 1]]}) je namenjen disciplinam testa: ${T.ex.map(id => EX[resolveEx(id, S.profile.injuries)].n.toLowerCase()).join(', ')}.</p>
+      <button class="btn small" data-a="test-train" style="align-self:flex-start">Odpri trening za test</button>
+    </section>
+    ${mocks.length ? `<section class="card"><span class="eyebrow">Zgodovina poskusnih testov</span><div class="tablewrap"><table class="week-t"><thead><tr><th>Datum</th>${T.d.map(x => `<th style="text-align:right">${x.n}</th>`).join('')}</tr></thead><tbody>${mocks.map(m => `<tr><td>${shortDate(m.d)}</td>${T.d.map(x => `<td class="r">${fmtVal(x, m.r[x.id])}</td>`).join('')}</tr>`).join('')}</tbody></table></div></section>` : ''}
+    <button class="btn ghost small" data-a="test-change" style="align-self:center">Zamenjaj test</button>`;
+}
+function openMock() {
+  const T = TESTS[S.test.type];
+  openSheet(`<div class="row between"><h2>Poskusni test</h2><button class="iconbtn" data-a="sheet-close" aria-label="Zapri">${ic('x')}</button></div>
+    <p class="muted small">Izvedi discipline z ustreznim odmorom in vpiši rezultate. Čase vpiši kot minute:sekunde (npr. 11:30) ali v sekundah za kratke teke.</p>
+    <div class="timerbox"><div class="seg" style="width:100%"><button data-a="tm-mode" data-v="sw" aria-pressed="${testTimer.mode === 'sw'}">Štoparica</button><button data-a="tm-mode" data-v="cd" aria-pressed="${testTimer.mode === 'cd'}">2 minuti</button></div>
+      <span class="num" id="tm-disp">0:00</span><div class="row"><button class="btn primary small" data-a="tm-toggle" id="tm-btn">Start</button><button class="btn small" data-a="tm-reset">Ponastavi</button></div></div>
+    <form id="mockform" class="stack">${T.d.map(dsc => `<label class="stack-s"><span style="font-weight:700">${dsc.n} <span class="muted small">(${dsc.time ? 'min:s' : dsc.u})</span></span><input class="field" id="mock-${dsc.id}" name="${dsc.id}" inputmode="${dsc.time ? 'text' : 'decimal'}" placeholder="${dsc.time ? 'npr. ' + fmtTime(targetFor(dsc)) : 'npr. ' + fmtVal(dsc, targetFor(dsc))}"></label>`).join('')}
+      <button class="btn primary block" type="submit">Shrani rezultate</button></form>`);
+  updTimer();
+}
+function updTimer() {
+  const el = $('#tm-disp'); if (!el) { clearInterval(testTimer.iv); return; }
+  const elapsed = testTimer.acc + (testTimer.run ? (Date.now() - testTimer.start) / 1000 : 0);
+  if (testTimer.mode === 'cd') { const left = 120 - elapsed; el.textContent = fmtTime(Math.ceil(Math.max(0, left))); if (left <= 0 && testTimer.run) { testTimer.run = false; testTimer.acc = 120; clearInterval(testTimer.iv); beep(); const b = $('#tm-btn'); if (b) b.textContent = 'Start'; } }
+  else el.textContent = Math.floor(elapsed / 60) + ':' + pad2(Math.floor(elapsed % 60)) + '.' + Math.floor((elapsed % 1) * 10);
+}
+
+/* --- profile --- */
+function vProfil() {
+  const p = S.profile, t = targets();
+  const start = S.startDate || dkey(), trialLeft = Math.max(0, 7 - daysBetween(start, dkey()));
+  const planLbl = {trial: trialLeft > 0 ? `Brezplačni preizkus · še ${dni(trialLeft)}` : 'Preizkus je potekel', mesecno: 'Mesečna naročnina · 9,99 €', letno: 'Letna naročnina · 79,99 €'}[S.sub.plan];
+  const kv = (k, v) => `<div class="kv"><span class="muted">${k}</span><b>${v}</b></div>`;
+  return `<div class="greet"><span class="eyebrow">Profil</span><h1>Tvoji podatki</h1></div>
+    <section class="card"><div>${kv('Cilj', GOALS[p.goal] || '–')}${kv('Spol', p.sex === 'z' ? 'Ženska' : 'Moški')}${kv('Starost', p.age + ' let')}${kv('Višina', p.height + ' cm')}${kv('Teža', fmtN(latestWeight(), 1) + ' kg')}${kv('Izkušnje', EXPS[p.exp] || '–')}${kv('Oprema', p.equip === 'gym' ? 'Fitnes' : 'Doma')}${kv('Dni na teden', p.days)}${kv('Poškodbe', (p.injuries || []).map(x => INJ[x]).join(', ') || 'Brez')}${kv('Dnevni cilj', fmtN(t.kcal) + ' kcal · ' + t.prot + ' g beljakovin')}</div>
+      <button class="btn block" data-a="edit-profile">Uredi podatke</button></section>
+    <section class="card">
+      <div class="stack-s"><span class="eyebrow">Naročnina</span><h2>${planLbl}</h2>${S.sub.plan === 'trial' ? `<div class="bar"><i style="width:${(7 - trialLeft) / 7 * 100}%"></i></div><span class="small muted">Preizkus se je začel ${longDate(start)}.</span>` : ''}</div>
+      <div class="plans">
+        <button class="plan" data-a="plan-pick" data-v="mesecno" aria-pressed="${S.sub.plan === 'mesecno'}"><span class="eyebrow">Mesečno</span><span class="num">9,99 €</span><span class="small muted">na mesec</span></button>
+        <button class="plan" data-a="plan-pick" data-v="letno" aria-pressed="${S.sub.plan === 'letno'}"><span class="badge">−33 %</span><span class="eyebrow">Letno</span><span class="num">79,99 €</span><span class="small muted">6,67 € na mesec</span></button>
+      </div>
+      ${confirmPlan ? `<div class="banner" style="border-style:solid"><span>Izbereš ${confirmPlan === 'letno' ? 'letno naročnino (79,99 €)' : 'mesečno naročnino (9,99 €)'}? Plačila v tej različici še niso povezana, zato se paket samo označi.</span><div class="row"><button class="btn small" data-a="plan-cancel">Prekliči</button><button class="btn small primary" data-a="plan-confirm">Potrdi</button></div></div>` : ''}
+      <p class="small muted">Naročnino lahko kadar koli prekličeš. Po preizkusu ostanejo tvoji podatki shranjeni.</p>
+    </section>
+    <section class="card">
+      <div class="row between"><span class="eyebrow">Tvoja koda za druge naprave</span>${syncState === 'cloud' ? `<span class="pill ok">${ic('check')} Shranjeno v oblaku</span>` : syncState === 'error' ? '<span class="pill warn">Brez povezave</span>' : ''}</div>
+      ${syncCode ? `<div class="row wrap between"><span class="num" id="sync-code" style="font-size:22px;user-select:all">${esc(syncCode)}</span><button class="btn small" data-a="code-copy">Kopiraj</button></div>` : '<p class="small muted">Koda se ustvari ob prvem shranjevanju.</p>'}
+      <p class="small muted">S to kodo odpreš svoje podatke na drugem telefonu ali računalniku. Shrani si jo in je ne deli z drugimi. Fotografije ostanejo samo na tej napravi.</p>
+      <form id="codeform" class="row"><input class="field" id="code-in" placeholder="Koda z druge naprave" autocomplete="off" aria-label="Koda z druge naprave"><button class="btn" type="submit">Prenesi</button></form>
+      <div class="divider"></div>
+      ${confirmReset ? `<div class="banner" style="border-style:solid;border-color:var(--bad)"><span>Res izbrišem vse treninge, težo, klepet in fotografije?</span><div class="row"><button class="btn small" data-a="reset-cancel">Prekliči</button><button class="btn small" data-a="reset-do" style="background:var(--bad);color:var(--ink);border-color:var(--bad)">Izbriši</button></div></div>` : `<button class="btn small ghost" data-a="reset-ask" style="align-self:flex-start;color:var(--bad)">Izbriši vse podatke</button>`}
+    </section>`;
+}
+
+/* --- sheet --- */
+function openSheet(html) {
+  closeSheet();
+  const o = document.createElement('div'); o.className = 'overlay'; o.id = 'overlay';
+  o.innerHTML = `<div class="sheet" role="dialog" aria-modal="true">${html}</div>`;
+  document.body.appendChild(o); document.body.style.overflow = 'hidden';
+  o.addEventListener('click', e => { if (e.target === o) closeSheet(); });
+  setTimeout(() => o.querySelector('button,input')?.focus(), 30);
+}
+function closeSheet() { const o = $('#overlay'); if (o) o.remove(); document.body.style.overflow = ''; clearInterval(testTimer.iv); testTimer = {mode: testTimer.mode, start: 0, acc: 0, run: false, iv: null}; }
+function openDemo(id, i) {
+  const e = EX[id], c = workoutCtx(selDay), eq = S.profile.equip || 'home', inj = S.profile.injuries || [];
+  const alts = i != null && c.w && !c.isFuture ? Object.entries(EX).filter(([k, x]) => k !== id && x.p === e.p && (x.eq === 'both' || x.eq === eq) && !x.avoid.some(a => inj.includes(a))).slice(0, 4) : [];
+  const yt = 'https://www.youtube.com/results?search_query=' + encodeURIComponent(e.n + ' pravilna izvedba');
+  openSheet(`<div class="row between"><div class="stack-s"><span class="eyebrow">${esc(e.m)}</span><h2>${esc(e.n)}</h2></div><button class="iconbtn" data-a="sheet-close" aria-label="Zapri">${ic('x')}</button></div>
+    <div class="demo">${figSVG(e.p)}</div>
+    <ol class="cues">${e.cues.map(x => `<li>${esc(x)}</li>`).join('')}</ol>
+    <a class="btn block" href="${yt}" target="_blank" rel="noopener">${ic('play')} Poglej video na YouTubu ${ic('ext')}</a>
+    ${alts.length ? `<div class="stack-s"><span class="eyebrow">Zamenjaj z</span>${alts.map(([k, x]) => `<button class="btn small" data-a="ex-swap" data-to="${k}" data-i="${i}" style="justify-content:space-between">${esc(x.n)} ${ic('swap')}</button>`).join('')}</div>` : ''}`);
+}
+
+/* ---------- example data ---------- */
+function loadExample() {
+  S = freshState(); S.example = true; S.onboarded = true;
+  S.profile = {goal: 'test', sex: 'm', age: 24, height: 182, weight: 84, exp: 'srednji', equip: 'gym', days: 4, injuries: []};
+  const today = new Date(); S.startDate = dkey(addDays(today, -24));
+  S.test = {type: 'policija', date: dkey(addDays(today, 52)), targets: {}, mocks: [
+    {d: dkey(addDays(today, -20)), r: {t60: 8.9, skok: 212, ovire: 15.2, zgibe: 6, cooper: 712}},
+    {d: dkey(addDays(today, -6)), r: {t60: 8.7, skok: 218, ovire: 14.6, zgibe: 8, cooper: 688}}]};
+  for (let i = 24; i >= 0; i -= 3) S.weights.push({d: dkey(addDays(today, -i)), kg: Math.round((86.2 - (24 - i) * 0.085 + Math.sin(i) * 0.25) * 10) / 10});
+  const base = {pocep_drog: 70, rdl: 70, izpadni_rocke: 14, hip_thrust: 80, bench: 60, ohp: 35, latpull: 50, veslanje_kabel: 50, biceps: 12};
+  const P = plan();
+  for (let i = 24; i >= 1; i--) {
+    const d = addDays(today, -i), wd = dow(d), w = P[wd]; if (!w) continue;
+    const wk = Math.floor((24 - i) / 7), items = {};
+    w.items.forEach((it, idx) => {
+      const e = EX[it.id];
+      items[idx] = {id: it.id, sets: Array.from({length: it.rx.s}, (_, s) => ({w: e.w ? String((base[it.id] || 20) + wk * 2.5) : '', r: e.type === 'cardio' ? '' : e.type === 'time' ? '40' : String(e.w ? 10 - (s > 1 ? 1 : 0) : 8 + wk), d: true}))};
+    });
+    S.logs[dkey(d)] = {wd, name: w.name, items, done: true};
+  }
+  S.eaten[dkey()] = {zajtrk: true};
+  save();
+}
+
+/* ---------- events ---------- */
+const ACT = {
+  nav: a => { if (a.dataset.r === 'trening') selDay = dow(); go(a.dataset.r); },
+  'ob-example': () => { loadExample(); ob = null; go('domov'); },
+  'ex-leave': () => { setCode(''); syncState = 'local'; S = freshState(); photos = []; lsSet(LS_PHOTOS, photos); save(); ob = {step: 0, data: {...S.profile}}; render(); },
+  'ob-code': () => { showCodeForm = true; render(); setTimeout(() => $('#code-in')?.focus(), 0); },
+  'code-copy': () => {
+    const fallback = () => { const el = $('#sync-code'); const r = document.createRange(); r.selectNodeContents(el); const s = getSelection(); s.removeAllRanges(); s.addRange(r); toast('Koda je označena. Kopiraj jo s Ctrl+C.'); };
+    try { navigator.clipboard.writeText(syncCode).then(() => toast('Koda kopirana'), fallback); } catch (e) { fallback(); }
+  },
+  'ob-next': () => { ob.step++; render(); window.scrollTo(0, 0); },
+  'ob-back': () => { if (ob.step === 0 || (ob.edit && ob.step === 1)) { if (ob.edit) { ob = null; go('profil'); } return; } ob.step--; render(); },
+  'ob-pick': a => { const q = Q[ob.step - 1]; ob.data[q.k] = a.dataset.v; render(); setTimeout(() => { if (ob && Q[ob.step - 1] === q) { ob.step++; render(); } }, 220); },
+  'ob-num': a => { const q = Q[ob.step - 1]; ob.data[q.k] = clamp(Math.round((Number(ob.data[q.k]) + Number(a.dataset.dir) * q.step) * 10) / 10, q.min, q.max); $('#obnum').textContent = fmtN(ob.data[q.k], q.step < 1 ? 1 : 0); $('#ob-range').value = ob.data[q.k]; },
+  'ob-days': a => { ob.data.days = Number(a.dataset.v); render(); },
+  'ob-toggle': a => { const v = a.dataset.v, inj = ob.data.injuries = [...(ob.data.injuries || [])]; const i = inj.indexOf(v); i >= 0 ? inj.splice(i, 1) : inj.push(v); render(); },
+  'ob-noinj': () => { ob.data.injuries = []; render(); },
+  'ob-finish': () => {
+    const prevDays = S.profile.days, prevEq = S.profile.equip, wasEdit = ob.edit;
+    S.profile = {...ob.data, injuries: [...(ob.data.injuries || [])]};
+    if (prevDays !== S.profile.days || prevEq !== S.profile.equip || !wasEdit) S.overrides = {};
+    if (!S.startDate) S.startDate = dkey();
+    const k = dkey(); const ex = S.weights.find(w => w.d === k);
+    if (!wasEdit || !S.weights.length) { if (ex) ex.kg = S.profile.weight; else S.weights.push({d: k, kg: S.profile.weight}); }
+    else if (Math.abs(S.profile.weight - latestWeight()) > 0.01) { if (ex) ex.kg = S.profile.weight; else S.weights.push({d: k, kg: S.profile.weight}); }
+    S.onboarded = true; S.example = false; ob = null; save();
+    go(wasEdit ? 'profil' : S.profile.goal === 'test' ? 'testi' : 'domov');
+    if (!wasEdit) toast('Tvoj načrt je pripravljen');
+  },
+  'edit-profile': () => { ob = {step: 1, data: {...S.profile, weight: latestWeight(), injuries: [...(S.profile.injuries || [])]}, edit: true}; render(); window.scrollTo(0, 0); },
+  eat: a => { const k = dkey(); const e = S.eaten[k] = S.eaten[k] || {}; e[a.dataset.slot] = !e[a.dataset.slot]; save(); render(); },
+  'tr-day': a => { selDay = Number(a.dataset.wd); render(); },
+  'tr-today': a => { const wd = Number(a.dataset.wd), k = dkey(); const P = plan(); if (S.logs[k] && sessionDone(k) && S.logs[k].wd !== wd) { toast('Danes si že opravil(-a) trening'); return; } S.logs[k] = {wd, name: P[wd].name, items: {}, done: false}; save(); selDay = dow(); render(); window.scrollTo(0, 0); },
+  'set-done': a => {
+    const c = workoutCtx(selDay); if (!c.w || c.isFuture) return;
+    const i = Number(a.dataset.i), si = Number(a.dataset.si), it = c.w.items[i];
+    const item = ensureItem(c.wWd, i, it);
+    while (item.sets.length <= si) item.sets.push({w: '', r: '', d: false});
+    const st = item.sets[si];
+    if (!st.d) {
+      const e = EX[it.id];
+      const rIn = $(`#r-${c.k}-${i}-${si}`), wIn = $(`#w-${c.k}-${i}-${si}`);
+      const isNum = v => /^\d+([.,]\d+)?$/.test(v);
+      if (rIn && !st.r && isNum(rIn.placeholder)) st.r = rIn.placeholder;
+      if (wIn && !st.w && isNum(wIn.placeholder)) st.w = wIn.placeholder;
+      st.d = true;
+      try { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch (er) {}
+      const last = si === it.rx.s - 1 && i === c.w.items.length - 1;
+      if (!last && it.rx.rest) startRest(it.rx.rest);
+      if (e.type === 'cardio' && !it.rx.rest) {}
+    } else st.d = false;
+    save(); render();
+  },
+  'tr-finish': () => { const c = workoutCtx(selDay); if (!c.w) return; const k = c.k; if (!S.logs[k]) S.logs[k] = {wd: c.wWd, name: c.w.name, items: {}, done: false}; S.logs[k].done = true; S.logs[k].name = c.w.name; rest = null; clearInterval(restTimer); save(); render(); toast('Trening shranjen. Bravo!'); window.scrollTo(0, 0); },
+  'rest-adj': a => { if (!rest) return; rest.end += Number(a.dataset.v) * 1000; rest.total = Math.max(5, rest.total + Number(a.dataset.v)); rest.finished = false; renderRest(); },
+  'rest-skip': () => { rest = null; clearInterval(restTimer); renderRest(); },
+  'ex-demo': a => openDemo(a.dataset.id, a.dataset.i != null ? Number(a.dataset.i) : null),
+  'ex-swap': a => { const c = workoutCtx(selDay); S.overrides[c.wWd + ':' + a.dataset.i] = a.dataset.to; const log = S.logs[c.k]; if (log && log.items[a.dataset.i]) delete log.items[a.dataset.i]; save(); closeSheet(); render(); toast('Vaja zamenjana'); },
+  'sheet-close': () => closeSheet(),
+  'nut-tab': a => { nutTab = a.dataset.v; render(); },
+  'nut-day': a => { nutDay = Number(a.dataset.v); render(); },
+  shop: a => { S.shop[a.dataset.id] = !S.shop[a.dataset.id]; save(); render(); },
+  'shop-clear': () => { S.shop = {}; save(); render(); },
+  'chat-chip': a => sendChat(a.dataset.t),
+  'chat-stop': () => chatCtl?.abort(),
+  'str-ex': a => { strengthEx = a.dataset.id; render(); },
+  'ph-sel': a => { const id = a.dataset.id; if (cmpSel.includes(id)) cmpSel = cmpSel.filter(x => x !== id); else cmpSel = [...cmpSel, id].slice(-2); if (cmpSel.length === 2) cmpSel.sort((x, y) => (photos.find(p => p.id === x).d < photos.find(p => p.id === y).d ? -1 : 1)); renderKeepCmp(); },
+  'ph-del': () => { if (!cmpSel.length) { toast('Najprej izberi fotografijo'); return; } photos = photos.filter(p => !cmpSel.includes(p.id)); cmpSel = []; lsSet(LS_PHOTOS, photos); render(); toast('Izbrisano'); },
+  'test-pick': a => { S.test.type = a.dataset.v; S.overrides = Object.fromEntries(Object.entries(S.overrides).filter(([k]) => Number(k.split(':')[0]) !== SCHED[S.profile.days].slice(-1)[0])); save(); render(); },
+  'test-change': () => { S.test.type = null; S.test.targets = {}; save(); render(); },
+  'test-date-edit': () => { const r = $('#date-row'); if (r) { r.hidden = false; $('#test-date').focus(); } },
+  'test-date-save': () => { const v = $('#test-date').value; if (!v) { toast('Izberi datum'); return; } S.test.date = v; save(); render(); },
+  'test-train': () => { selDay = SCHED[S.profile.days].slice(-1)[0]; go('trening'); },
+  'mock-open': () => openMock(),
+  'tm-mode': a => { testTimer.mode = a.dataset.v; testTimer.acc = 0; testTimer.run = false; clearInterval(testTimer.iv); document.querySelectorAll('[data-a="tm-mode"]').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === testTimer.mode)); $('#tm-btn').textContent = 'Start'; updTimer(); },
+  'tm-toggle': a => { try { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {}
+    if (testTimer.run) { testTimer.acc += (Date.now() - testTimer.start) / 1000; testTimer.run = false; clearInterval(testTimer.iv); a.textContent = 'Nadaljuj'; }
+    else { if (testTimer.mode === 'cd' && testTimer.acc >= 120) testTimer.acc = 0; testTimer.start = Date.now(); testTimer.run = true; testTimer.iv = setInterval(updTimer, 100); a.textContent = 'Ustavi'; } updTimer(); },
+  'tm-reset': () => { testTimer.acc = 0; testTimer.run = false; clearInterval(testTimer.iv); $('#tm-btn').textContent = 'Start'; updTimer(); },
+  'target-edit': a => {
+    const T = TESTS[S.test.type], dsc = T.d.find(x => x.id === a.dataset.id);
+    openSheet(`<div class="row between"><h2>Cilj: ${esc(dsc.n)}</h2><button class="iconbtn" data-a="sheet-close" aria-label="Zapri">${ic('x')}</button></div>
+      <form id="targetform" data-id="${dsc.id}" class="stack"><label class="stack-s"><span class="muted small">${dsc.time ? 'Čas v minutah in sekundah (npr. 11:30)' : 'Vrednost v enoti ' + dsc.u}</span><input class="field" id="target-in" value="${fmtVal(dsc, targetFor(dsc))}" inputmode="${dsc.time ? 'text' : 'decimal'}"></label>
+      <button class="btn primary block" type="submit">Shrani cilj</button></form>`);
+  },
+  'plan-pick': a => { confirmPlan = a.dataset.v; render(); },
+  'plan-cancel': () => { confirmPlan = null; render(); },
+  'plan-confirm': () => { S.sub.plan = confirmPlan; confirmPlan = null; save(); render(); toast('Paket je označen'); },
+  'reset-ask': () => { confirmReset = true; render(); },
+  'reset-cancel': () => { confirmReset = false; render(); },
+  'reset-do': () => { confirmReset = false; setCode(''); syncState = 'local'; S = freshState(); photos = []; lsSet(LS_PHOTOS, photos); save(); ob = {step: 0, data: {...S.profile}}; render(); }
+};
+function renderKeepCmp() { const y = window.scrollY; render(); window.scrollTo(0, y); }
+
+document.addEventListener('click', e => {
+  const a = e.target.closest('[data-a]'); if (!a || a.disabled) return;
+  const fn = ACT[a.dataset.a]; if (fn) { e.preventDefault(); fn(a, e); }
+});
+let setSaveT = null;
+document.addEventListener('input', e => {
+  const t = e.target;
+  if (t.dataset.in === 'ob-range') { const q = Q[ob.step - 1]; ob.data[q.k] = Number(t.value); $('#obnum').textContent = fmtN(ob.data[q.k], q.step < 1 ? 1 : 0); }
+  if (t.dataset.in === 'set') {
+    const c = workoutCtx(selDay); if (!c.w) return;
+    const i = Number(t.dataset.i), si = Number(t.dataset.si);
+    const item = ensureItem(c.wWd, i, c.w.items[i]);
+    while (item.sets.length <= si) item.sets.push({w: '', r: '', d: false});
+    item.sets[si][t.dataset.f] = t.value.replace(',', '.').replace(/[^\d.]/g, '');
+    clearTimeout(setSaveT); setSaveT = setTimeout(save, 600);
+  }
+  if (t.id === 'chat-in') { t.style.height = 'auto'; t.style.height = Math.min(140, t.scrollHeight) + 'px'; }
+});
+document.addEventListener('change', e => {
+  const t = e.target;
+  if (t.dataset.in === 'photo' && t.files && t.files[0]) {
+    const f = t.files[0], rd = new FileReader();
+    rd.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const sc = Math.min(1, 720 / Math.max(img.width, img.height)), cv = document.createElement('canvas');
+        cv.width = Math.round(img.width * sc); cv.height = Math.round(img.height * sc);
+        cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+        const src = cv.toDataURL('image/jpeg', 0.8);
+        const next = [...photos, {id: 'p' + Date.now(), d: dkey(), src}];
+        if (lsSet(LS_PHOTOS, next)) { photos = next; cmpSel = []; render(); toast('Fotografija dodana'); }
+        else toast('Na napravi ni več prostora. Izbriši starejše fotografije.');
+      };
+      img.onerror = () => toast('Te datoteke ni mogoče odpreti kot sliko.');
+      img.src = rd.result;
+    };
+    rd.readAsDataURL(f);
+  }
+});
+document.addEventListener('submit', e => {
+  const f = e.target; e.preventDefault();
+  if (f.id === 'composer') { const t = $('#chat-in'); const v = t.value; t.value = ''; sendChat(v); }
+  if (f.id === 'codeform') restoreFromCode($('#code-in').value);
+  if (f.id === 'wform') { const v = Number($('#w-in').value.replace(',', '.')); if (!(v > 30 && v < 300)) { toast('Vpiši težo v kilogramih, npr. 78,5'); return; } const k = dkey(), ex = S.weights.find(w => w.d === k); if (ex) ex.kg = v; else S.weights.push({d: k, kg: v}); S.profile.weight = v; save(); render(); toast('Teža shranjena'); }
+  if (f.id === 'mockform') {
+    const T = TESTS[S.test.type], r = {}; let any = false;
+    for (const dsc of T.d) { const raw = f.elements[dsc.id].value.trim(); if (!raw) continue; const v = dsc.time ? parseTime(raw) : Number(raw.replace(',', '.')); if (v == null || !isFinite(v)) { toast('Preveri vnos: ' + dsc.n); return; } r[dsc.id] = v; any = true; }
+    if (!any) { toast('Vpiši vsaj en rezultat'); return; }
+    S.test.mocks.push({d: dkey(), r}); save(); closeSheet(); render(); toast('Rezultati poskusnega testa shranjeni');
+  }
+  if (f.id === 'targetform') {
+    const T = TESTS[S.test.type], dsc = T.d.find(x => x.id === f.dataset.id), raw = $('#target-in').value;
+    const v = dsc.time ? parseTime(raw) : Number(String(raw).replace(',', '.'));
+    if (v == null || !isFinite(v) || v <= 0) { toast('Vpiši veljavno vrednost'); return; }
+    S.test.targets[dsc.id] = v; save(); closeSheet(); render();
+  }
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && $('#overlay')) closeSheet();
+  if (e.key === 'Enter' && !e.shiftKey && e.target.id === 'chat-in') { e.preventDefault(); $('#composer').requestSubmit(); }
+});
+document.addEventListener('visibilitychange', () => { if (!document.hidden && rest) tickRest(); });
+
+render();
+requestAnimationFrame(animLoop);
+initRemote();
+</script>
+
+</body>
+</html>
