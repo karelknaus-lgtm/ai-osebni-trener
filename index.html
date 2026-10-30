@@ -266,6 +266,9 @@ input[type=range]{width:100%;accent-color:var(--accent);height:28px}
 .daygrid button{height:84px;border-radius:20px;background:var(--surface);font-family:var(--display);font-stretch:118%;font-weight:800;font-size:30px;border:1.5px solid transparent}
 .daygrid button[aria-pressed="true"]{background:var(--accent);color:var(--ink)}
 .ob-foot{margin-top:auto;display:flex;flex-direction:column;gap:10px}
+.auth{gap:18px}.auth .welcome{padding-top:2vh;gap:16px}.auth .welcome h1{font-size:36px}.auth .welcome .fig-hero{height:140px}
+@media (min-width:640px){.auth .welcome h1{font-size:44px}}
+.auth-err{color:var(--bad);font-weight:700;font-size:14px;margin:0}
 .welcome{display:flex;flex-direction:column;gap:22px;padding-top:6vh}
 .welcome h1{font-size:46px;line-height:.98;font-stretch:122%}
 @media (min-width:640px){.welcome h1{font-size:60px}}
@@ -457,61 +460,174 @@ const freshState = () => ({v: 1, onboarded: false, profile: {goal: null, sex: nu
   nutrition: {enabled: false, meals: ['zajtrk', 'kosilo', 'malica', 'vecerja'], budget: {amount: null, period: 'teden'}}, test: {type: null, date: null, targets: {}, mocks: []}, sub: {plan: 'trial'}, example: false, updatedAt: 0});
 const migrate = s => Object.assign(freshState(), s || {});
 let S = migrate(lsGet(LS_KEY));
-let photos = lsGet(LS_PHOTOS) || [];
 
-/* ---------- cloud sync (Supabase) ---------- */
+/* ---------- account and cloud sync (Supabase) ---------- */
 const SB_URL = 'https://ztvyxybjvehmvctulztm.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp0dnl4eWJqdmVobXZjdHVsenRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMzMDQ1NTEsImV4cCI6MjEwODg4MDU1MX0.gyUWUuGb829fofx57EcXB4ddO3rcaf46-3jagv4Wrtw';
 const SB_H = {apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json'};
-const LS_CODE = 'aitrener:code';
-let syncCode = (() => { try { return localStorage.getItem(LS_CODE) || ''; } catch (e) { return ''; } })();
-let remoteTimer = null, writing = false, pendingWrite = false, syncState = 'local', showCodeForm = false;
-const normCode = v => String(v || '').toUpperCase().replace(/[^A-Z0-9]/g, '').replace(/(.{4})(?=.)/g, '$1-');
-function newCode() { const A = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789', b = crypto.getRandomValues(new Uint8Array(16)); return normCode(Array.from(b, x => A[x % 32]).join('')); }
-function setCode(c) { syncCode = c; try { c ? localStorage.setItem(LS_CODE, c) : localStorage.removeItem(LS_CODE); } catch (e) {} }
-async function rpc(fn, args) {
-  const r = await fetch(SB_URL + '/rest/v1/rpc/' + fn, {method: 'POST', headers: SB_H, body: JSON.stringify(args)});
-  if (!r.ok) throw new Error('rpc ' + r.status);
+const LS_AUTH = 'aitrener:auth', LS_OWNER = 'aitrener:owner';
+const APP_URL = location.origin + location.pathname;
+// session: {access_token, refresh_token, expires_at, user: {id, email, name}}
+let session = lsGet(LS_AUTH);
+const photosKey = () => session ? 'aitrener:photos:' + session.user.id : LS_PHOTOS;
+let photos = lsGet(photosKey()) || [];
+let remoteTimer = null, writing = false, pendingWrite = false, syncState = 'local', remoteReady = false, refreshing = null;
+const authInit = (view = 'signup') => ({view, busy: false, err: '', email: ''});
+let auth = authInit();
+const userName = () => session?.user.name || '';
+
+const AUTH_ERR = {
+  invalid_credentials: 'Napačen e-naslov ali geslo.',
+  invalid_grant: 'Napačen e-naslov ali geslo.',
+  email_not_confirmed: 'E-naslov še ni potrjen. Odpri povezavo, ki smo ti jo poslali po e-pošti.',
+  user_already_exists: 'Račun s tem e-naslovom že obstaja. Prijavi se.',
+  email_exists: 'Račun s tem e-naslovom že obstaja. Prijavi se.',
+  weak_password: 'Geslo je prešibko. Uporabi vsaj 8 znakov, črke in številke.',
+  same_password: 'Novo geslo mora biti drugačno od starega.',
+  email_address_invalid: 'Ta e-naslov ni veljaven.',
+  validation_failed: 'Preveri e-naslov in geslo.',
+  over_email_send_rate_limit: 'Poslali smo preveč e-pošte. Poskusi znova čez nekaj minut.',
+  over_request_rate_limit: 'Preveč poskusov. Počakaj minuto in poskusi znova.',
+  signup_disabled: 'Registracija je trenutno izklopljena.',
+  otp_expired: 'Povezava je potekla ali je bila že uporabljena. Prijavi se ali zahtevaj novo.',
+  network: 'Ni povezave z internetom. Poskusi znova.'
+};
+const authMsg = e => AUTH_ERR[e.code] || 'Nekaj je šlo narobe. Poskusi znova.';
+async function authApi(path, body, tok, method = 'POST') {
+  let r;
+  try { r = await fetch(SB_URL + '/auth/v1/' + path, {method, headers: {apikey: SB_KEY, 'Content-Type': 'application/json', ...(tok ? {Authorization: 'Bearer ' + tok} : {})}, body: body ? JSON.stringify(body) : undefined}); }
+  catch (e) { throw Object.assign(new Error('auth network'), {code: 'network'}); }
+  let data = null; try { data = await r.json(); } catch (e) {}
+  if (!r.ok) throw Object.assign(new Error('auth ' + r.status), {status: r.status, code: data?.error_code || data?.error || 'unknown'});
+  return data;
+}
+const mapUser = u => ({id: u.id, email: u.email, name: String(u.user_metadata?.name || '').trim()});
+function setSession(d) {
+  if (!d) { session = null; try { localStorage.removeItem(LS_AUTH); } catch (e) {} return; }
+  session = {access_token: d.access_token, refresh_token: d.refresh_token, expires_at: d.expires_at || Math.floor(Date.now() / 1000) + (d.expires_in || 3600), user: d.user ? mapUser(d.user) : session.user};
+  lsSet(LS_AUTH, session);
+}
+async function token() {
+  if (!session) throw Object.assign(new Error('signed out'), {code: 'signed_out'});
+  if (session.expires_at - 60 > Date.now() / 1000) return session.access_token;
+  refreshing = refreshing || authApi('token?grant_type=refresh_token', {refresh_token: session.refresh_token})
+    .then(setSession, e => { if (e.status === 400 || e.status === 401) { clearLocal(); auth = authInit('login'); auth.err = 'Seja je potekla. Prijavi se znova.'; render(); } throw e; })
+    .finally(() => { refreshing = null; });
+  await refreshing;
+  return session.access_token;
+}
+async function db(path, opt = {}) {
+  const r = await fetch(SB_URL + '/rest/v1/' + path, {...opt, headers: {apikey: SB_KEY, Authorization: 'Bearer ' + await token(), 'Content-Type': 'application/json', ...opt.headers}});
+  if (!r.ok) throw new Error('db ' + r.status);
   const t = await r.text(); return t ? JSON.parse(t) : null;
 }
+
 function save() { S.updatedAt = Date.now(); lsSet(LS_KEY, S); queueRemote(); }
-function queueRemote(delay = 1500) { if (!S.onboarded) return; clearTimeout(remoteTimer); remoteTimer = setTimeout(pushRemote, delay); }
+function queueRemote(delay = 1500) { if (!session || !remoteReady || S.example) return; clearTimeout(remoteTimer); remoteTimer = setTimeout(pushRemote, delay); }
 async function pushRemote() {
   if (writing) { pendingWrite = true; return; }
-  if (!syncCode) setCode(newCode());
   writing = true;
   try {
     const st = JSON.parse(JSON.stringify(S));
     st.chat = st.chat.slice(-40);
-    await rpc('trener_save', {p_code: syncCode, p_state: st, p_updated_at: S.updatedAt});
+    await db('user_state', {method: 'POST', headers: {Prefer: 'resolution=merge-duplicates,return=minimal'}, body: JSON.stringify({user_id: session.user.id, state: st, updated_at: S.updatedAt})});
     syncState = 'cloud';
   } catch (e) { syncState = 'error'; }
   writing = false;
   if (pendingWrite) { pendingWrite = false; queueRemote(800); }
 }
-async function initRemote() {
-  if (!syncCode) { if (S.onboarded) queueRemote(0); return; }
+// fresh: this device's data has not belonged to this account before, so the account's saved data wins.
+async function initRemote(fresh) {
+  if (!session) return;
   try {
-    const r = await rpc('trener_load', {p_code: syncCode});
-    if (r && r.state && (r.updated_at || 0) > (S.updatedAt || 0)) {
-      S = migrate(r.state); lsSet(LS_KEY, S);
-      if (S.onboarded && ob && !ob.edit) ob = null;
-      render();
-    } else if (S.onboarded && (!r || (S.updatedAt || 0) > (r.updated_at || 0))) queueRemote(0);
+    const r = (await db('user_state?select=state,updated_at&user_id=eq.' + session.user.id))[0];
+    if (r && (fresh || (r.updated_at || 0) > (S.updatedAt || 0))) { S = migrate(r.state); lsSet(LS_KEY, S); }
+    else if (S.onboarded && (!r || (S.updatedAt || 0) > (r.updated_at || 0))) setTimeout(pushRemote, 0);
     syncState = 'cloud';
-    if (route === 'profil') render();
   } catch (e) { syncState = 'error'; }
+  remoteReady = true;
+  if (S.onboarded) { if (ob && !ob.edit) ob = null; } else if (!ob) ob = newOb();
+  render();
 }
-async function restoreFromCode(raw) {
-  const code = normCode(raw);
-  if (code.replace(/-/g, '').length !== 16) { toast('Koda ima 16 znakov, npr. ABCD-EFGH-JKLM-NPQR'); return; }
+const newOb = () => ({step: 1, data: {...S.profile}});
+// Data that was on this device before accounts existed moves into the first account that signs in here.
+function claimLocal() {
+  if (lsGet(LS_OWNER) === session.user.id) return false;
+  if (S.example) S = freshState();
+  else { const old = lsGet(LS_PHOTOS); if (old && old.length && !lsGet(photosKey())) lsSet(photosKey(), old); }
+  try { localStorage.removeItem(LS_PHOTOS); localStorage.removeItem('aitrener:code'); } catch (e) {}
+  lsSet(LS_OWNER, session.user.id); lsSet(LS_KEY, S);
+  photos = lsGet(photosKey()) || [];
+  return true;
+}
+function signedIn() {
+  const fresh = claimLocal();
+  auth = authInit(); remoteReady = false; syncState = 'local';
+  ob = S.onboarded ? null : newOb();
+  go('domov');
+  initRemote(fresh);
+}
+// Signing out leaves this device without the account's data; photos stay under the account's key on this device.
+function clearLocal() {
+  clearTimeout(remoteTimer);
+  setSession(null);
+  try { localStorage.removeItem(LS_OWNER); } catch (e) {}
+  S = freshState(); lsSet(LS_KEY, S); photos = []; ob = null; syncState = 'local'; remoteReady = false;
+}
+async function signOut() {
+  if (!S.example) { while (writing) await new Promise(r => setTimeout(r, 100)); clearTimeout(remoteTimer); await pushRemote(); }
+  if (syncState === 'error') { toast('Brez povezave. Podatki še niso shranjeni, zato se odjavi, ko bo povezava spet delovala.'); render(); return; }
+  const t = session?.access_token;
+  if (t) authApi('logout', null, t).catch(() => {});
+  clearLocal(); auth = authInit('login'); render(); window.scrollTo(0, 0);
+}
+async function deleteAccount() {
+  try { await db('rpc/delete_my_account', {method: 'POST', body: '{}'}); }
+  catch (e) { toast('Brisanje ni uspelo. Preveri povezavo in poskusi znova.'); return; }
+  try { localStorage.removeItem(photosKey()); } catch (e) {}
+  clearLocal(); auth = authInit(); render(); window.scrollTo(0, 0); toast('Račun in vsi podatki so izbrisani');
+}
+async function submitAuth(f) {
+  const v = auth.view, val = n => (f.elements[n]?.value || '').trim();
+  const email = val('email'), password = f.elements.password?.value || '', name = val('name');
+  auth.busy = true; auth.err = ''; auth.email = email || auth.email; render();
   try {
-    const r = await rpc('trener_load', {p_code: code});
-    if (!r || !r.state) { toast('Te kode ni v bazi. Preveri, ali je pravilno prepisana.'); return; }
-    setCode(code); S = migrate(r.state); lsSet(LS_KEY, S); syncState = 'cloud';
-    ob = S.onboarded ? null : {step: 0, data: {...S.profile}}; showCodeForm = false;
-    go('domov'); toast('Podatki so preneseni');
-  } catch (e) { toast('Povezava z bazo ni uspela. Poskusi znova.'); }
+    if (v === 'signup') {
+      const d = await authApi('signup?redirect_to=' + encodeURIComponent(APP_URL), {email, password, data: {name}});
+      if (d.access_token) { setSession(d); signedIn(); return; }
+      auth = {...authInit('check'), email};
+    } else if (v === 'login') {
+      setSession(await authApi('token?grant_type=password', {email, password}));
+      signedIn(); return;
+    } else if (v === 'reset') {
+      await authApi('recover?redirect_to=' + encodeURIComponent(APP_URL), {email});
+      auth = {...authInit('sent'), email};
+    } else if (v === 'newpass') {
+      await authApi('user', {password}, await token(), 'PUT');
+      signedIn(); toast('Geslo je spremenjeno'); return;
+    }
+  } catch (e) { auth.err = authMsg(e); }
+  auth.busy = false; render();
+}
+async function saveName(name) {
+  name = name.trim().slice(0, 40);
+  if (!name) { toast('Vpiši ime'); return; }
+  try { const u = await authApi('user', {data: {name}}, await token(), 'PUT'); session.user = mapUser(u); lsSet(LS_AUTH, session); render(); toast('Ime shranjeno'); }
+  catch (e) { toast(authMsg(e)); }
+}
+// Links from confirmation and password-reset emails come back with the session (or an error) in the URL hash.
+async function readAuthRedirect() {
+  const h = new URLSearchParams(location.hash.slice(1));
+  if (!h.has('access_token') && !h.has('error')) return false;
+  try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
+  if (!h.get('access_token')) { auth = authInit('login'); auth.err = AUTH_ERR[h.get('error_code')] || 'Povezava ne deluje. Prijavi se ali zahtevaj novo.'; render(); return true; }
+  const d = {access_token: h.get('access_token'), refresh_token: h.get('refresh_token'), expires_at: Number(h.get('expires_at')) || 0, expires_in: Number(h.get('expires_in')) || 3600};
+  try { d.user = await authApi('user', null, d.access_token, 'GET'); }
+  catch (e) { auth = authInit('login'); auth.err = authMsg(e); render(); return true; }
+  setSession(d);
+  if (h.get('type') === 'recovery') { auth = authInit('newpass'); render(); }
+  else { signedIn(); toast('Račun je potrjen'); }
+  return true;
 }
 
 /* ---------- AI coach (Supabase Edge Function) ---------- */
@@ -730,8 +846,8 @@ function ring(frac, label, size = 76) {
 /* ---------- UI state ---------- */
 const ROUTES = ['domov', 'trening', 'prehrana', 'trener', 'napredek', 'testi', 'profil'];
 let route = ROUTES.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'domov';
-let ob = S.onboarded ? null : {step: 0, data: {...S.profile}};
-let selDay = dow(), nutTab = 'dan', nutDay = dow(), strengthEx = null, cmpSel = [], confirmReset = false, confirmPlan = null;
+let ob = S.onboarded || !session ? null : newOb();
+let selDay = dow(), nutTab = 'dan', nutDay = dow(), strengthEx = null, cmpSel = [], confirmReset = false, confirmDel = false, confirmPlan = null;
 let rest = null, restTimer = null, audioCtx = null, toastTimer = null;
 const NAV = [['domov', 'Domov', 'home'], ['trening', 'Trening', 'dumbbell'], ['prehrana', 'Prehrana', 'bowl'], ['trener', 'AI trener', 'chat'], ['napredek', 'Napredek', 'chart'], ['testi', 'Testi', 'target'], ['profil', 'Profil', 'user']];
 
@@ -742,13 +858,15 @@ function go(r) { route = r; try { history.replaceState(null, '', '#' + r); } cat
 function render() {
   chartN = 0;
   const app = $('#app');
+  if ((!session && !S.example) || auth.view === 'newpass') { app.innerHTML = vAuth(); return; }
+  if (!remoteReady && !S.onboarded && !S.example) { app.innerHTML = vLoading(); return; }
   if (ob) { app.innerHTML = vOnboarding(); return; }
-  const initials = S.profile.sex === 'z' ? 'Ž' : S.profile.sex === 'm' ? 'M' : 'T';
+  const initials = userName() ? esc(userName()[0].toUpperCase()) : S.profile.sex === 'z' ? 'Ž' : S.profile.sex === 'm' ? 'M' : 'T';
   const navBtn = ([r, l, i]) => `<button class="tab" data-a="nav" data-r="${r}" ${route === r ? 'aria-current="page"' : ''}>${ic(i)}<span>${l}</span></button>`;
   const views = {domov: vHome, trening: vTrening, prehrana: vPrehrana, trener: vTrener, napredek: vNapredek, testi: vTesti, profil: vProfil};
   app.innerHTML = `
     <aside class="side"><div class="logo"><span class="logo-mark">AI</span>osebni trener</div><nav>${NAV.map(navBtn).join('')}</nav>
-      <div class="side-foot"><span>${syncState === 'cloud' ? 'Podatki so shranjeni v oblaku.' : 'Podatki so shranjeni na tej napravi.'}</span></div></aside>
+      <div class="side-foot"><span>${syncState === 'cloud' ? 'Podatki so shranjeni v tvojem računu.' : 'Podatki so shranjeni na tej napravi.'}</span></div></aside>
     <header class="top"><div class="logo"><span class="logo-mark">AI</span>osebni trener</div><button class="avatar" data-a="nav" data-r="profil" aria-label="Profil">${initials}</button></header>
     <main class="view" id="view">${S.example ? `<div class="banner"><span>Ogleduješ primer z izmišljenimi podatki.</span><button class="btn small primary" data-a="ex-leave">Ustvari svoj načrt</button></div>` : ''}${views[route]()}</main>
     <nav class="tabbar" aria-label="Glavni meni">${NAV.slice(0, 6).map(navBtn).join('')}</nav>
@@ -756,6 +874,45 @@ function render() {
   renderRest();
   if (route === 'trener') { const log = $('#chatlog'); if (log) log.lastElementChild?.scrollIntoView({block: 'end'}); }
 }
+
+/* --- account --- */
+function vAuth() {
+  const v = auth.view, busy = auth.busy;
+  const head = `<div class="logo"><span class="logo-mark">AI</span>osebni trener</div>`;
+  const field = (name, label, type, ac, extra = '') => `<label class="stack-s"><span class="small muted">${label}</span><input class="field" name="${name}" type="${type}" autocomplete="${ac}" required ${extra}></label>`;
+  const email = field('email', 'E-pošta', 'email', 'email', `value="${esc(auth.email)}" inputmode="email"`);
+  const err = auth.err ? `<p class="auth-err" role="alert">${esc(auth.err)}</p>` : '';
+  const submit = l => `<button class="btn primary block" type="submit" ${busy ? 'disabled' : ''}>${busy ? 'Počakaj …' : l}</button>`;
+  const back = `<button class="btn ghost block" data-a="auth-view" data-v="login">Nazaj na prijavo</button>`;
+  if (v === 'check' || v === 'sent') {
+    return `<div class="ob auth">${head}<div class="ob-q"><h1>Preveri e-pošto</h1>
+      <p class="muted">${v === 'check' ? `Na <b>${esc(auth.email)}</b> smo poslali povezavo za potrditev računa. Odpri jo na tej napravi in aplikacija se odpre sama.` : `Če obstaja račun z e-naslovom <b>${esc(auth.email)}</b>, smo nanj poslali povezavo za novo geslo.`}</p>
+      <p class="small muted">Sporočila ni? Preveri mapo z neželeno pošto.</p></div>
+      <div class="ob-foot">${back}</div></div>`;
+  }
+  if (v === 'newpass') {
+    return `<div class="ob auth">${head}<div class="ob-q"><h1>Novo geslo</h1><p class="muted">Vpiši novo geslo za ${esc(session?.user.email || 'svoj račun')}.</p></div>
+      <form id="authform" class="stack">${field('password', 'Novo geslo (vsaj 8 znakov)', 'password', 'new-password', 'minlength="8"')}${err}${submit('Shrani geslo')}</form></div>`;
+  }
+  if (v === 'reset') {
+    return `<div class="ob auth">${head}<div class="ob-q"><h1>Pozabljeno geslo</h1><p class="muted">Vpiši e-naslov in poslali ti bomo povezavo za novo geslo.</p></div>
+      <form id="authform" class="stack">${email}${err}${submit('Pošlji povezavo')}</form>${back}</div>`;
+  }
+  const legacy = S.onboarded && !S.example, up = v === 'signup';
+  return `<div class="ob auth">${head}
+    <div class="welcome"><div class="fig-hero">${figSVG('squat')}</div><h1>Tvoj trening in jedilnik. Na enem mestu.</h1></div>
+    ${legacy ? `<div class="banner"><span>Na tej napravi so tvoji dosedanji podatki. Ko ustvariš račun, jih prenesemo vanj.</span></div>` : ''}
+    <div class="seg" role="group" aria-label="Račun"><button data-a="auth-view" data-v="signup" aria-pressed="${up}">Nov račun</button><button data-a="auth-view" data-v="login" aria-pressed="${!up}">Prijava</button></div>
+    <form id="authform" class="stack">
+      ${up ? field('name', 'Ime', 'text', 'given-name', 'maxlength="40"') : ''}${email}
+      ${field('password', up ? 'Geslo (vsaj 8 znakov)' : 'Geslo', 'password', up ? 'new-password' : 'current-password', up ? 'minlength="8"' : '')}
+      ${err}${submit(up ? 'Ustvari račun' : 'Prijava')}
+    </form>
+    ${up ? '' : `<button class="btn ghost block small" data-a="auth-view" data-v="reset">Pozabljeno geslo?</button>`}
+    <div class="ob-foot">${legacy ? '' : `<button class="btn ghost block" data-a="ob-example">Najprej poglej primer</button>`}
+      <p class="small muted" style="text-align:center">7 dni brezplačno, nato 9,99 € na mesec ali 79,99 € na leto.</p></div></div>`;
+}
+const vLoading = () => `<div class="ob auth"><div class="logo"><span class="logo-mark">AI</span>osebni trener</div><div class="ob-q"><p class="muted" role="status">Nalagam tvoje podatke …</p></div></div>`;
 
 /* --- onboarding --- */
 const Q = [
@@ -772,15 +929,6 @@ const Q = [
 ];
 function vOnboarding() {
   const st = ob.step, d = ob.data;
-  if (st === 0) {
-    return `<div class="ob"><div class="logo"><span class="logo-mark">AI</span>osebni trener</div>
-      <div class="welcome"><div class="fig-hero">${figSVG('squat')}</div>
-        <h1>Tvoj trening in jedilnik. Na enem mestu.</h1>
-        <p class="muted" style="font-size:17px">Odgovori na 10 kratkih vprašanj. Pripravimo ti tedenski načrt vadbe in po želji jedilnik, ki ustreza tvojemu proračunu.</p></div>
-      <div class="ob-foot"><button class="btn primary block" data-a="ob-next">Začni</button><button class="btn ghost block" data-a="ob-example">Najprej poglej primer</button>
-      ${showCodeForm ? `<form id="codeform" class="row"><input class="field" id="code-in" placeholder="ABCD-EFGH-JKLM-NPQR" autocomplete="off" aria-label="Koda z druge naprave"><button class="btn" type="submit">Prenesi</button></form>` : `<button class="btn ghost block small" data-a="ob-code">Imam že kodo z druge naprave</button>`}
-      <p class="small muted" style="text-align:center">7 dni brezplačno, nato 9,99 € na mesec ali 79,99 € na leto.</p></div></div>`;
-  }
   if (st > Q.length) {
     const t = targets(d, Number(d.weight)), P = SCHED[d.days];
     return `<div class="ob"><div class="ob-top"><button class="iconbtn" data-a="ob-back" aria-label="Nazaj">${ic('left')}</button><div class="bar grow"><i style="width:100%"></i></div></div>
@@ -807,7 +955,7 @@ function vOnboarding() {
     body = `<div class="opts">${q.o.map(([v, l]) => `<button class="opt" data-a="ob-toggle" data-v="${v}" aria-pressed="${inj.includes(v)}"><div class="grow"><b>${l}</b></div><span class="tick">${ic('check')}</span></button>`).join('')}
       <button class="opt" data-a="ob-noinj" aria-pressed="${!inj.length}"><div class="grow"><b>Nimam poškodb</b></div><span class="tick">${ic('check')}</span></button></div>`;
   }
-  return `<div class="ob"><div class="ob-top"><button class="iconbtn" data-a="ob-back" aria-label="Nazaj">${ic('left')}</button><div class="bar grow"><i style="width:${pct}%"></i></div><span class="small muted num" style="font-size:13px">${st}/${Q.length}</span></div>
+  return `<div class="ob"><div class="ob-top"><button class="iconbtn" data-a="ob-back" aria-label="Nazaj" ${st > 1 || ob.edit ? '' : 'style="visibility:hidden"'}>${ic('left')}</button><div class="bar grow"><i style="width:${pct}%"></i></div><span class="small muted num" style="font-size:13px">${st}/${Q.length}</span></div>
     <div class="ob-q"><h1>${q.t}</h1>${q.sub ? `<p class="muted">${q.sub}</p>` : ''}</div>${body}
     <div class="ob-foot"><button class="btn primary block" data-a="ob-next" ${canNext ? '' : 'disabled'}>Naprej</button></div></div>`;
 }
@@ -834,7 +982,7 @@ function vHome() {
       <button class="btn small primary" data-a="nut-on" style="align-self:flex-start">Ustvari jedilnik</button></div>`;
   }
   return `
-    <div class="greet"><span class="eyebrow">${DAYS_FULL[today]}, ${longDate(tk)}</span><h1>${greet}.</h1></div>
+    <div class="greet"><span class="eyebrow">${DAYS_FULL[today]}, ${longDate(tk)}</span><h1>${greet}${userName() ? ', ' + esc(userName()) : ''}.</h1></div>
     <div class="card">
       <div class="row between"><div class="stack-s"><span class="eyebrow">Treningi ta teden</span><h2>${ws.done} od ${ws.planned}</h2></div>${ring(ws.planned ? ws.done / ws.planned : 0, Math.round(ws.planned ? ws.done / ws.planned * 100 : 0) + '%')}</div>
       <div class="week">${DAYS.map((n, i) => { const k = dkey(dateOfWd(i)), dn = sessionDone(k); return `<div class="d">${n}<span class="dot ${dn ? 'done' : P[i] ? 'plan' : ''} ${i === today ? 'today' : ''}">${dn ? ic('check') : ''}</span></div>`; }).join('')}</div>
@@ -996,6 +1144,7 @@ function coachContext() {
   const p = S.profile, t = targets(), P = plan(), eq = p.equip || 'home';
   const lines = [];
   lines.push(`Danes: ${DAYS_FULL[dow()]}, ${dkey()}.`);
+  if (userName()) lines.push(`Ime uporabnika: ${userName()}.`);
   lines.push(`Profil: ${p.sex === 'z' ? 'ženska' : 'moški'}, ${p.age} let, ${p.height} cm, ${fmtN(latestWeight(), 1)} kg. Cilj: ${GOALS[p.goal] || '-'}. Izkušnje: ${EXPS[p.exp] || '-'}. Vadba: ${eq === 'gym' ? 'fitnes' : 'doma'}, ${p.days} dni na teden. Poškodbe: ${(p.injuries || []).map(x => INJ[x]).join(', ') || 'brez'}.`);
   lines.push(`Prehranski cilj: ${t.kcal} kcal, ${t.prot} g beljakovin, ${t.carb} g OH, ${t.fat} g maščob.`);
   if (S.nutrition.enabled) { const wm = weekMenu(), b = S.nutrition.budget; lines.push(`Jedilnik: obroki ${selectedSlots().join(', ')}; proračun ${b.amount > 0 ? b.amount + ' € ' + periodLabel(b.period) : 'brez omejitve'}; današnji jedilnik: ${dayMenu(dow()).meals.map(m => m.label + ' ' + m.n).join('; ')} (≈ ${fmtEur(dayMenu(dow()).tot.cost)}).${wm.over ? ' Proračun je prenizek za izbrane obroke.' : ''}`); }
@@ -1219,12 +1368,14 @@ function vProfil() {
       <p class="small muted">Naročnino lahko kadar koli prekličeš. Po preizkusu ostanejo tvoji podatki shranjeni.</p>
     </section>
     <section class="card">
-      <div class="row between"><span class="eyebrow">Tvoja koda za druge naprave</span>${syncState === 'cloud' ? `<span class="pill ok">${ic('check')} Shranjeno v oblaku</span>` : syncState === 'error' ? '<span class="pill warn">Brez povezave</span>' : ''}</div>
-      ${syncCode ? `<div class="row wrap between"><span class="num" id="sync-code" style="font-size:22px;user-select:all">${esc(syncCode)}</span><button class="btn small" data-a="code-copy">Kopiraj</button></div>` : '<p class="small muted">Koda se ustvari ob prvem shranjevanju.</p>'}
-      <p class="small muted">S to kodo odpreš svoje podatke na drugem telefonu ali računalniku. Shrani si jo in je ne deli z drugimi. Fotografije ostanejo samo na tej napravi.</p>
-      <form id="codeform" class="row"><input class="field" id="code-in" placeholder="Koda z druge naprave" autocomplete="off" aria-label="Koda z druge naprave"><button class="btn" type="submit">Prenesi</button></form>
+      <div class="row between"><span class="eyebrow">Račun</span>${syncState === 'cloud' ? `<span class="pill ok">${ic('check')} Shranjeno v oblaku</span>` : syncState === 'error' ? '<span class="pill warn">Brez povezave</span>' : ''}</div>
+      ${session ? `<div>${kv('E-pošta', esc(session.user.email))}</div>
+      <form id="nameform" class="stack-s"><label class="small muted" for="name-in">Ime v pozdravu</label><div class="row"><input class="field" id="name-in" value="${esc(userName())}" maxlength="40" autocomplete="given-name" required><button class="btn" type="submit">Shrani</button></div></form>
+      <p class="small muted">Podatki so shranjeni v tvojem računu, zato se lahko prijaviš tudi na drugem telefonu ali računalniku. Fotografije ostanejo samo na tej napravi.</p>
+      <button class="btn block" data-a="sign-out">Odjava</button>` : `<p class="small muted">Primer ni povezan z računom.</p><button class="btn primary block" data-a="ex-leave">Ustvari svoj račun</button>`}
       <div class="divider"></div>
       ${confirmReset ? `<div class="banner" style="border-style:solid;border-color:var(--bad)"><span>Res izbrišem vse treninge, težo, klepet in fotografije?</span><div class="row"><button class="btn small" data-a="reset-cancel">Prekliči</button><button class="btn small" data-a="reset-do" style="background:var(--bad);color:var(--ink);border-color:var(--bad)">Izbriši</button></div></div>` : `<button class="btn small ghost" data-a="reset-ask" style="align-self:flex-start;color:var(--bad)">Izbriši vse podatke</button>`}
+      ${!session ? '' : confirmDel ? `<div class="banner" style="border-style:solid;border-color:var(--bad)"><span>Res izbrišem račun ${esc(session.user.email)} in vse podatke v njem? Tega ni mogoče razveljaviti.</span><div class="row"><button class="btn small" data-a="del-cancel">Prekliči</button><button class="btn small" data-a="del-do" style="background:var(--bad);color:var(--ink);border-color:var(--bad)">Izbriši račun</button></div></div>` : `<button class="btn small ghost" data-a="del-ask" style="align-self:flex-start;color:var(--bad)">Izbriši račun</button>`}
     </section>`;
 }
 
@@ -1278,14 +1429,14 @@ function loadExample() {
 const ACT = {
   nav: a => { if (a.dataset.r === 'trening') selDay = dow(); go(a.dataset.r); },
   'ob-example': () => { loadExample(); ob = null; go('domov'); },
-  'ex-leave': () => { setCode(''); syncState = 'local'; S = freshState(); photos = []; lsSet(LS_PHOTOS, photos); save(); ob = {step: 0, data: {...S.profile}}; render(); },
-  'ob-code': () => { showCodeForm = true; render(); setTimeout(() => $('#code-in')?.focus(), 0); },
-  'code-copy': () => {
-    const fallback = () => { const el = $('#sync-code'); const r = document.createRange(); r.selectNodeContents(el); const s = getSelection(); s.removeAllRanges(); s.addRange(r); toast('Koda je označena. Kopiraj jo s Ctrl+C.'); };
-    try { navigator.clipboard.writeText(syncCode).then(() => toast('Koda kopirana'), fallback); } catch (e) { fallback(); }
-  },
+  'ex-leave': () => { S = freshState(); lsSet(LS_KEY, S); if (!session) { photos = []; lsSet(LS_PHOTOS, photos); } ob = session ? newOb() : null; auth = authInit(); go('domov'); },
+  'auth-view': a => { auth = {...authInit(a.dataset.v), email: auth.email}; render(); window.scrollTo(0, 0); },
+  'sign-out': () => signOut(),
+  'del-ask': () => { confirmDel = true; render(); },
+  'del-cancel': () => { confirmDel = false; render(); },
+  'del-do': () => { confirmDel = false; deleteAccount(); },
   'ob-next': () => { ob.step++; render(); window.scrollTo(0, 0); },
-  'ob-back': () => { if (ob.step === 0 || (ob.edit && ob.step === 1)) { if (ob.edit) { ob = null; go('profil'); } return; } ob.step--; render(); },
+  'ob-back': () => { if (ob.step <= 1) { if (ob.edit) { ob = null; go('profil'); } return; } ob.step--; render(); },
   'ob-pick': a => { const q = Q[ob.step - 1]; ob.data[q.k] = a.dataset.v; render(); setTimeout(() => { if (ob && Q[ob.step - 1] === q) { ob.step++; render(); } }, 220); },
   'ob-num': a => { const q = Q[ob.step - 1]; ob.data[q.k] = clamp(Math.round((Number(ob.data[q.k]) + Number(a.dataset.dir) * q.step) * 10) / 10, q.min, q.max); $('#obnum').textContent = fmtN(ob.data[q.k], q.step < 1 ? 1 : 0); $('#ob-range').value = ob.data[q.k]; },
   'ob-days': a => { ob.data.days = Number(a.dataset.v); render(); },
@@ -1349,7 +1500,7 @@ const ACT = {
   'chat-stop': () => chatCtl?.abort(),
   'str-ex': a => { strengthEx = a.dataset.id; render(); },
   'ph-sel': a => { const id = a.dataset.id; if (cmpSel.includes(id)) cmpSel = cmpSel.filter(x => x !== id); else cmpSel = [...cmpSel, id].slice(-2); if (cmpSel.length === 2) cmpSel.sort((x, y) => (photos.find(p => p.id === x).d < photos.find(p => p.id === y).d ? -1 : 1)); renderKeepCmp(); },
-  'ph-del': () => { if (!cmpSel.length) { toast('Najprej izberi fotografijo'); return; } photos = photos.filter(p => !cmpSel.includes(p.id)); cmpSel = []; lsSet(LS_PHOTOS, photos); render(); toast('Izbrisano'); },
+  'ph-del': () => { if (!cmpSel.length) { toast('Najprej izberi fotografijo'); return; } photos = photos.filter(p => !cmpSel.includes(p.id)); cmpSel = []; lsSet(photosKey(), photos); render(); toast('Izbrisano'); },
   'test-pick': a => { S.test.type = a.dataset.v; S.overrides = Object.fromEntries(Object.entries(S.overrides).filter(([k]) => Number(k.split(':')[0]) !== TEST_WD)); save(); render(); },
   'test-change': () => { S.test.type = null; S.test.targets = {}; save(); render(); },
   'test-date-edit': () => { const r = $('#date-row'); if (r) { r.hidden = false; $('#test-date').focus(); } },
@@ -1377,7 +1528,7 @@ const ACT = {
   'plan-confirm': () => { S.sub.plan = confirmPlan; confirmPlan = null; save(); render(); toast('Paket je označen'); },
   'reset-ask': () => { confirmReset = true; render(); },
   'reset-cancel': () => { confirmReset = false; render(); },
-  'reset-do': () => { confirmReset = false; setCode(''); syncState = 'local'; S = freshState(); photos = []; lsSet(LS_PHOTOS, photos); save(); ob = {step: 0, data: {...S.profile}}; render(); }
+  'reset-do': () => { confirmReset = false; S = freshState(); photos = []; lsSet(photosKey(), photos); save(); ob = session ? newOb() : null; render(); }
 };
 function renderKeepCmp() { const y = window.scrollY; render(); window.scrollTo(0, y); }
 
@@ -1397,6 +1548,7 @@ document.addEventListener('input', e => {
     item.sets[si][t.dataset.f] = t.value.replace(',', '.').replace(/[^\d.]/g, '');
     clearTimeout(setSaveT); setSaveT = setTimeout(save, 600);
   }
+  if (t.form?.id === 'authform' && t.name === 'email') auth.email = t.value;
   if (t.id === 'chat-in') { t.style.height = 'auto'; t.style.height = Math.min(140, t.scrollHeight) + 'px'; }
 });
 document.addEventListener('change', e => {
@@ -1411,7 +1563,7 @@ document.addEventListener('change', e => {
         cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
         const src = cv.toDataURL('image/jpeg', 0.8);
         const next = [...photos, {id: 'p' + Date.now(), d: dkey(), src}];
-        if (lsSet(LS_PHOTOS, next)) { photos = next; cmpSel = []; render(); toast('Fotografija dodana'); }
+        if (lsSet(photosKey(), next)) { photos = next; cmpSel = []; render(); toast('Fotografija dodana'); }
         else toast('Na napravi ni več prostora. Izbriši starejše fotografije.');
       };
       img.onerror = () => toast('Te datoteke ni mogoče odpreti kot sliko.');
@@ -1423,7 +1575,8 @@ document.addEventListener('change', e => {
 document.addEventListener('submit', e => {
   const f = e.target; e.preventDefault();
   if (f.id === 'composer') { const t = $('#chat-in'); const v = t.value; t.value = ''; sendChat(v); }
-  if (f.id === 'codeform') restoreFromCode($('#code-in').value);
+  if (f.id === 'authform' && !auth.busy) submitAuth(f);
+  if (f.id === 'nameform') saveName($('#name-in').value);
   if (f.id === 'budform' && saveBudget()) { save(); render(); toast(S.nutrition.budget.amount ? 'Jedilnik je prilagojen proračunu' : 'Jedilnik je brez omejitve cene'); }
   if (f.id === 'wform') { const v = Number($('#w-in').value.replace(',', '.')); if (!(v > 30 && v < 300)) { toast('Vpiši težo v kilogramih, npr. 78,5'); return; } const k = dkey(), ex = S.weights.find(w => w.d === k); if (ex) ex.kg = v; else S.weights.push({d: k, kg: v}); S.profile.weight = v; save(); render(); toast('Teža shranjena'); }
   if (f.id === 'mockform') {
@@ -1447,7 +1600,7 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden && re
 
 render();
 requestAnimationFrame(animLoop);
-initRemote();
+readAuthRedirect().then(handled => { if (!handled && session) initRemote(false); });
 </script>
 
 </body>
