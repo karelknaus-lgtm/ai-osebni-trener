@@ -400,41 +400,43 @@ const INJ = {koleno: 'Koleno', rama: 'Rama', hrbet: 'Spodnji del hrbta', zapestj
 
 /* ---------- foods (approximate shelf prices, October 2026) ---------- */
 const PR = {
-  ovseni: {n: 'Ovseni kosmiči', s: 'Lidl', pack: 500, price: 0.99, k: 372, p: 13, c: 59, f: 7},
-  skyr: {n: 'Skyr naravni', s: 'Lidl', pack: 450, price: 1.49, k: 63, p: 11, c: 4, f: 0.2},
-  piscanec: {n: 'Piščančji file', s: 'Lidl', pack: 1000, price: 8.99, k: 110, p: 23, c: 0, f: 1.5},
-  jajca: {n: 'Jajca M, 10 kosov', s: 'Lidl', pack: 600, price: 2.49, k: 143, p: 12.6, c: 0.7, f: 9.5, per: 60, unit: 'jajce'},
-  riz: {n: 'Riž basmati', s: 'Lidl', pack: 1000, price: 2.19, k: 352, p: 8, c: 78, f: 0.8},
-  banane: {n: 'Banane', s: 'Lidl', pack: 1000, price: 1.29, k: 89, p: 1.1, c: 23, f: 0.3},
-  tuna: {n: 'Tuna v lastnem soku', s: 'Lidl', pack: 120, price: 1.29, k: 116, p: 26, c: 0, f: 1},
-  toast: {n: 'Polnozrnati toast', s: 'Lidl', pack: 500, price: 1.19, k: 247, p: 9, c: 41, f: 4},
-  arasidi: {n: 'Arašidovo maslo', s: 'Lidl', pack: 350, price: 2.49, k: 600, p: 25, c: 14, f: 49},
-  zelenjava: {n: 'Zamrznjena zelenjavna mešanica', s: 'Lidl', pack: 750, price: 1.79, k: 40, p: 2, c: 6, f: 0.5},
-  olje: {n: 'Oljčno olje', s: 'Lidl', pack: 750, price: 7.99, k: 884, p: 0, c: 0, f: 100},
-  mleko: {n: 'Mleko 1,5 %', s: 'Mercator', pack: 1000, price: 1.15, k: 46, p: 3.4, c: 4.8, f: 1.5},
-  testenine: {n: 'Polnozrnate testenine', s: 'Mercator', pack: 500, price: 1.49, k: 350, p: 13, c: 64, f: 2.5},
-  puran: {n: 'Mleto puranje meso', s: 'Mercator', pack: 500, price: 4.99, k: 150, p: 20, c: 0, f: 8},
-  cicerika: {n: 'Čičerika v pločevinki', s: 'Mercator', pack: 240, price: 0.99, k: 120, p: 7, c: 17, f: 2.5},
-  jabolka: {n: 'Jabolka', s: 'Mercator', pack: 1000, price: 1.69, k: 52, p: 0.3, c: 14, f: 0.2},
-  zrnati: {n: 'Zrnati sir', s: 'Mercator', pack: 200, price: 1.49, k: 98, p: 11, c: 3, f: 4.5},
-  krompir: {n: 'Krompir', s: 'Mercator', pack: 2000, price: 1.99, k: 77, p: 2, c: 17, f: 0.1},
-  losos: {n: 'Losos file, zamrznjen', s: 'Spar', pack: 250, price: 5.49, k: 200, p: 20, c: 0, f: 13},
-  ajda: {n: 'Ajdova kaša', s: 'Spar', pack: 500, price: 1.89, k: 343, p: 13, c: 72, f: 3.4},
-  grski: {n: 'Grški jogurt', s: 'Spar', pack: 500, price: 1.99, k: 73, p: 9, c: 4, f: 2},
-  borovnice: {n: 'Borovnice, zamrznjene', s: 'Spar', pack: 300, price: 2.79, k: 57, p: 0.7, c: 14, f: 0.3},
-  tortilje: {n: 'Polnozrnate tortilje', s: 'Spar', pack: 370, price: 1.79, k: 300, p: 9, c: 48, f: 7},
-  paradiznik: {n: 'Paradižnik', s: 'Spar', pack: 1000, price: 2.49, k: 18, p: 0.9, c: 3.9, f: 0.2},
-  fizol: {n: 'Rdeči fižol v pločevinki', s: 'Spar', pack: 240, price: 0.89, k: 110, p: 7.5, c: 15, f: 0.5},
-  mandlji: {n: 'Mandlji', s: 'Spar', pack: 200, price: 3.29, k: 600, p: 21, c: 10, f: 50}
+  ovseni: {n: 'Ovseni kosmiči', pack: 500, price: 0.99, k: 372, p: 13, c: 59, f: 7},
+  skyr: {n: 'Skyr naravni', pack: 450, price: 1.49, k: 63, p: 11, c: 4, f: 0.2},
+  piscanec: {n: 'Piščančji file', pack: 1000, price: 8.99, k: 110, p: 23, c: 0, f: 1.5},
+  jajca: {n: 'Jajca M, 10 kosov', pack: 600, price: 2.49, k: 143, p: 12.6, c: 0.7, f: 9.5, per: 60, unit: 'jajce'},
+  riz: {n: 'Riž basmati', pack: 1000, price: 2.19, k: 352, p: 8, c: 78, f: 0.8},
+  banane: {n: 'Banane', pack: 1000, price: 1.29, k: 89, p: 1.1, c: 23, f: 0.3},
+  tuna: {n: 'Tuna v lastnem soku', pack: 120, price: 1.29, k: 116, p: 26, c: 0, f: 1},
+  toast: {n: 'Polnozrnati toast', pack: 500, price: 1.19, k: 247, p: 9, c: 41, f: 4},
+  arasidi: {n: 'Arašidovo maslo', pack: 350, price: 2.49, k: 600, p: 25, c: 14, f: 49},
+  zelenjava: {n: 'Zamrznjena zelenjavna mešanica', pack: 750, price: 1.79, k: 40, p: 2, c: 6, f: 0.5},
+  olje: {n: 'Oljčno olje', pack: 750, price: 7.99, k: 884, p: 0, c: 0, f: 100},
+  mleko: {n: 'Mleko 1,5 %', pack: 1000, price: 1.15, k: 46, p: 3.4, c: 4.8, f: 1.5},
+  jogurt: {n: 'Navadni jogurt', pack: 500, price: 0.89, k: 61, p: 3.5, c: 4.7, f: 3.2},
+  testenine: {n: 'Polnozrnate testenine', pack: 500, price: 1.49, k: 350, p: 13, c: 64, f: 2.5},
+  puran: {n: 'Mleto puranje meso', pack: 500, price: 4.99, k: 150, p: 20, c: 0, f: 8},
+  cicerika: {n: 'Čičerika v pločevinki', pack: 240, price: 0.99, k: 120, p: 7, c: 17, f: 2.5},
+  jabolka: {n: 'Jabolka', pack: 1000, price: 1.69, k: 52, p: 0.3, c: 14, f: 0.2},
+  zrnati: {n: 'Zrnati sir', pack: 200, price: 1.49, k: 98, p: 11, c: 3, f: 4.5},
+  krompir: {n: 'Krompir', pack: 2000, price: 1.99, k: 77, p: 2, c: 17, f: 0.1},
+  losos: {n: 'Losos file, zamrznjen', pack: 250, price: 5.49, k: 200, p: 20, c: 0, f: 13},
+  ajda: {n: 'Ajdova kaša', pack: 500, price: 1.89, k: 343, p: 13, c: 72, f: 3.4},
+  grski: {n: 'Grški jogurt', pack: 500, price: 1.99, k: 73, p: 9, c: 4, f: 2},
+  borovnice: {n: 'Borovnice, zamrznjene', pack: 300, price: 2.79, k: 57, p: 0.7, c: 14, f: 0.3},
+  tortilje: {n: 'Polnozrnate tortilje', pack: 370, price: 1.79, k: 300, p: 9, c: 48, f: 7},
+  paradiznik: {n: 'Paradižnik', pack: 1000, price: 2.49, k: 18, p: 0.9, c: 3.9, f: 0.2},
+  fizol: {n: 'Rdeči fižol v pločevinki', pack: 240, price: 0.89, k: 110, p: 7.5, c: 15, f: 0.5},
+  mandlji: {n: 'Mandlji', pack: 200, price: 3.29, k: 600, p: 21, c: 10, f: 50}
 };
 const MEALS = {
-  zajtrk: [{n: 'Ovsena kaša s skyrom in borovnicami', i: {ovseni: 70, mleko: 250, skyr: 150, borovnice: 80}}, {n: 'Omleta s toastom in paradižnikom', i: {jajca: 180, toast: 70, paradiznik: 120}}, {n: 'Grški jogurt z ovsenimi kosmiči in banano', i: {grski: 250, ovseni: 50, banane: 120, arasidi: 15}}],
-  kosilo: [{n: 'Piščanec z rižem in zelenjavo', i: {piscanec: 160, riz: 80, zelenjava: 200, olje: 8}}, {n: 'Polnozrnate testenine s puranjo bolonjsko', i: {puran: 140, testenine: 90, paradiznik: 150, olje: 6}}, {n: 'Losos s pečenim krompirjem in zelenjavo', i: {losos: 125, krompir: 300, zelenjava: 200, olje: 5}}, {n: 'Ajdova kaša s piščancem in zelenjavo', i: {ajda: 80, piscanec: 150, zelenjava: 200, olje: 8}}],
-  malica: [{n: 'Zrnati sir z jabolkom', i: {zrnati: 200, jabolka: 150}}, {n: 'Toast z arašidovim maslom in banano', i: {toast: 60, arasidi: 20, banane: 100}}, {n: 'Skyr z mandlji', i: {skyr: 200, mandlji: 20}}],
-  vecerja: [{n: 'Tortilje s tuno in fižolom', i: {tortilje: 125, tuna: 120, fizol: 120, paradiznik: 100}}, {n: 'Čičerikina skleda z jajci', i: {cicerika: 200, jajca: 120, zelenjava: 150, olje: 8}}, {n: 'Omleta z zrnatim sirom', i: {jajca: 180, zrnati: 100, toast: 50, paradiznik: 100}}]
+  zajtrk: [{n: 'Ovsena kaša s skyrom in borovnicami', i: {ovseni: 70, mleko: 250, skyr: 150, borovnice: 80}}, {n: 'Omleta s toastom in paradižnikom', i: {jajca: 180, toast: 70, paradiznik: 120}}, {n: 'Grški jogurt z ovsenimi kosmiči in banano', i: {grski: 250, ovseni: 50, banane: 120, arasidi: 15}}, {n: 'Ovseni kosmiči z mlekom in banano', i: {ovseni: 80, mleko: 300, banane: 120}}],
+  kosilo: [{n: 'Piščanec z rižem in zelenjavo', i: {piscanec: 160, riz: 80, zelenjava: 200, olje: 8}}, {n: 'Polnozrnate testenine s puranjo bolonjsko', i: {puran: 140, testenine: 90, paradiznik: 150, olje: 6}}, {n: 'Losos s pečenim krompirjem in zelenjavo', i: {losos: 125, krompir: 300, zelenjava: 200, olje: 5}}, {n: 'Ajdova kaša s piščancem in zelenjavo', i: {ajda: 80, piscanec: 150, zelenjava: 200, olje: 8}}, {n: 'Testenine s fižolom in paradižnikom', i: {testenine: 100, fizol: 150, paradiznik: 150, olje: 6}}, {n: 'Riž s čičeriko in zelenjavo', i: {riz: 80, cicerika: 200, zelenjava: 200, olje: 8}}],
+  malica: [{n: 'Zrnati sir z jabolkom', i: {zrnati: 200, jabolka: 150}}, {n: 'Toast z arašidovim maslom in banano', i: {toast: 60, arasidi: 20, banane: 100}}, {n: 'Skyr z mandlji', i: {skyr: 200, mandlji: 20}}, {n: 'Jogurt z banano', i: {jogurt: 250, banane: 120}}, {n: 'Jabolko z arašidovim maslom', i: {jabolka: 180, arasidi: 20}}],
+  vecerja: [{n: 'Tortilje s tuno in fižolom', i: {tortilje: 125, tuna: 120, fizol: 120, paradiznik: 100}}, {n: 'Čičerikina skleda z jajci', i: {cicerika: 200, jajca: 120, zelenjava: 150, olje: 8}}, {n: 'Omleta z zrnatim sirom', i: {jajca: 180, zrnati: 100, toast: 50, paradiznik: 100}}, {n: 'Pečen krompir z jajci in zelenjavo', i: {krompir: 300, jajca: 120, zelenjava: 150, olje: 6}}]
 };
 const SLOTS = [['zajtrk', 'Zajtrk'], ['kosilo', 'Kosilo'], ['malica', 'Malica'], ['vecerja', 'Večerja']];
-const STORES = ['Lidl', 'Mercator', 'Spar'];
+const SLOT_SHARE = {zajtrk: 0.25, kosilo: 0.35, malica: 0.15, vecerja: 0.25};
+const PERIODS = [['dan', 'Na dan', 1], ['teden', 'Na teden', 7], ['mesec', 'Na mesec', 30]];
 
 /* ---------- tests ---------- */
 const TESTS = {
@@ -451,7 +453,8 @@ const LS_KEY = 'aitrener:v1', LS_PHOTOS = 'aitrener:photos:v1';
 const lsGet = k => { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } };
 const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } };
 const freshState = () => ({v: 1, onboarded: false, profile: {goal: null, sex: null, age: 28, height: 175, weight: 75, exp: null, equip: null, days: 3, injuries: []},
-  startDate: null, logs: {}, weights: [], eaten: {}, shop: {}, chat: [], overrides: {}, test: {type: null, date: null, targets: {}, mocks: []}, sub: {plan: 'trial'}, example: false, updatedAt: 0});
+  startDate: null, logs: {}, weights: [], eaten: {}, shop: {}, chat: [], overrides: {},
+  nutrition: {enabled: false, meals: ['zajtrk', 'kosilo', 'malica', 'vecerja'], budget: {amount: null, period: 'teden'}}, test: {type: null, date: null, targets: {}, mocks: []}, sub: {plan: 'trial'}, example: false, updatedAt: 0});
 const migrate = s => Object.assign(freshState(), s || {});
 let S = migrate(lsGet(LS_KEY));
 let photos = lsGet(LS_PHOTOS) || [];
@@ -595,24 +598,51 @@ function streak() {
 
 /* ---------- nutrition ---------- */
 function mealCalc(i) { let k = 0, p = 0, c = 0, f = 0, cost = 0; for (const [id, g] of Object.entries(i)) { const x = PR[id]; k += x.k * g / 100; p += x.p * g / 100; c += x.c * g / 100; f += x.f * g / 100; cost += x.price * g / x.pack; } return {k, p, c, f, cost}; }
-function dayMenu(wd) {
-  const picks = [MEALS.zajtrk[wd % 3], MEALS.kosilo[wd % 4], MEALS.malica[(wd + 1) % 3], MEALS.vecerja[(wd + 2) % 3]];
-  const base = picks.reduce((a, m) => a + mealCalc(m.i).k, 0);
-  const factor = clamp(targets().kcal / base, 0.7, 1.8);
-  const meals = picks.map((m, idx) => {
-    const i = {};
-    for (const [id, g] of Object.entries(m.i)) { const x = PR[id]; i[id] = x.per ? Math.max(1, Math.round(g * factor / x.per)) * x.per : (id === 'olje' ? Math.max(5, Math.round(g * Math.min(factor, 1.2))) : Math.max(10, Math.round(g * factor / 5) * 5)); }
-    return {slot: SLOTS[idx][0], label: SLOTS[idx][1], n: m.n, i, ...mealCalc(i)};
-  });
-  const tot = meals.reduce((a, m) => ({k: a.k + m.k, p: a.p + m.p, c: a.c + m.c, f: a.f + m.f, cost: a.cost + m.cost}), {k: 0, p: 0, c: 0, f: 0, cost: 0});
-  return {meals, tot};
+function scaleMeal(m, slot, kcal) {
+  const factor = clamp(kcal / mealCalc(m.i).k, 0.6, 2);
+  const i = {};
+  for (const [id, g] of Object.entries(m.i)) { const x = PR[id]; i[id] = x.per ? Math.max(1, Math.round(g * factor / x.per)) * x.per : (id === 'olje' ? Math.max(5, Math.round(g * Math.min(factor, 1.2))) : Math.max(10, Math.round(g * factor / 5) * 5)); }
+  return {slot, label: SLOTS.find(s => s[0] === slot)[1], n: m.n, i, ...mealCalc(i)};
 }
+const selectedSlots = () => SLOTS.map(s => s[0]).filter(k => S.nutrition.meals.includes(k));
+function dailyBudget() { const b = S.nutrition.budget; if (!b || !(b.amount > 0)) return null; return b.amount / (PERIODS.find(p => p[0] === b.period) || PERIODS[0])[2]; }
+// Builds the week by trying every combination of recipes for the chosen meals and keeping the
+// best-scoring one that fits the daily budget (protein, variety, no repeat from the day before).
+let menuKey = '', menuCache = null;
+function weekMenu() {
+  const t = targets(), slots = selectedSlots(), B = dailyBudget();
+  const key = JSON.stringify([t.kcal, slots, B]);
+  if (key === menuKey) return menuCache;
+  const cands = slots.map(s => MEALS[s].map((m, idx) => ({idx, ...scaleMeal(m, s, t.kcal * SLOT_SHARE[s])})));
+  const combos = [];
+  (function walk(d, pick) { if (d === cands.length) { combos.push(pick); return; } cands[d].forEach(c => walk(d + 1, [...pick, c])); })(0, []);
+  let prev = null; const days = [];
+  for (let wd = 0; wd < 7; wd++) {
+    let best = null, bestScore = -Infinity, cheapest = null;
+    for (const cb of combos) {
+      const cost = cb.reduce((a, m) => a + m.cost, 0);
+      if (!cheapest || cost < cheapest.cost) cheapest = {cb, cost};
+      if (B != null && cost > B) continue;
+      let score = cb.reduce((a, m) => a + m.p, 0) * 0.02;
+      cb.forEach((m, d) => { if (m.idx === (wd + d) % cands[d].length) score += 1; if (prev && prev[d] === m.idx) score -= 1.5; });
+      if (score > bestScore) { bestScore = score; best = cb; }
+    }
+    const over = !best; const pick = best || (cheapest ? cheapest.cb : []);
+    prev = pick.map(m => m.idx);
+    const tot = pick.reduce((a, m) => ({k: a.k + m.k, p: a.p + m.p, c: a.c + m.c, f: a.f + m.f, cost: a.cost + m.cost}), {k: 0, p: 0, c: 0, f: 0, cost: 0});
+    days.push({meals: pick, tot, over});
+  }
+  const minDay = Math.min(...combos.map(cb => cb.reduce((a, m) => a + m.cost, 0)));
+  menuKey = key; menuCache = {days, over: days.some(d => d.over), minDay, budget: B, kcal: t.kcal * slots.reduce((a, s) => a + SLOT_SHARE[s], 0)};
+  return menuCache;
+}
+const dayMenu = wd => weekMenu().days[wd];
 function gramsLabel(id, g) { const x = PR[id]; if (x.per) { const n = Math.round(g / x.per); return n + ' ' + plural(n, 'jajce', 'jajci', 'jajca', 'jajc'); } if (id === 'olje') return g + ' ml'; return g + ' g'; }
+function packLabel(id) { const x = PR[id]; if (x.per) return '10 kosov'; if (x.pack >= 1000) return fmtN(x.pack / 1000, 1) + (id === 'olje' ? ' l' : ' kg'); return x.pack + (id === 'olje' ? ' ml' : ' g'); }
 function shoppingList() {
   const tot = {};
   for (let wd = 0; wd < 7; wd++) for (const m of dayMenu(wd).meals) for (const [id, g] of Object.entries(m.i)) tot[id] = (tot[id] || 0) + g;
-  const list = Object.entries(tot).map(([id, g]) => { const x = PR[id]; const packs = Math.ceil(g / x.pack - 0.05) || 1; return {id, g, packs, cost: packs * x.price, store: x.s}; });
-  return list;
+  return Object.entries(tot).map(([id, g]) => { const x = PR[id]; const packs = Math.ceil(g / x.pack - 0.05) || 1; return {id, g, packs, cost: packs * x.price}; }).sort((a, b) => PR[a.id].n.localeCompare(PR[b.id].n, 'sl'));
 }
 
 /* ---------- stick-figure demos ---------- */
@@ -738,15 +768,16 @@ const Q = [
   {k: 'exp', t: 'Koliko izkušenj imaš s treningom?', type: 'choice', o: [['zacetnik', 'Začetnik', 'Manj kot 6 mesecev'], ['srednji', 'Srednje izkušen', '6 mesecev do 2 leti'], ['izkusen', 'Izkušen', 'Več kot 2 leti rednega treninga']]},
   {k: 'equip', t: 'Kje želiš trenirati?', type: 'choice', o: [['home', 'Doma', 'Lastna teža, po želji drog za zgibe'], ['gym', 'V fitnesu', 'Drogovi, ročke in naprave']]},
   {k: 'days', t: 'Koliko dni na teden lahko treniraš?', sub: 'Priporočamo 3 do 4 dni s počitkom vmes.', type: 'days'},
-  {k: 'injuries', t: 'Imaš kakšno poškodbo ali bolečino?', sub: 'Vaje, ki ta del obremenjujejo, bomo zamenjali z varnejšimi.', type: 'multi', o: Object.entries(INJ)}
+  {k: 'injuries', t: 'Imaš kakšno poškodbo ali bolečino?', sub: 'Vaje, ki ta del obremenjujejo, bomo zamenjali z varnejšimi.', type: 'multi', o: Object.entries(INJ)},
+  {k: 'mealplan', t: 'Želiš tudi jedilnik?', sub: 'Lahko ga vklopiš ali izklopiš kadar koli.', type: 'choice', o: [['da', 'Da, pripravi mi jedilnik', 'Izbereš obroke in koliko želiš porabiti'], ['ne', 'Ne, samo trening', 'Jedilnik lahko dodaš kasneje']]}
 ];
 function vOnboarding() {
   const st = ob.step, d = ob.data;
   if (st === 0) {
     return `<div class="ob"><div class="logo"><span class="logo-mark">AI</span>osebni trener</div>
       <div class="welcome"><div class="fig-hero">${figSVG('squat')}</div>
-        <h1>Trening, prehrana in priprava na test. Na enem mestu.</h1>
-        <p class="muted" style="font-size:17px">Odgovori na 9 kratkih vprašanj. Pripravimo ti tedenski načrt vadbe, jedilnik iz izdelkov iz Lidla, Mercatorja in Spara ter odštevanje do fizičnega testa.</p></div>
+        <h1>Tvoj trening in jedilnik. Na enem mestu.</h1>
+        <p class="muted" style="font-size:17px">Odgovori na 10 kratkih vprašanj. Pripravimo ti tedenski načrt vadbe in po želji jedilnik, ki ustreza tvojemu proračunu.</p></div>
       <div class="ob-foot"><button class="btn primary block" data-a="ob-next">Začni</button><button class="btn ghost block" data-a="ob-example">Najprej poglej primer</button>
       ${showCodeForm ? `<form id="codeform" class="row"><input class="field" id="code-in" placeholder="ABCD-EFGH-JKLM-NPQR" autocomplete="off" aria-label="Koda z druge naprave"><button class="btn" type="submit">Prenesi</button></form>` : `<button class="btn ghost block small" data-a="ob-code">Imam že kodo z druge naprave</button>`}
       <p class="small muted" style="text-align:center">7 dni brezplačno, nato 9,99 € na mesec ali 79,99 € na leto.</p></div></div>`;
@@ -787,9 +818,9 @@ function vHome() {
   const h = new Date().getHours(), greet = h < 10 ? 'Dobro jutro' : h < 18 ? 'Dober dan' : 'Dober večer';
   const P = plan(), today = dow(), tk = dkey();
   const todaysWd = S.logs[tk]?.wd ?? today, w = P[todaysWd];
-  const ws = weekStats(), t = targets(), menu = dayMenu(today);
-  const eaten = S.eaten[tk] || {}, kEaten = menu.meals.filter(m => eaten[m.slot]).reduce((a, m) => a + m.k, 0), pEaten = menu.meals.filter(m => eaten[m.slot]).reduce((a, m) => a + m.p, 0);
-  const wsort = sortedWeights(), wDelta = wsort.length > 1 ? wsort[wsort.length - 1].kg - wsort[0].kg : 0;
+  const ws = weekStats();
+  const totalDone = Object.keys(S.logs).filter(sessionDone).length;
+  const weekMins = DAYS.reduce((a, _, i) => { const k = dkey(dateOfWd(i)); const l = S.logs[k]; return a + (sessionDone(k) && P[l?.wd ?? i] ? P[l?.wd ?? i].mins : 0); }, 0);
   let next = null; for (let i = 1; i <= 7; i++) { const wd = (today + i) % 7; if (P[wd]) { next = {wd, ...P[wd]}; break; } }
   const done = sessionDone(tk);
   const workoutCard = w ? `
@@ -803,25 +834,29 @@ function vHome() {
       <p class="muted">Lahkotna hoja ali raztezanje pospešita regeneracijo.${next ? ` Naslednji trening: <b style="color:var(--fg)">${esc(next.name)}</b> v ${DAYS_IN[next.wd]}.` : ''}</p>
       <button class="btn small" data-a="nav" data-r="trening" style="align-self:flex-start">Vseeno treniraj danes</button>
     </div>`;
-  const tst = S.test.type ? TESTS[S.test.type] : null;
-  const testCard = tst ? (S.test.date ? (() => { const left = daysBetween(tk, S.test.date); return `<button class="card tight" data-a="nav" data-r="testi" style="text-align:left"><div class="row between"><div class="stack-s"><span class="eyebrow">Test ${esc(tst.n)}</span><span class="small muted">${longDate(S.test.date)}</span></div><div class="num acc" style="font-size:36px">${left >= 0 ? left : 0}<span class="small muted" style="font-size:13px"> ${plural(left, 'dan', 'dneva', 'dnevi', 'dni')}</span></div></div></button>`; })()
-    : `<button class="card tight" data-a="nav" data-r="testi" style="text-align:left"><div class="row between"><span>Vpiši datum testa (${esc(tst.n)})</span>${ic('right')}</div></button>`)
-    : S.profile.goal === 'test' ? `<button class="card tight" data-a="nav" data-r="testi" style="text-align:left"><div class="row between"><div class="stack-s"><span class="eyebrow">Fizični test</span><span>Izberi policijo ali Slovensko vojsko</span></div>${ic('right')}</div></button>` : '';
+  let mealCard;
+  if (S.nutrition.enabled) {
+    const menu = dayMenu(today), wm = weekMenu(), eaten = S.eaten[tk] || {};
+    const kEaten = menu.meals.filter(m => eaten[m.slot]).reduce((a, m) => a + m.k, 0);
+    mealCard = `<div class="card">
+      <div class="row between"><div class="stack-s"><span class="eyebrow">Današnji jedilnik</span><h2>${fmtN(kEaten)} <span class="muted" style="font-size:16px">/ ${fmtN(menu.tot.k)} kcal</span></h2></div><button class="btn small" data-a="nav" data-r="prehrana">Jedilnik</button></div>
+      <div class="bar"><i style="width:${clamp(kEaten / (menu.tot.k || 1) * 100, 0, 100)}%"></i></div>
+      <p class="small muted">Danes ≈ ${fmtEur(menu.tot.cost)}${wm.budget != null ? ` · proračun ${fmtEur(wm.budget)} na dan` : ''}${menu.over ? ' <span style="color:var(--warn)">· nad proračunom</span>' : ''}</p>
+      <div>${menu.meals.map(m => `<div class="meal-line"><button class="tick" data-a="eat" data-slot="${m.slot}" aria-pressed="${!!eaten[m.slot]}" aria-label="Označi ${m.label.toLowerCase()} kot pojeden">${ic('check')}</button><div class="grow"><div class="eyebrow">${m.label}</div><div style="font-weight:700">${esc(m.n)}</div></div><span class="small muted num" style="font-size:14px;white-space:nowrap">${Math.round(m.k)} kcal</span></div>`).join('')}</div>
+    </div>`;
+  } else {
+    mealCard = `<div class="card outline"><span class="eyebrow">Jedilnik</span><p class="muted">Izberi, katere obroke želiš, in koliko želiš porabiti. Jedilnik ti sestavimo glede na tvoj cilj.</p>
+      <button class="btn small primary" data-a="nut-on" style="align-self:flex-start">Ustvari jedilnik</button></div>`;
+  }
   return `
     <div class="greet"><span class="eyebrow">${DAYS_FULL[today]}, ${longDate(tk)}</span><h1>${greet}.</h1></div>
     ${workoutCard}
-    ${testCard}
     <div class="card">
-      <div class="row between"><div class="stack-s"><span class="eyebrow">Ta teden</span><h2>${ws.done} od ${ws.planned} ${plural(ws.planned, 'treninga', 'treningov', 'treningov', 'treningov')}</h2></div>${ring(ws.planned ? ws.done / ws.planned : 0, Math.round(ws.planned ? ws.done / ws.planned * 100 : 0) + '%')}</div>
+      <div class="row between"><div class="stack-s"><span class="eyebrow">Treningi ta teden</span><h2>${ws.done} od ${ws.planned}</h2></div>${ring(ws.planned ? ws.done / ws.planned : 0, Math.round(ws.planned ? ws.done / ws.planned * 100 : 0) + '%')}</div>
       <div class="week">${DAYS.map((n, i) => { const k = dkey(dateOfWd(i)), dn = sessionDone(k); return `<div class="d">${n}<span class="dot ${dn ? 'done' : P[i] ? 'plan' : ''} ${i === today ? 'today' : ''}">${dn ? ic('check') : ''}</span></div>`; }).join('')}</div>
-      <div class="statrow"><div class="stat"><span class="num">${streak()}</span><span class="small muted">v nizu</span></div><div class="stat"><span class="num">${fmtN(latestWeight(), 1)}</span><span class="small muted">kg zdaj</span></div><div class="stat"><span class="num">${wDelta > 0 ? '+' : ''}${fmtN(wDelta, 1)}</span><span class="small muted">kg od začetka</span></div></div>
+      <div class="statrow"><div class="stat"><span class="num">${streak()}</span><span class="small muted">v nizu</span></div><div class="stat"><span class="num">${weekMins}</span><span class="small muted">minut</span></div><div class="stat"><span class="num">${totalDone}</span><span class="small muted">skupaj</span></div></div>
     </div>
-    <div class="card">
-      <div class="row between"><div class="stack-s"><span class="eyebrow">Današnji obroki</span><h2>${fmtN(kEaten)} <span class="muted" style="font-size:16px">/ ${fmtN(t.kcal)} kcal</span></h2></div><button class="btn small" data-a="nav" data-r="prehrana">Jedilnik</button></div>
-      <div class="bar"><i style="width:${clamp(kEaten / t.kcal * 100, 0, 100)}%"></i></div>
-      <p class="small muted">${Math.round(pEaten)} g od ${t.prot} g beljakovin</p>
-      <div>${menu.meals.map(m => `<div class="meal-line"><button class="tick" data-a="eat" data-slot="${m.slot}" aria-pressed="${!!eaten[m.slot]}" aria-label="Označi ${m.label.toLowerCase()} kot pojeden">${ic('check')}</button><div class="grow"><div class="eyebrow">${m.label}</div><div style="font-weight:700">${esc(m.n)}</div></div><span class="small muted num" style="font-size:14px;white-space:nowrap">${Math.round(m.k)} kcal</span></div>`).join('')}</div>
-    </div>`;
+    ${mealCard}`;
 }
 
 /* --- workout --- */
@@ -904,34 +939,65 @@ function beep() {
 }
 
 /* --- nutrition --- */
+let nutSetOpen = false;
+const periodLabel = p => ({dan: 'na dan', teden: 'na teden', mesec: 'na mesec'}[p] || 'na dan');
+function nutSettingsCard() {
+  const n = S.nutrition, b = n.budget || {amount: null, period: 'teden'}, wm = weekMenu();
+  const summary = selectedSlots().map(s => SLOTS.find(x => x[0] === s)[1].toLowerCase()).join(', ') + ' · ' + (b.amount > 0 ? fmtEur(b.amount) + ' ' + periodLabel(b.period) : 'brez omejitve cene');
+  return `<section class="card">
+    <div class="row between"><div class="stack-s grow"><span class="eyebrow">Nastavitve jedilnika</span><span class="small muted">${esc(summary.charAt(0).toUpperCase() + summary.slice(1))}</span></div><button class="btn small" data-a="nut-set">${nutSetOpen ? 'Zapri' : 'Uredi'}</button></div>
+    ${nutSetOpen ? `
+      <div class="stack-s"><span style="font-weight:700">Katere obroke želiš?</span>
+        <div class="chips" style="flex-wrap:wrap">${SLOTS.map(([k, l]) => `<button class="chip" data-a="nut-meal" data-v="${k}" aria-pressed="${n.meals.includes(k)}">${l}</button>`).join('')}</div></div>
+      <div class="stack-s"><span style="font-weight:700">Koliko želiš porabiti?</span>
+        <div class="seg" role="group" aria-label="Obdobje">${PERIODS.map(([v, l]) => `<button data-a="bud-period" data-v="${v}" aria-pressed="${b.period === v}">${l}</button>`).join('')}</div>
+        <form id="budform" class="row"><input class="field" id="bud-in" inputmode="decimal" placeholder="Brez omejitve" value="${b.amount > 0 ? String(b.amount).replace('.', ',') : ''}" aria-label="Znesek v evrih ${periodLabel(b.period)}"><span style="font-weight:800">€</span><button class="btn primary" type="submit">Shrani</button></form>
+        <span class="small muted">Najcenejši jedilnik za izbrane obroke stane približno ${fmtEur(wm.minDay)} na dan, ${fmtEur(wm.minDay * 7)} na teden ali ${fmtEur(wm.minDay * 30)} na mesec.</span></div>
+      <button class="btn small ghost" data-a="nut-off" style="align-self:flex-start">Izklopi jedilnik</button>` : ''}
+  </section>`;
+}
 function vPrehrana() {
   const t = targets();
+  if (!S.nutrition.enabled) {
+    return `<div class="greet"><span class="eyebrow">Prehrana</span><h1>Jedilnik po tvoji meri</h1><p class="muted">Izbereš obroke, ki jih želiš (npr. samo zajtrk in kosilo), in koliko želiš porabiti na dan, teden ali mesec. Jedilnik sestavimo glede na tvoj cilj ${fmtN(t.kcal)} kcal na dan.</p></div>
+      <button class="btn primary" data-a="nut-on" style="align-self:flex-start">Ustvari jedilnik</button>`;
+  }
+  const wm = weekMenu(), wk = wm.days.reduce((a, d) => a + d.tot.cost, 0);
   const seg = `<div class="seg" role="group" aria-label="Pogled">${[['dan', 'Dan'], ['teden', 'Teden'], ['nakup', 'Nakup']].map(([v, l]) => `<button data-a="nut-tab" data-v="${v}" aria-pressed="${nutTab === v}">${l}</button>`).join('')}</div>`;
-  const head = `<div class="greet"><span class="eyebrow">Prehrana</span><h1>${fmtN(t.kcal)} kcal na dan</h1><p class="muted">${t.prot} g beljakovin · ${t.carb} g ogljikovih hidratov · ${t.fat} g maščob</p></div>`;
+  const head = `<div class="greet"><span class="eyebrow">Prehrana</span><h1>${fmtN(wm.kcal)} kcal na dan</h1><p class="muted">${selectedSlots().length < 4 ? `Za izbrane obroke. Tvoj celoten dnevni cilj je ${fmtN(t.kcal)} kcal.` : `${t.prot} g beljakovin · ${t.carb} g ogljikovih hidratov · ${t.fat} g maščob`}</p></div>
+    <div class="statrow"><div class="stat"><span class="num" style="font-size:18px">≈ ${fmtEur(wk / 7)}</span><span class="small muted">na dan</span></div><div class="stat"><span class="num" style="font-size:18px">≈ ${fmtEur(wk)}</span><span class="small muted">na teden</span></div><div class="stat"><span class="num" style="font-size:18px">≈ ${fmtEur(wk / 7 * 30)}</span><span class="small muted">na mesec</span></div></div>
+    ${wm.over ? `<div class="banner" style="border-style:solid;border-color:var(--warn)"><span>S ${fmtEur(wm.budget)} na dan jedilnika za izbrane obroke ni mogoče sestaviti. Prikazan je najcenejši možen. Povečaj znesek ali izberi manj obrokov.</span></div>` : ''}
+    ${nutSettingsCard()}`;
   let body = '';
   if (nutTab === 'dan') {
     const m = dayMenu(nutDay), eaten = nutDay === dow() ? (S.eaten[dkey()] || {}) : {};
     body = `<div class="chips">${DAYS.map((n, i) => `<button class="chip" data-a="nut-day" data-v="${i}" aria-pressed="${i === nutDay}">${n}</button>`).join('')}</div>
       <div class="statrow"><div class="stat"><span class="num">${fmtN(m.tot.k)}</span><span class="small muted">kcal</span></div><div class="stat"><span class="num">${Math.round(m.tot.p)} g</span><span class="small muted">beljakovin</span></div><div class="stat"><span class="num">${fmtEur(m.tot.cost)}</span><span class="small muted">približno</span></div></div>
       ${m.meals.map(ml => `<article class="card">
-        <div class="row between" style="align-items:flex-start"><div class="stack-s grow"><span class="eyebrow">${ml.label}</span><h3>${esc(ml.n)}</h3><span class="small muted">${Math.round(ml.k)} kcal · B ${Math.round(ml.p)} g · OH ${Math.round(ml.c)} g · M ${Math.round(ml.f)} g · ${fmtEur(ml.cost)}</span></div>
+        <div class="row between" style="align-items:flex-start"><div class="stack-s grow"><span class="eyebrow">${ml.label}</span><h3>${esc(ml.n)}</h3><span class="small muted">${Math.round(ml.k)} kcal · B ${Math.round(ml.p)} g · OH ${Math.round(ml.c)} g · M ${Math.round(ml.f)} g · ≈ ${fmtEur(ml.cost)}</span></div>
         ${nutDay === dow() ? `<button class="tick" data-a="eat" data-slot="${ml.slot}" aria-pressed="${!!eaten[ml.slot]}" aria-label="Označi kot pojedeno" style="width:40px;height:40px">${ic('check')}</button>` : ''}</div>
-        <div>${Object.entries(ml.i).map(([id, g]) => `<div class="ing"><span class="grow">${esc(PR[id].n)}</span><span class="pill store">${PR[id].s}</span><span class="num" style="font-size:14px;min-width:64px;text-align:right">${gramsLabel(id, g)}</span></div>`).join('')}</div>
+        <div>${Object.entries(ml.i).map(([id, g]) => `<div class="ing"><span class="grow">${esc(PR[id].n)}</span><span class="num" style="font-size:14px;min-width:64px;text-align:right">${gramsLabel(id, g)}</span><span class="small muted" style="min-width:62px;text-align:right">≈ ${fmtEur(PR[id].price * g / PR[id].pack)}</span></div>`).join('')}</div>
       </article>`).join('')}`;
   } else if (nutTab === 'teden') {
-    let wk = 0;
-    const rows = DAYS_FULL.map((n, i) => { const m = dayMenu(i); wk += m.tot.cost; return `<tr><td><b>${n}</b></td><td>${m.meals.map(x => esc(x.n)).join('<br>')}</td><td class="r">${fmtN(m.tot.k)}</td><td class="r">${Math.round(m.tot.p)} g</td><td class="r">${fmtEur(m.tot.cost)}</td></tr>`; }).join('');
-    body = `<div class="card"><div class="row between"><div class="stack-s"><span class="eyebrow">Teden skupaj</span><h2>${fmtEur(wk)}</h2></div><span class="small muted">≈ ${fmtEur(wk / 7)} na dan</span></div>
+    const rows = DAYS_FULL.map((n, i) => { const m = dayMenu(i); return `<tr><td><b>${n}</b></td><td>${m.meals.map(x => esc(x.n)).join('<br>')}</td><td class="r">${fmtN(m.tot.k)}</td><td class="r">${Math.round(m.tot.p)} g</td><td class="r">≈ ${fmtEur(m.tot.cost)}</td></tr>`; }).join('');
+    body = `<div class="card"><div class="row between"><div class="stack-s"><span class="eyebrow">Teden skupaj</span><h2>≈ ${fmtEur(wk)}</h2></div><span class="small muted">≈ ${fmtEur(wk / 7)} na dan</span></div>
       <div class="tablewrap"><table class="week-t"><thead><tr><th>Dan</th><th>Obroki</th><th style="text-align:right">kcal</th><th style="text-align:right">Belj.</th><th style="text-align:right">Cena</th></tr></thead><tbody>${rows}</tbody></table></div></div>
       <p class="small muted">Cena upošteva porabljeno količino izdelkov. Pri nakupu celih pakiranj je račun višji, ostanek pa porabiš naslednji teden.</p>`;
   } else {
     const list = shoppingList(), tot = list.reduce((a, x) => a + x.cost, 0), left = list.filter(x => !S.shop[x.id]).reduce((a, x) => a + x.cost, 0);
-    body = `<div class="card hero"><div class="row between"><div class="stack-s"><span class="eyebrow">Seznam za nakup · 7 dni</span><div class="num" style="font-size:34px">${fmtEur(tot)}</div></div><div style="text-align:right"><div class="small muted">Še za nakup</div><div class="num" style="font-size:20px">${fmtEur(left)}</div></div></div></div>
-      ${STORES.map(st => { const items = list.filter(x => x.store === st); if (!items.length) return ''; const sum = items.reduce((a, x) => a + x.cost, 0);
-        return `<section class="card"><div class="row between"><h2>${st}</h2><span class="num" style="font-size:18px">${fmtEur(sum)}</span></div><div>${items.map(x => { const p = PR[x.id]; return `<div class="shop-item ${S.shop[x.id] ? 'checked' : ''}"><button class="tick" data-a="shop" data-id="${x.id}" aria-pressed="${!!S.shop[x.id]}" aria-label="Kupljeno: ${esc(p.n)}">${ic('check')}</button><div class="grow"><div style="font-weight:700">${esc(p.n)}</div><div class="small muted">${x.packs} × ${p.per ? '10 kosov' : p.pack >= 1000 ? fmtN(p.pack / 1000, 1) + (x.id === 'olje' ? ' l' : ' kg') : p.pack + (x.id === 'olje' ? ' ml' : ' g')} · potrebuješ ${p.per ? Math.round(x.g / p.per) + ' kos' : x.g >= 1000 ? fmtN(x.g / 1000, 1) + ' kg' : x.g + ' g'}</div></div><span class="num" style="font-size:15px">${fmtEur(x.cost)}</span></div>`; }).join('')}</div></section>`; }).join('')}
-      <div class="row wrap between"><p class="small muted grow">Cene so približne (oktober 2026) in se razlikujejo med poslovalnicami in akcijami.</p><button class="btn small" data-a="shop-clear">Počisti kljukice</button></div>`;
+    body = `<div class="card hero"><div class="row between"><div class="stack-s"><span class="eyebrow">Seznam za nakup · 7 dni</span><div class="num" style="font-size:34px">≈ ${fmtEur(tot)}</div></div><div style="text-align:right"><div class="small muted">Še za nakup</div><div class="num" style="font-size:20px">${fmtEur(left)}</div></div></div></div>
+      <section class="card"><div>${list.map(x => { const p = PR[x.id]; return `<div class="shop-item ${S.shop[x.id] ? 'checked' : ''}"><button class="tick" data-a="shop" data-id="${x.id}" aria-pressed="${!!S.shop[x.id]}" aria-label="Kupljeno: ${esc(p.n)}">${ic('check')}</button><div class="grow"><div style="font-weight:700">${esc(p.n)}</div><div class="small muted">${x.packs} × ${packLabel(x.id)} po ≈ ${fmtEur(p.price)} · potrebuješ ${p.per ? Math.round(x.g / p.per) + ' kos' : x.g >= 1000 ? fmtN(x.g / 1000, 1) + ' kg' : x.g + ' g'}</div></div><span class="num" style="font-size:15px">≈ ${fmtEur(x.cost)}</span></div>`; }).join('')}</div></section>
+      <div class="row wrap between"><p class="small muted grow">Cene so približne in se razlikujejo med trgovinami in akcijami.</p><button class="btn small" data-a="shop-clear">Počisti kljukice</button></div>`;
   }
   return head + seg + body;
+}
+function saveBudget() {
+  const el = $('#bud-in'); if (!el) return true;
+  const raw = el.value.trim().replace(',', '.');
+  if (!raw) { S.nutrition.budget.amount = null; return true; }
+  const v = Number(raw);
+  if (!(v > 0 && v < 100000)) { toast('Vpiši znesek v evrih, npr. 40'); return false; }
+  S.nutrition.budget.amount = Math.round(v * 100) / 100; return true;
 }
 
 /* --- AI coach --- */
@@ -939,7 +1005,7 @@ const COACH_RULES = `Si "AI osebni trener" v slovenski fitnes aplikaciji. Odgova
 Pravila:
 - Upoštevaj uporabnikov profil, cilj, poškodbe, načrt in zadnje treninge spodaj.
 - Ne postavljaj diagnoz. Pri ostri ali vztrajni bolečini svetuj posvet z zdravnikom ali fizioterapevtom.
-- Prehranski nasveti naj bodo praktični in vezani na izdelke iz slovenskih trgovin (Lidl, Mercator, Spar).
+- Prehranski nasveti naj bodo praktični, cenovno dostopni in vezani na izdelke, ki jih dobiš v običajni slovenski trgovini.
 - Pri vprašanjih o policijskem testu ali testu Slovenske vojske povej, da uradne kriterije objavita policija (gov.si) in Slovenska vojska (postanivojak.si).
 TOOLS_LINE`;
 function coachContext() {
@@ -948,6 +1014,8 @@ function coachContext() {
   lines.push(`Danes: ${DAYS_FULL[dow()]}, ${dkey()}.`);
   lines.push(`Profil: ${p.sex === 'z' ? 'ženska' : 'moški'}, ${p.age} let, ${p.height} cm, ${fmtN(latestWeight(), 1)} kg. Cilj: ${GOALS[p.goal] || '-'}. Izkušnje: ${EXPS[p.exp] || '-'}. Vadba: ${eq === 'gym' ? 'fitnes' : 'doma'}, ${p.days} dni na teden. Poškodbe: ${(p.injuries || []).map(x => INJ[x]).join(', ') || 'brez'}.`);
   lines.push(`Prehranski cilj: ${t.kcal} kcal, ${t.prot} g beljakovin, ${t.carb} g OH, ${t.fat} g maščob.`);
+  if (S.nutrition.enabled) { const wm = weekMenu(), b = S.nutrition.budget; lines.push(`Jedilnik: obroki ${selectedSlots().join(', ')}; proračun ${b.amount > 0 ? b.amount + ' € ' + periodLabel(b.period) : 'brez omejitve'}; današnji jedilnik: ${dayMenu(dow()).meals.map(m => m.label + ' ' + m.n).join('; ')} (≈ ${fmtEur(dayMenu(dow()).tot.cost)}).${wm.over ? ' Proračun je prenizek za izbrane obroke.' : ''}`); }
+  else lines.push('Jedilnik: uporabnik ga nima vklopljenega.');
   if (S.test.type) { const T = TESTS[S.test.type]; lines.push(`Fizični test: ${T.full}${S.test.date ? ', datum ' + S.test.date + ' (čez ' + daysBetween(dkey(), S.test.date) + ' dni)' : ''}. Discipline: ${T.d.map(x => x.n).join(', ')}.`); const lm = S.test.mocks[S.test.mocks.length - 1]; if (lm) lines.push('Zadnji poskusni test (' + lm.d + '): ' + T.d.map(x => x.n + ' ' + (lm.r[x.id] != null ? (x.time ? fmtTime(lm.r[x.id]) : lm.r[x.id]) + ' ' + x.u : '-')).join('; ') + '.'); }
   lines.push('Tedenski načrt (weekday 0 = ponedeljek):');
   P.forEach((w, wd) => { if (w) lines.push(`- weekday ${wd} (${DAYS_FULL[wd]}): ${w.name} — ` + w.items.map((it, i) => `${i + 1}) ${it.id} "${EX[it.id].n}" ${it.rx.s}×${it.rx.r}`).join(', ')); });
@@ -1217,6 +1285,7 @@ function loadExample() {
     S.logs[dkey(d)] = {wd, name: w.name, items, done: true};
   }
   S.eaten[dkey()] = {zajtrk: true};
+  S.nutrition = {enabled: true, meals: ['zajtrk', 'kosilo', 'malica', 'vecerja'], budget: {amount: 150, period: 'mesec'}};
   save();
 }
 
@@ -1239,17 +1308,25 @@ const ACT = {
   'ob-noinj': () => { ob.data.injuries = []; render(); },
   'ob-finish': () => {
     const prevDays = S.profile.days, prevEq = S.profile.equip, wasEdit = ob.edit;
-    S.profile = {...ob.data, injuries: [...(ob.data.injuries || [])]};
+    const {mealplan, ...prof} = ob.data;
+    S.profile = {...prof, injuries: [...(prof.injuries || [])]};
+    if (mealplan) S.nutrition.enabled = mealplan === 'da';
+    if (S.nutrition.enabled && !wasEdit) nutSetOpen = true;
     if (prevDays !== S.profile.days || prevEq !== S.profile.equip || !wasEdit) S.overrides = {};
     if (!S.startDate) S.startDate = dkey();
     const k = dkey(); const ex = S.weights.find(w => w.d === k);
     if (!wasEdit || !S.weights.length) { if (ex) ex.kg = S.profile.weight; else S.weights.push({d: k, kg: S.profile.weight}); }
     else if (Math.abs(S.profile.weight - latestWeight()) > 0.01) { if (ex) ex.kg = S.profile.weight; else S.weights.push({d: k, kg: S.profile.weight}); }
     S.onboarded = true; S.example = false; ob = null; save();
-    go(wasEdit ? 'profil' : S.profile.goal === 'test' ? 'testi' : 'domov');
+    go(wasEdit ? 'profil' : S.nutrition.enabled ? 'prehrana' : S.profile.goal === 'test' ? 'testi' : 'domov');
     if (!wasEdit) toast('Tvoj načrt je pripravljen');
   },
-  'edit-profile': () => { ob = {step: 1, data: {...S.profile, weight: latestWeight(), injuries: [...(S.profile.injuries || [])]}, edit: true}; render(); window.scrollTo(0, 0); },
+  'edit-profile': () => { ob = {step: 1, data: {...S.profile, weight: latestWeight(), injuries: [...(S.profile.injuries || [])], mealplan: S.nutrition.enabled ? 'da' : 'ne'}, edit: true}; render(); window.scrollTo(0, 0); },
+  'nut-on': () => { S.nutrition.enabled = true; nutSetOpen = true; save(); go('prehrana'); },
+  'nut-off': () => { S.nutrition.enabled = false; nutSetOpen = false; save(); render(); toast('Jedilnik je izklopljen'); },
+  'nut-set': () => { if (nutSetOpen && !saveBudget()) return; nutSetOpen = !nutSetOpen; save(); render(); },
+  'nut-meal': a => { const v = a.dataset.v, m = S.nutrition.meals; if (m.includes(v)) { if (m.length === 1) { toast('Izberi vsaj en obrok'); return; } S.nutrition.meals = m.filter(x => x !== v); } else S.nutrition.meals = [...m, v]; saveBudget(); save(); render(); },
+  'bud-period': a => { saveBudget(); S.nutrition.budget.period = a.dataset.v; save(); render(); },
   eat: a => { const k = dkey(); const e = S.eaten[k] = S.eaten[k] || {}; e[a.dataset.slot] = !e[a.dataset.slot]; save(); render(); },
   'tr-day': a => { selDay = Number(a.dataset.wd); render(); },
   'tr-today': a => { const wd = Number(a.dataset.wd), k = dkey(); const P = plan(); if (S.logs[k] && sessionDone(k) && S.logs[k].wd !== wd) { toast('Danes si že opravil(-a) trening'); return; } S.logs[k] = {wd, name: P[wd].name, items: {}, done: false}; save(); selDay = dow(); render(); window.scrollTo(0, 0); },
@@ -1357,6 +1434,7 @@ document.addEventListener('submit', e => {
   const f = e.target; e.preventDefault();
   if (f.id === 'composer') { const t = $('#chat-in'); const v = t.value; t.value = ''; sendChat(v); }
   if (f.id === 'codeform') restoreFromCode($('#code-in').value);
+  if (f.id === 'budform' && saveBudget()) { save(); render(); toast(S.nutrition.budget.amount ? 'Jedilnik je prilagojen proračunu' : 'Jedilnik je brez omejitve cene'); }
   if (f.id === 'wform') { const v = Number($('#w-in').value.replace(',', '.')); if (!(v > 30 && v < 300)) { toast('Vpiši težo v kilogramih, npr. 78,5'); return; } const k = dkey(), ex = S.weights.find(w => w.d === k); if (ex) ex.kg = v; else S.weights.push({d: k, kg: v}); S.profile.weight = v; save(); render(); toast('Teža shranjena'); }
   if (f.id === 'mockform') {
     const T = TESTS[S.test.type], r = {}; let any = false;
