@@ -139,13 +139,21 @@ input.field:focus,textarea.field:focus{border-color:var(--accent)}
 
 /* Workout */
 .daystrip{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
-.daybtn{height:64px;border-radius:16px;background:var(--surface);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;font-weight:800;font-size:13px;color:var(--muted)}
+.weeknav{display:flex;align-items:center;gap:12px}
+.weeknav .iconbtn:disabled{opacity:.35}
+.daybtn{height:70px;border-radius:16px;background:var(--surface);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-weight:800;font-size:12px;color:var(--muted)}
+.daybtn b{font-size:17px;font-weight:800;color:var(--fg);font-variant-numeric:tabular-nums}
 .daybtn i{width:6px;height:6px;border-radius:50%;background:transparent}
 .daybtn.has i{background:var(--muted)}
 .daybtn.done i{background:var(--accent)}
+.daybtn.missed i{background:var(--bad)}
+.daybtn.pre{opacity:.45}
 .daybtn.today{color:var(--fg)}
-.daybtn[aria-pressed="true"]{background:var(--fg);color:var(--ink)}
+.daybtn.today b{color:var(--accent)}
+.daybtn[aria-pressed="true"]{background:var(--fg);color:var(--ink);opacity:1}
+.daybtn[aria-pressed="true"] b{color:var(--ink)}
 .daybtn[aria-pressed="true"].has i{background:var(--ink)}
+.daybtn[aria-pressed="true"].missed i{background:var(--bad)}
 .ex{background:var(--surface);border-radius:var(--r-lg);padding:16px;display:flex;flex-direction:column;gap:14px}
 .ex-head{display:flex;gap:14px;align-items:center}
 .thumb{width:84px;height:68px;border-radius:16px;background:var(--surface-2);flex:none;position:relative;overflow:hidden;display:block}
@@ -306,6 +314,8 @@ const dow = (d = new Date()) => (d.getDay() + 6) % 7;
 const monday = (d = new Date()) => addDays(new Date(d.getFullYear(), d.getMonth(), d.getDate()), -dow(d));
 const dateOfWd = wd => addDays(monday(), wd);
 const shortDate = k => { const d = parseD(k); return d.getDate() + '. ' + (d.getMonth() + 1) + '.'; };
+const dayLabel = k => { const d = parseD(k); return DAYS_FULL[dow(d)] + ', ' + d.getDate() + '. ' + MONTHS[d.getMonth()]; };
+const dayIn = k => 'v ' + DAYS_IN[dow(parseD(k))] + ', ' + shortDate(k);
 const daysBetween = (a, b) => Math.round((parseD(b) - parseD(a)) / 864e5);
 const fmtTime = s => { s = Math.max(0, Math.round(s)); return Math.floor(s / 60) + ':' + pad2(s % 60); };
 const parseTime = v => { v = String(v).trim().replace(',', '.'); if (!v) return null; if (v.includes(':')) { const [m, s] = v.split(':'); const r = Number(m) * 60 + Number(s); return isFinite(r) ? r : null; } const n = Number(v); return isFinite(n) ? Math.round(n * 60) : null; };
@@ -688,10 +698,24 @@ function plan() {
   if (S.test.type) build(TEST_WD, 'Trening za test: ' + TESTS[S.test.type].n, [...TESTS[S.test.type].ex], true, 'discipline testa');
   return out;
 }
+// The weekly plan runs on real dates from the day the user chose to start; earlier days have no workouts.
+const planStart = () => S.planStart || S.startDate || dkey();
+const planWeek = k => Math.floor(daysBetween(dkey(monday(parseD(planStart()))), dkey(monday(parseD(k)))) / 7) + 1;
+function plannedWd(k, P = plan()) { const wd = dow(parseD(k)); return k >= planStart() && P[wd] ? wd : null; }
+// First planned workout on or after fromK that is not done yet.
+function nextWorkout(fromK, P = plan()) {
+  for (let d = parseD(fromK), i = 0; i < 21; i++, d = addDays(d, 1)) { const k = dkey(d), wd = plannedWd(k, P); if (wd != null && !sessionDone(k)) return {k, w: P[wd]}; }
+  return null;
+}
+function firstSessions(days, startK, n = 3) {
+  const sched = SCHED[days], split = SPLIT[days], out = [];
+  for (let d = parseD(startK), i = 0; out.length < n && i < 21; i++, d = addDays(d, 1)) { const j = sched.indexOf(dow(d)); if (j >= 0) out.push({k: dkey(d), n: TPL[split[j]].n}); }
+  return out;
+}
 function sessionDone(k) { const s = S.logs[k]; if (!s) return false; if (s.done) return true; return Object.values(s.items || {}).some(it => it.sets.some(x => x.d)); }
 function weekStats() {
   const P = plan(); let planned = 0, done = 0;
-  for (let wd = 0; wd < 7; wd++) { const k = dkey(dateOfWd(wd)); if (P[wd]) planned++; if (sessionDone(k)) done++; }
+  for (let wd = 0; wd < 7; wd++) { const k = dkey(dateOfWd(wd)); if (plannedWd(k, P) != null) planned++; if (sessionDone(k)) done++; }
   return {planned, done};
 }
 function prevSet(id, beforeKey) {
@@ -701,11 +725,11 @@ function prevSet(id, beforeKey) {
 }
 function streak() {
   let n = 0, d = new Date();
-  const P = plan();
+  const P = plan(), start = planStart();
   for (let i = 0; i < 60; i++) {
-    const k = dkey(d), wd = dow(d);
+    const k = dkey(d);
     if (sessionDone(k)) n++;
-    else if (P[wd] && k !== dkey()) break;
+    else if (k < start || (plannedWd(k, P) != null && k !== dkey())) break;
     d = addDays(d, -1);
   }
   return n;
@@ -847,7 +871,7 @@ function ring(frac, label, size = 76) {
 const ROUTES = ['domov', 'trening', 'prehrana', 'trener', 'napredek', 'testi', 'profil'];
 let route = ROUTES.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'domov';
 let ob = S.onboarded || !session ? null : newOb();
-let selDay = dow(), nutTab = 'dan', nutDay = dow(), strengthEx = null, cmpSel = [], confirmReset = false, confirmDel = false, confirmPlan = null;
+let selDate = dkey(), nutTab = 'dan', nutDay = dow(), strengthEx = null, cmpSel = [], confirmReset = false, confirmDel = false, confirmPlan = null;
 let rest = null, restTimer = null, audioCtx = null, toastTimer = null;
 const NAV = [['domov', 'Domov', 'home'], ['trening', 'Trening', 'dumbbell'], ['prehrana', 'Prehrana', 'bowl'], ['trener', 'AI trener', 'chat'], ['napredek', 'Napredek', 'chart'], ['testi', 'Testi', 'target'], ['profil', 'Profil', 'user']];
 
@@ -927,6 +951,7 @@ const Q = [
   {k: 'injuries', t: 'Imaš kakšno poškodbo ali bolečino?', sub: 'Vaje, ki ta del obremenjujejo, bomo zamenjali z varnejšimi.', type: 'multi', o: Object.entries(INJ)},
   {k: 'mealplan', t: 'Želiš tudi jedilnik?', sub: 'Lahko ga vklopiš ali izklopiš kadar koli.', type: 'choice', o: [['da', 'Da, pripravi mi jedilnik', 'Izbereš obroke in koliko želiš porabiti'], ['ne', 'Ne, samo trening', 'Jedilnik lahko dodaš kasneje']]}
 ];
+const obStart = d => d.start === 'pon' && dow() ? dkey(addDays(monday(), 7)) : dkey();
 function vOnboarding() {
   const st = ob.step, d = ob.data;
   if (st > Q.length) {
@@ -937,6 +962,9 @@ function vOnboarding() {
         <div class="grid3"><div class="stat"><span class="num">${t.prot} g</span><span class="small muted">beljakovin</span></div><div class="stat"><span class="num">${t.carb} g</span><span class="small muted">ogljikovih hidratov</span></div><div class="stat"><span class="num">${t.fat} g</span><span class="small muted">maščob</span></div></div></div>
       <div class="card"><div class="eyebrow">Tedenski razpored</div><div class="week">${DAYS.map((n, i) => `<div class="d">${n}<span class="dot ${P.includes(i) ? 'plan' : ''}">${P.includes(i) ? ic('dumbbell') : ''}</span></div>`).join('')}</div>
         <p class="small muted">${d.equip === 'gym' ? 'Vadba v fitnesu' : 'Vadba doma'}${(d.injuries || []).length ? ', prilagojeno za: ' + d.injuries.map(x => INJ[x].toLowerCase()).join(', ') : ''}.</p></div>
+      ${ob.edit ? '' : `<div class="card"><div class="eyebrow">Začetek</div>
+        ${dow() ? `<div class="seg" role="group" aria-label="Začetek"><button data-a="ob-start" data-v="danes" aria-pressed="${d.start !== 'pon'}">Od danes</button><button data-a="ob-start" data-v="pon" aria-pressed="${d.start === 'pon'}">Od ponedeljka</button></div>` : ''}
+        <div><span class="small muted">Prvi treningi</span>${firstSessions(d.days, obStart(d)).map(x => `<div class="kv"><span>${dayLabel(x.k)}</span><b>${esc(x.n)}</b></div>`).join('')}</div></div>`}
       <div class="ob-foot"><button class="btn primary block" data-a="ob-finish">${ob.edit ? 'Shrani spremembe' : 'Začni 7-dnevni brezplačni preizkus'}</button></div></div>`;
   }
   const q = Q[st - 1], pct = Math.round(st / (Q.length + 1) * 100);
@@ -984,32 +1012,48 @@ function vHome() {
   return `
     <div class="greet"><span class="eyebrow">${DAYS_FULL[today]}, ${longDate(tk)}</span><h1>${greet}${userName() ? ', ' + esc(userName()) : ''}.</h1></div>
     <div class="card">
-      <div class="row between"><div class="stack-s"><span class="eyebrow">Treningi ta teden</span><h2>${ws.done} od ${ws.planned}</h2></div>${ring(ws.planned ? ws.done / ws.planned : 0, Math.round(ws.planned ? ws.done / ws.planned * 100 : 0) + '%')}</div>
-      <div class="week">${DAYS.map((n, i) => { const k = dkey(dateOfWd(i)), dn = sessionDone(k); return `<div class="d">${n}<span class="dot ${dn ? 'done' : P[i] ? 'plan' : ''} ${i === today ? 'today' : ''}">${dn ? ic('check') : ''}</span></div>`; }).join('')}</div>
+      <div class="row between"><div class="stack-s"><span class="eyebrow">Treningi ta teden</span><h2>${planStart() > tk && !ws.done ? 'Začneš v ' + DAYS_IN[dow(parseD(planStart()))] : ws.done + ' od ' + ws.planned}</h2></div>${ring(ws.planned ? ws.done / ws.planned : 0, Math.round(ws.planned ? ws.done / ws.planned * 100 : 0) + '%')}</div>
+      <div class="week">${DAYS.map((n, i) => { const k = dkey(dateOfWd(i)), dn = sessionDone(k); return `<div class="d">${n}<span class="dot ${dn ? 'done' : plannedWd(k, P) != null ? 'plan' : ''} ${i === today ? 'today' : ''}">${dn ? ic('check') : ''}</span></div>`; }).join('')}</div>
+      ${planStart() > tk ? `<p class="small muted">Tvoj načrt se začne ${dayIn(planStart())}</p>` : ''}
       <div class="statrow"><div class="stat"><span class="num">${streak()}</span><span class="small muted">v nizu</span></div><div class="stat"><span class="num">${weekMins}</span><span class="small muted">minut</span></div><div class="stat"><span class="num">${totalDone}</span><span class="small muted">skupaj</span></div></div>
     </div>
     ${mealCard}`;
 }
 
 /* --- workout --- */
-function workoutCtx(wd) {
-  const P = plan(), date = dateOfWd(wd), k = dkey(date), tk = dkey();
-  const log = S.logs[k];
-  const wWd = log?.wd ?? wd;
-  return {P, date, k, isToday: k === tk, isFuture: k > tk, w: P[wWd], wWd, log};
+function workoutCtx(k = selDate) {
+  const P = plan(), tk = dkey(), log = S.logs[k];
+  const wWd = log ? log.wd : plannedWd(k, P);
+  return {P, k, wd: dow(parseD(k)), isToday: k === tk, isFuture: k > tk, w: wWd == null ? null : P[wWd], wWd, log};
 }
 function vTrening() {
-  const c = workoutCtx(selDay), P = c.P;
-  const strip = `<div class="daystrip">${DAYS.map((n, i) => { const k = dkey(dateOfWd(i)); return `<button class="daybtn ${P[i] ? 'has' : ''} ${sessionDone(k) ? 'done' : ''} ${i === dow() ? 'today' : ''}" data-a="tr-day" data-wd="${i}" aria-pressed="${i === selDay}">${n}<i></i></button>`; }).join('')}</div>`;
+  const c = workoutCtx(), P = c.P, tk = dkey(), start = planStart();
+  const mon = monday(parseD(selDate)), sun = addDays(mon, 6), wk = planWeek(selDate);
+  const canPrev = mon > monday(parseD(start < tk ? start : tk)), canNext = mon < addDays(monday(), 7 * 12);
+  const range = mon.getMonth() === sun.getMonth() ? `${mon.getDate()}.–${sun.getDate()}. ${MONTHS[sun.getMonth()]}` : `${mon.getDate()}. ${MONTHS[mon.getMonth()]} – ${sun.getDate()}. ${MONTHS[sun.getMonth()]}`;
+  const nav = `<div class="weeknav"><button class="iconbtn" data-a="tr-week" data-v="-1" aria-label="Prejšnji teden" ${canPrev ? '' : 'disabled'}>${ic('left')}</button>
+    <div class="grow stack-s" style="gap:2px;text-align:center"><b>${wk >= 1 ? wk + '. teden načrta' : 'Pred začetkom načrta'}</b><span class="small muted">${range}</span></div>
+    <button class="iconbtn" data-a="tr-week" data-v="1" aria-label="Naslednji teden" ${canNext ? '' : 'disabled'}>${ic('right')}</button></div>`;
+  const strip = `<div class="daystrip">${DAYS.map((n, i) => {
+    const d = addDays(mon, i), k = dkey(d), log = S.logs[k], done = sessionDone(k);
+    const has = plannedWd(k, P) != null || !!(log && P[log.wd]);
+    return `<button class="daybtn ${has ? 'has' : ''} ${done ? 'done' : ''} ${has && !done && k < tk ? 'missed' : ''} ${k === tk ? 'today' : ''} ${k < start ? 'pre' : ''}" data-a="tr-day" data-k="${k}" aria-pressed="${k === selDate}" aria-label="${dayLabel(k)}">${n}<b>${d.getDate()}</b><i></i></button>`;
+  }).join('')}</div>`;
+  const head = (h1, sub = '') => `<div class="greet"><div class="row between"><span class="eyebrow">${dayLabel(selDate)}</span>${selDate !== tk ? `<button class="chip" data-a="tr-day" data-k="${tk}">Danes</button>` : ''}</div><h1>${h1}</h1>${sub}</div>${nav}${strip}`;
   if (!c.w) {
+    const nx = nextWorkout(selDate >= tk ? dkey(addDays(parseD(selDate), 1)) : tk, P);
+    const nxLine = nx ? `<div class="row between"><span class="small"><span class="muted">Naslednji trening:</span> <b>${nx.k === tk ? 'danes' : dayIn(nx.k)}</b> · ${esc(nx.w.name)}</span><button class="btn small" data-a="tr-day" data-k="${nx.k}">Poglej</button></div>` : '';
     const opts = P.map((w, i) => w ? `<button class="chip" data-a="tr-today" data-wd="${i}">${esc(w.name)}</button>` : '').join('');
-    return `<div class="greet"><span class="eyebrow">Trening</span><h1>${DAYS_FULL[selDay]}</h1></div>${strip}
-      <div class="card outline"><h2>Dan počitka</h2><p class="muted">Mišice rastejo med počitkom. Če imaš energijo, pojdi na 30-minutni sprehod.</p>
+    const pre = selDate < start;
+    return `${head(pre ? 'Pred začetkom' : 'Dan počitka')}
+      <div class="card outline">${pre ? (start > tk ? '' : `<p class="muted">Tvoj načrt se je začel ${dayIn(start)}</p>`) : `<p class="muted">Mišice rastejo med počitkom. Če imaš energijo, pojdi na 30-minutni sprehod.</p>`}
+      ${nxLine}
       ${c.isToday ? `<div class="stack-s"><span class="eyebrow">Vseeno treniraj danes</span><div class="chips">${opts}</div></div>` : ''}</div>`;
   }
   const w = c.w, ro = c.isFuture;
   const total = w.items.reduce((a, it) => a + it.rx.s, 0);
   const doneN = w.items.reduce((a, it, i) => a + (c.log?.items?.[i]?.sets || []).filter(x => x.d).length, 0);
+  const missed = !ro && !c.isToday && !sessionDone(c.k);
   const cards = w.items.map((it, i) => {
     const e = EX[it.id], logIt = c.log?.items?.[i], prev = prevSet(it.id, c.k);
     const kind = e.type === 'cardio' ? 'cardio' : e.w ? '' : 'nokg';
@@ -1029,15 +1073,15 @@ function vTrening() {
       <div class="sets ${kind}">${head}${rows}</div>
     </article>`;
   }).join('');
-  return `<div class="greet"><span class="eyebrow">Trening · ${DAYS_FULL[selDay]}</span><h1>${esc(w.name)}</h1><p class="muted">${w.items.length} ${plural(w.items.length, 'vaja', 'vaji', 'vaje', 'vaj')} · ~${w.mins} min · ${doneN}/${total} serij</p></div>
-    ${strip}
-    ${c.log && c.log.wd !== selDay && c.log.wd < 7 && P[c.log.wd] ? `<p class="small muted">Ta dan si opravil(-a) trening z dne ${DAYS_IN[c.log.wd]}.</p>` : ''}
-    ${ro ? `<div class="banner"><span>Ta trening je na vrsti v ${DAYS_IN[selDay]}.</span><button class="btn small primary" data-a="tr-today" data-wd="${selDay}">Opravi ga danes</button></div>` : `<div class="bar"><i style="width:${total ? doneN / total * 100 : 0}%"></i></div>`}
+  return `${head(esc(w.name), `<p class="muted">${w.items.length} ${plural(w.items.length, 'vaja', 'vaji', 'vaje', 'vaj')} · ~${w.mins} min · ${doneN}/${total} serij</p>`)}
+    ${c.log && c.log.wd !== c.wd && c.log.wd < 7 && P[c.log.wd] ? `<p class="small muted">Ta dan si opravil(-a) trening, ki je bil v načrtu za ${DAYS_IN[c.log.wd]}.</p>` : ''}
+    ${missed ? `<div class="banner"><span>Ta trening ni bil opravljen. Če si ga naredil(-a), ga lahko vpišeš še zdaj.</span></div>` : ''}
+    ${ro ? `<div class="banner"><span>Ta trening je na vrsti ${dayIn(selDate)}</span><button class="btn small primary" data-a="tr-today" data-wd="${c.wWd}">Opravi ga danes</button></div>` : `<div class="bar"><i style="width:${total ? doneN / total * 100 : 0}%"></i></div>`}
     ${cards}
     ${ro ? '' : c.log?.done ? `<div class="card outline" style="align-items:center;text-align:center"><span class="pill ok">${ic('check')} Trening shranjen</span><p class="muted small">Odlično. Rezultati so vidni v zavihku Napredek.</p></div>` : `<button class="btn primary block" data-a="tr-finish">Zaključi trening</button>`}`;
 }
 function ensureItem(wdForLog, i, it) {
-  const k = dkey(dateOfWd(selDay));
+  const k = selDate;
   if (!S.logs[k]) S.logs[k] = {wd: wdForLog, name: plan()[wdForLog]?.name || '', items: {}, done: false};
   const log = S.logs[k];
   if (!log.items[i] || log.items[i].id !== it.id) log.items[i] = {id: it.id, sets: Array.from({length: it.rx.s}, () => ({w: '', r: '', d: false}))};
@@ -1150,6 +1194,10 @@ function coachContext() {
   if (S.nutrition.enabled) { const wm = weekMenu(), b = S.nutrition.budget; lines.push(`Jedilnik: obroki ${selectedSlots().join(', ')}; proračun ${b.amount > 0 ? b.amount + ' € ' + periodLabel(b.period) : 'brez omejitve'}; današnji jedilnik: ${dayMenu(dow()).meals.map(m => m.label + ' ' + m.n).join('; ')} (≈ ${fmtEur(dayMenu(dow()).tot.cost)}).${wm.over ? ' Proračun je prenizek za izbrane obroke.' : ''}`); }
   else lines.push('Jedilnik: uporabnik ga nima vklopljenega.');
   if (S.test.type) { const T = TESTS[S.test.type]; lines.push(`Fizični test: ${T.full}${S.test.date ? ', datum ' + S.test.date + ' (čez ' + daysBetween(dkey(), S.test.date) + ' dni)' : ''}. Discipline: ${T.d.map(x => x.n).join(', ')}.`); const lm = S.test.mocks[S.test.mocks.length - 1]; if (lm) lines.push('Zadnji poskusni test (' + lm.d + '): ' + T.d.map(x => x.n + ' ' + (lm.r[x.id] != null ? (x.time ? fmtTime(lm.r[x.id]) : lm.r[x.id]) + ' ' + x.u : '-')).join('; ') + '.'); }
+  { const st = planStart(), tk = dkey(), up = [];
+    for (let d = new Date(), i = 0; i < 14 && up.length < 4; i++, d = addDays(d, 1)) { const k = dkey(d), wd = plannedWd(k, P); if (wd != null && !sessionDone(k)) up.push(`${DAYS_FULL[wd]} ${k}: ${P[wd].name}`); }
+    lines.push(st > tk ? `Načrt se začne ${st}.` : `Načrt se je začel ${st}; zdaj je ${planWeek(tk)}. teden načrta.`);
+    lines.push('Naslednji treningi: ' + (up.join('; ') || 'ni načrtovanih') + '.'); }
   lines.push('Tedenski načrt (weekday 0 = ponedeljek):');
   P.forEach((w, wd) => { if (w) lines.push(`- weekday ${wd} (${DAYS_FULL[wd] || 'neobvezen trening za test, ni v razporedu'}): ${w.name} — ` + w.items.map((it, i) => `${i + 1}) ${it.id} "${EX[it.id].n}" ${it.rx.s}×${it.rx.r}`).join(', ')); });
   const recent = Object.keys(S.logs).sort().reverse().slice(0, 5);
@@ -1356,7 +1404,7 @@ function vProfil() {
   const planLbl = {trial: trialLeft > 0 ? `Brezplačni preizkus · še ${dni(trialLeft)}` : 'Preizkus je potekel', mesecno: 'Mesečna naročnina · 9,99 €', letno: 'Letna naročnina · 79,99 €'}[S.sub.plan];
   const kv = (k, v) => `<div class="kv"><span class="muted">${k}</span><b>${v}</b></div>`;
   return `<div class="greet"><span class="eyebrow">Profil</span><h1>Tvoji podatki</h1></div>
-    <section class="card"><div>${kv('Cilj', GOALS[p.goal] || '–')}${kv('Spol', p.sex === 'z' ? 'Ženska' : 'Moški')}${kv('Starost', p.age + ' let')}${kv('Višina', p.height + ' cm')}${kv('Teža', fmtN(latestWeight(), 1) + ' kg')}${kv('Izkušnje', EXPS[p.exp] || '–')}${kv('Oprema', p.equip === 'gym' ? 'Fitnes' : 'Doma')}${kv('Dni na teden', p.days)}${kv('Poškodbe', (p.injuries || []).map(x => INJ[x]).join(', ') || 'Brez')}${kv('Dnevni cilj', fmtN(t.kcal) + ' kcal · ' + t.prot + ' g beljakovin')}</div>
+    <section class="card"><div>${kv('Cilj', GOALS[p.goal] || '–')}${kv('Spol', p.sex === 'z' ? 'Ženska' : 'Moški')}${kv('Starost', p.age + ' let')}${kv('Višina', p.height + ' cm')}${kv('Teža', fmtN(latestWeight(), 1) + ' kg')}${kv('Izkušnje', EXPS[p.exp] || '–')}${kv('Oprema', p.equip === 'gym' ? 'Fitnes' : 'Doma')}${kv('Dni na teden', p.days)}${kv('Začetek načrta', longDate(planStart()))}${kv('Poškodbe', (p.injuries || []).map(x => INJ[x]).join(', ') || 'Brez')}${kv('Dnevni cilj', fmtN(t.kcal) + ' kcal · ' + t.prot + ' g beljakovin')}</div>
       <button class="btn block" data-a="edit-profile">Uredi podatke</button></section>
     <section class="card">
       <div class="stack-s"><span class="eyebrow">Naročnina</span><h2>${planLbl}</h2>${S.sub.plan === 'trial' ? `<div class="bar"><i style="width:${(7 - trialLeft) / 7 * 100}%"></i></div><span class="small muted">Preizkus se je začel ${longDate(start)}.</span>` : ''}</div>
@@ -1390,7 +1438,7 @@ function openSheet(html) {
 }
 function closeSheet() { const o = $('#overlay'); if (o) o.remove(); document.body.style.overflow = ''; clearInterval(testTimer.iv); testTimer = {mode: testTimer.mode, start: 0, acc: 0, run: false, iv: null}; }
 function openDemo(id, i) {
-  const e = EX[id], c = workoutCtx(selDay), eq = S.profile.equip || 'home', inj = S.profile.injuries || [];
+  const e = EX[id], c = workoutCtx(), eq = S.profile.equip || 'home', inj = S.profile.injuries || [];
   const alts = i != null && c.w && !c.isFuture ? Object.entries(EX).filter(([k, x]) => k !== id && x.p === e.p && (x.eq === 'both' || x.eq === eq) && !x.avoid.some(a => inj.includes(a))).slice(0, 4) : [];
   const yt = 'https://www.youtube.com/results?search_query=' + encodeURIComponent(e.n + ' pravilna izvedba');
   openSheet(`<div class="row between"><div class="stack-s"><span class="eyebrow">${esc(e.m)}</span><h2>${esc(e.n)}</h2></div><button class="iconbtn" data-a="sheet-close" aria-label="Zapri">${ic('x')}</button></div>
@@ -1427,7 +1475,7 @@ function loadExample() {
 
 /* ---------- events ---------- */
 const ACT = {
-  nav: a => { if (a.dataset.r === 'trening') selDay = dow(); go(a.dataset.r); },
+  nav: a => { if (a.dataset.r === 'trening') selDate = dkey(); go(a.dataset.r); },
   'ob-example': () => { loadExample(); ob = null; go('domov'); },
   'ex-leave': () => { S = freshState(); lsSet(LS_KEY, S); if (!session) { photos = []; lsSet(LS_PHOTOS, photos); } ob = session ? newOb() : null; auth = authInit(); go('domov'); },
   'auth-view': a => { auth = {...authInit(a.dataset.v), email: auth.email}; render(); window.scrollTo(0, 0); },
@@ -1439,17 +1487,19 @@ const ACT = {
   'ob-back': () => { if (ob.step <= 1) { if (ob.edit) { ob = null; go('profil'); } return; } ob.step--; render(); },
   'ob-pick': a => { const q = Q[ob.step - 1]; ob.data[q.k] = a.dataset.v; render(); setTimeout(() => { if (ob && Q[ob.step - 1] === q) { ob.step++; render(); } }, 220); },
   'ob-num': a => { const q = Q[ob.step - 1]; ob.data[q.k] = clamp(Math.round((Number(ob.data[q.k]) + Number(a.dataset.dir) * q.step) * 10) / 10, q.min, q.max); $('#obnum').textContent = fmtN(ob.data[q.k], q.step < 1 ? 1 : 0); $('#ob-range').value = ob.data[q.k]; },
+  'ob-start': a => { ob.data.start = a.dataset.v; render(); },
   'ob-days': a => { ob.data.days = Number(a.dataset.v); render(); },
   'ob-toggle': a => { const v = a.dataset.v, inj = ob.data.injuries = [...(ob.data.injuries || [])]; const i = inj.indexOf(v); i >= 0 ? inj.splice(i, 1) : inj.push(v); render(); },
   'ob-noinj': () => { ob.data.injuries = []; render(); },
   'ob-finish': () => {
     const prevDays = S.profile.days, prevEq = S.profile.equip, wasEdit = ob.edit;
-    const {mealplan, ...prof} = ob.data;
+    const {mealplan, start, ...prof} = ob.data;
     S.profile = {...prof, injuries: [...(prof.injuries || [])]};
     if (mealplan) S.nutrition.enabled = mealplan === 'da';
     if (S.nutrition.enabled && !wasEdit) nutSetOpen = true;
     if (prevDays !== S.profile.days || prevEq !== S.profile.equip || !wasEdit) S.overrides = {};
     if (!S.startDate) S.startDate = dkey();
+    if (!wasEdit) S.planStart = obStart({start});
     const k = dkey(); const ex = S.weights.find(w => w.d === k);
     if (!wasEdit || !S.weights.length) { if (ex) ex.kg = S.profile.weight; else S.weights.push({d: k, kg: S.profile.weight}); }
     else if (Math.abs(S.profile.weight - latestWeight()) > 0.01) { if (ex) ex.kg = S.profile.weight; else S.weights.push({d: k, kg: S.profile.weight}); }
@@ -1464,10 +1514,11 @@ const ACT = {
   'nut-meal': a => { const v = a.dataset.v, m = S.nutrition.meals; if (m.includes(v)) { if (m.length === 1) { toast('Izberi vsaj en obrok'); return; } S.nutrition.meals = m.filter(x => x !== v); } else S.nutrition.meals = [...m, v]; saveBudget(); save(); render(); },
   'bud-period': a => { saveBudget(); S.nutrition.budget.period = a.dataset.v; save(); render(); },
   eat: a => { const k = dkey(); const e = S.eaten[k] = S.eaten[k] || {}; e[a.dataset.slot] = !e[a.dataset.slot]; save(); render(); },
-  'tr-day': a => { selDay = Number(a.dataset.wd); render(); },
-  'tr-today': a => { const wd = Number(a.dataset.wd), k = dkey(); const P = plan(); if (S.logs[k] && sessionDone(k) && S.logs[k].wd !== wd) { toast('Danes si že opravil(-a) trening'); return; } S.logs[k] = {wd, name: P[wd].name, items: {}, done: false}; save(); selDay = dow(); render(); window.scrollTo(0, 0); },
+  'tr-day': a => { selDate = a.dataset.k; render(); },
+  'tr-week': a => { selDate = dkey(addDays(parseD(selDate), 7 * Number(a.dataset.v))); render(); },
+  'tr-today': a => { const wd = Number(a.dataset.wd), k = dkey(); const P = plan(); if (S.logs[k] && sessionDone(k) && S.logs[k].wd !== wd) { toast('Danes si že opravil(-a) trening'); return; } S.logs[k] = {wd, name: P[wd].name, items: {}, done: false}; save(); selDate = dkey(); render(); window.scrollTo(0, 0); },
   'set-done': a => {
-    const c = workoutCtx(selDay); if (!c.w || c.isFuture) return;
+    const c = workoutCtx(); if (!c.w || c.isFuture) return;
     const i = Number(a.dataset.i), si = Number(a.dataset.si), it = c.w.items[i];
     const item = ensureItem(c.wWd, i, it);
     while (item.sets.length <= si) item.sets.push({w: '', r: '', d: false});
@@ -1486,11 +1537,11 @@ const ACT = {
     } else st.d = false;
     save(); render();
   },
-  'tr-finish': () => { const c = workoutCtx(selDay); if (!c.w) return; const k = c.k; if (!S.logs[k]) S.logs[k] = {wd: c.wWd, name: c.w.name, items: {}, done: false}; S.logs[k].done = true; S.logs[k].name = c.w.name; rest = null; clearInterval(restTimer); save(); render(); toast('Trening shranjen. Bravo!'); window.scrollTo(0, 0); },
+  'tr-finish': () => { const c = workoutCtx(); if (!c.w) return; const k = c.k; if (!S.logs[k]) S.logs[k] = {wd: c.wWd, name: c.w.name, items: {}, done: false}; S.logs[k].done = true; S.logs[k].name = c.w.name; rest = null; clearInterval(restTimer); save(); render(); toast('Trening shranjen. Bravo!'); window.scrollTo(0, 0); },
   'rest-adj': a => { if (!rest) return; rest.end += Number(a.dataset.v) * 1000; rest.total = Math.max(5, rest.total + Number(a.dataset.v)); rest.finished = false; renderRest(); },
   'rest-skip': () => { rest = null; clearInterval(restTimer); renderRest(); },
   'ex-demo': a => openDemo(a.dataset.id, a.dataset.i != null ? Number(a.dataset.i) : null),
-  'ex-swap': a => { const c = workoutCtx(selDay); S.overrides[c.wWd + ':' + a.dataset.i] = a.dataset.to; const log = S.logs[c.k]; if (log && log.items[a.dataset.i]) delete log.items[a.dataset.i]; save(); closeSheet(); render(); toast('Vaja zamenjana'); },
+  'ex-swap': a => { const c = workoutCtx(); S.overrides[c.wWd + ':' + a.dataset.i] = a.dataset.to; const log = S.logs[c.k]; if (log && log.items[a.dataset.i]) delete log.items[a.dataset.i]; save(); closeSheet(); render(); toast('Vaja zamenjana'); },
   'sheet-close': () => closeSheet(),
   'nut-tab': a => { nutTab = a.dataset.v; render(); },
   'nut-day': a => { nutDay = Number(a.dataset.v); render(); },
@@ -1509,7 +1560,7 @@ const ACT = {
     const k = dkey(), log = S.logs[k];
     if (log && sessionDone(k) && log.wd !== TEST_WD) { toast('Danes si že opravil(-a) trening'); return; }
     if (!log || log.wd !== TEST_WD) S.logs[k] = {wd: TEST_WD, name: plan()[TEST_WD].name, items: {}, done: false};
-    save(); selDay = dow(); go('trening');
+    save(); selDate = dkey(); go('trening');
   },
   'mock-open': () => openMock(),
   'tm-mode': a => { testTimer.mode = a.dataset.v; testTimer.acc = 0; testTimer.run = false; clearInterval(testTimer.iv); document.querySelectorAll('[data-a="tm-mode"]').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === testTimer.mode)); $('#tm-btn').textContent = 'Start'; updTimer(); },
@@ -1541,7 +1592,7 @@ document.addEventListener('input', e => {
   const t = e.target;
   if (t.dataset.in === 'ob-range') { const q = Q[ob.step - 1]; ob.data[q.k] = Number(t.value); $('#obnum').textContent = fmtN(ob.data[q.k], q.step < 1 ? 1 : 0); }
   if (t.dataset.in === 'set') {
-    const c = workoutCtx(selDay); if (!c.w) return;
+    const c = workoutCtx(); if (!c.w) return;
     const i = Number(t.dataset.i), si = Number(t.dataset.si);
     const item = ensureItem(c.wWd, i, c.w.items[i]);
     while (item.sets.length <= si) item.sets.push({w: '', r: '', d: false});
