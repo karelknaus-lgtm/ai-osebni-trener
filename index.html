@@ -548,21 +548,14 @@ function rxFor(id, goal, exp, testDay) {
   if (!e.w && (goal === 'moc' || goal === 'misice')) r = '8–15';
   return {s, r, rest: g.rest};
 }
+const TEST_WD = 7;
 function plan() {
   const p = S.profile, eq = p.equip || 'home', inj = p.injuries || [];
   const days = clamp(p.days || 3, 2, 6);
   const sched = SCHED[days], split = SPLIT[days];
-  const out = Array(7).fill(null);
-  const testType = S.test.type;
-  sched.forEach((wd, i) => {
-    let tpl = TPL[split[i]], roles = [...tpl.roles], name = tpl.n, testDay = false, ids;
-    if (testType && i === sched.length - 1) {
-      testDay = true; name = 'Priprava na test: ' + TESTS[testType].n;
-      ids = [...TESTS[testType].ex];
-    } else {
-      if ((p.goal === 'hujsanje' || p.goal === 'kondicija' || p.goal === 'test') && split[i].startsWith('full') && !roles.includes('cond')) roles.push('cond');
-      ids = roles.map(r => { let id = ROLE[r][eq]; if (r === 'squat' && eq === 'gym' && p.exp === 'zacetnik') id = 'goblet'; if (r === 'pushH' && eq === 'home' && p.exp === 'zacetnik') id = 'sklece_klop'; return id; });
-    }
+  // Indexes 0–6 are the weekdays; TEST_WD holds the optional test workout, which is never scheduled.
+  const out = Array(8).fill(null);
+  const build = (wd, name, ids, testDay) => {
     const items = ids.map((id, k) => {
       const ov = S.overrides[wd + ':' + k];
       const rid = ov && EX[ov] ? ov : resolveEx(id, inj);
@@ -570,7 +563,13 @@ function plan() {
     });
     const mins = Math.round(items.reduce((a, it) => a + it.rx.s * ((EX[it.id].type === 'cardio' ? 75 : 40) + it.rx.rest), 0) / 60) + 8;
     out[wd] = {wd, name, items, mins, testDay};
+  };
+  sched.forEach((wd, i) => {
+    const roles = [...TPL[split[i]].roles];
+    if ((p.goal === 'hujsanje' || p.goal === 'kondicija' || p.goal === 'test') && split[i].startsWith('full') && !roles.includes('cond')) roles.push('cond');
+    build(wd, TPL[split[i]].n, roles.map(r => { let id = ROLE[r][eq]; if (r === 'squat' && eq === 'gym' && p.exp === 'zacetnik') id = 'goblet'; if (r === 'pushH' && eq === 'home' && p.exp === 'zacetnik') id = 'sklece_klop'; return id; }), false);
   });
+  if (S.test.type) build(TEST_WD, 'Trening za test: ' + TESTS[S.test.type].n, [...TESTS[S.test.type].ex], true);
   return out;
 }
 function sessionDone(k) { const s = S.logs[k]; if (!s) return false; if (s.done) return true; return Object.values(s.items || {}).some(it => it.sets.some(x => x.d)); }
@@ -899,7 +898,7 @@ function vTrening() {
   }).join('');
   return `<div class="greet"><span class="eyebrow">Trening · ${DAYS_FULL[selDay]}</span><h1>${esc(w.name)}</h1><p class="muted">${w.items.length} ${plural(w.items.length, 'vaja', 'vaji', 'vaje', 'vaj')} · ~${w.mins} min · ${doneN}/${total} serij</p></div>
     ${strip}
-    ${c.log && c.log.wd !== selDay && P[c.log.wd] ? `<p class="small muted">Ta dan si opravil(-a) trening z dne ${DAYS_IN[c.log.wd]}.</p>` : ''}
+    ${c.log && c.log.wd !== selDay && c.log.wd < 7 && P[c.log.wd] ? `<p class="small muted">Ta dan si opravil(-a) trening z dne ${DAYS_IN[c.log.wd]}.</p>` : ''}
     ${ro ? `<div class="banner"><span>Ta trening je na vrsti v ${DAYS_IN[selDay]}.</span><button class="btn small primary" data-a="tr-today" data-wd="${selDay}">Opravi ga danes</button></div>` : `<div class="bar"><i style="width:${total ? doneN / total * 100 : 0}%"></i></div>`}
     ${cards}
     ${ro ? '' : c.log?.done ? `<div class="card outline" style="align-items:center;text-align:center"><span class="pill ok">${ic('check')} Trening shranjen</span><p class="muted small">Odlično. Rezultati so vidni v zavihku Napredek.</p></div>` : `<button class="btn primary block" data-a="tr-finish">Zaključi trening</button>`}`;
@@ -1018,7 +1017,7 @@ function coachContext() {
   else lines.push('Jedilnik: uporabnik ga nima vklopljenega.');
   if (S.test.type) { const T = TESTS[S.test.type]; lines.push(`Fizični test: ${T.full}${S.test.date ? ', datum ' + S.test.date + ' (čez ' + daysBetween(dkey(), S.test.date) + ' dni)' : ''}. Discipline: ${T.d.map(x => x.n).join(', ')}.`); const lm = S.test.mocks[S.test.mocks.length - 1]; if (lm) lines.push('Zadnji poskusni test (' + lm.d + '): ' + T.d.map(x => x.n + ' ' + (lm.r[x.id] != null ? (x.time ? fmtTime(lm.r[x.id]) : lm.r[x.id]) + ' ' + x.u : '-')).join('; ') + '.'); }
   lines.push('Tedenski načrt (weekday 0 = ponedeljek):');
-  P.forEach((w, wd) => { if (w) lines.push(`- weekday ${wd} (${DAYS_FULL[wd]}): ${w.name} — ` + w.items.map((it, i) => `${i + 1}) ${it.id} "${EX[it.id].n}" ${it.rx.s}×${it.rx.r}`).join(', ')); });
+  P.forEach((w, wd) => { if (w) lines.push(`- weekday ${wd} (${DAYS_FULL[wd] || 'neobvezen trening za test, ni v razporedu'}): ${w.name} — ` + w.items.map((it, i) => `${i + 1}) ${it.id} "${EX[it.id].n}" ${it.rx.s}×${it.rx.r}`).join(', ')); });
   const recent = Object.keys(S.logs).sort().reverse().slice(0, 5);
   if (recent.length) { lines.push('Zadnji treningi:'); recent.forEach(k => { const l = S.logs[k]; const parts = Object.values(l.items || {}).map(it => { const d = it.sets.filter(x => x.d); if (!d.length) return null; const top = d[d.length - 1]; return `${EX[it.id]?.n || it.id} ${top.w ? top.w + ' kg × ' : ''}${top.r || ''} (${d.length} ser.)`; }).filter(Boolean); lines.push(`- ${k}: ${l.name || ''} ${parts.join('; ')}`); }); }
   const ws = sortedWeights().slice(-5); if (ws.length) lines.push('Teža: ' + ws.map(w => `${w.d} ${w.kg} kg`).join(', ') + '.');
@@ -1192,8 +1191,9 @@ function vTesti() {
     </section>
     <section class="card">
       <span class="eyebrow">Trening za test</span>
-      <p>Zadnji trening v tednu (${DAYS_IN[SCHED[S.profile.days][SCHED[S.profile.days].length - 1]]}) je namenjen disciplinam testa: ${T.ex.map(id => EX[resolveEx(id, S.profile.injuries)].n.toLowerCase()).join(', ')}.</p>
-      <button class="btn small" data-a="test-train" style="align-self:flex-start">Odpri trening za test</button>
+      <p>Vaje za discipline testa: ${T.ex.map(id => EX[resolveEx(id, S.profile.injuries)].n.toLowerCase()).join(', ')}.</p>
+      <p class="small muted">Ta trening ni v tedenskem načrtu. Opravi ga, kadar želiš, na primer enkrat do dvakrat na teden namesto običajnega treninga.</p>
+      <button class="btn small primary" data-a="test-train" style="align-self:flex-start">Začni trening za test danes</button>
     </section>
     ${mocks.length ? `<section class="card"><span class="eyebrow">Zgodovina poskusnih testov</span><div class="tablewrap"><table class="week-t"><thead><tr><th>Datum</th>${T.d.map(x => `<th style="text-align:right">${x.n}</th>`).join('')}</tr></thead><tbody>${mocks.map(m => `<tr><td>${shortDate(m.d)}</td>${T.d.map(x => `<td class="r">${fmtVal(x, m.r[x.id])}</td>`).join('')}</tr>`).join('')}</tbody></table></div></section>` : ''}
     <button class="btn ghost small" data-a="test-change" style="align-self:center">Zamenjaj test</button>`;
@@ -1365,11 +1365,16 @@ const ACT = {
   'str-ex': a => { strengthEx = a.dataset.id; render(); },
   'ph-sel': a => { const id = a.dataset.id; if (cmpSel.includes(id)) cmpSel = cmpSel.filter(x => x !== id); else cmpSel = [...cmpSel, id].slice(-2); if (cmpSel.length === 2) cmpSel.sort((x, y) => (photos.find(p => p.id === x).d < photos.find(p => p.id === y).d ? -1 : 1)); renderKeepCmp(); },
   'ph-del': () => { if (!cmpSel.length) { toast('Najprej izberi fotografijo'); return; } photos = photos.filter(p => !cmpSel.includes(p.id)); cmpSel = []; lsSet(LS_PHOTOS, photos); render(); toast('Izbrisano'); },
-  'test-pick': a => { S.test.type = a.dataset.v; S.overrides = Object.fromEntries(Object.entries(S.overrides).filter(([k]) => Number(k.split(':')[0]) !== SCHED[S.profile.days].slice(-1)[0])); save(); render(); },
+  'test-pick': a => { S.test.type = a.dataset.v; S.overrides = Object.fromEntries(Object.entries(S.overrides).filter(([k]) => Number(k.split(':')[0]) !== TEST_WD)); save(); render(); },
   'test-change': () => { S.test.type = null; S.test.targets = {}; save(); render(); },
   'test-date-edit': () => { const r = $('#date-row'); if (r) { r.hidden = false; $('#test-date').focus(); } },
   'test-date-save': () => { const v = $('#test-date').value; if (!v) { toast('Izberi datum'); return; } S.test.date = v; save(); render(); },
-  'test-train': () => { selDay = SCHED[S.profile.days].slice(-1)[0]; go('trening'); },
+  'test-train': () => {
+    const k = dkey(), log = S.logs[k];
+    if (log && sessionDone(k) && log.wd !== TEST_WD) { toast('Danes si že opravil(-a) trening'); return; }
+    if (!log || log.wd !== TEST_WD) S.logs[k] = {wd: TEST_WD, name: plan()[TEST_WD].name, items: {}, done: false};
+    save(); selDay = dow(); go('trening');
+  },
   'mock-open': () => openMock(),
   'tm-mode': a => { testTimer.mode = a.dataset.v; testTimer.acc = 0; testTimer.run = false; clearInterval(testTimer.iv); document.querySelectorAll('[data-a="tm-mode"]').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === testTimer.mode)); $('#tm-btn').textContent = 'Start'; updTimer(); },
   'tm-toggle': a => { try { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {}
