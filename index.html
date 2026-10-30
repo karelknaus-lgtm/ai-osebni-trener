@@ -813,41 +813,12 @@ function vOnboarding() {
 }
 
 /* --- home --- */
-const kgLabel = v => fmtN(v, v % 1 ? 1 : 0);
-// One useful line for today's workout: a weight to aim for from the last session, or a technique cue.
-function todayHint(w, k) {
-  for (const it of w.items) {
-    const e = EX[it.id]; if (!e.w) continue;
-    const prev = prevSet(it.id, k); if (!prev || !prev.w) continue;
-    const pw = Number(String(prev.w).replace(',', '.')), pr = Number(prev.r) || 0;
-    const m = String(it.rx.r).match(/^(\d+)(?:–(\d+))?/), top = m ? Number(m[2] || m[1]) : 0;
-    const up = top && pr >= top ? pw + 2.5 : 0;
-    return `Zadnjič: ${e.n.toLowerCase()}, ${kgLabel(pw)} kg × ${pr}. ${up ? `Danes poskusi ${kgLabel(up)} kg.` : 'Danes poskusi z isto težo narediti eno ponovitev več.'}`;
-  }
-  const e = EX[w.items[0].id], cue = e.cues[new Date().getDate() % e.cues.length];
-  return `Nasvet za ${e.n.toLowerCase()}: ${cue.charAt(0).toLowerCase() + cue.slice(1)}.`;
-}
 function vHome() {
   const h = new Date().getHours(), greet = h < 10 ? 'Dobro jutro' : h < 18 ? 'Dober dan' : 'Dober večer';
   const P = plan(), today = dow(), tk = dkey();
-  const todaysWd = S.logs[tk]?.wd ?? today, w = P[todaysWd];
   const ws = weekStats();
   const totalDone = Object.keys(S.logs).filter(sessionDone).length;
   const weekMins = DAYS.reduce((a, _, i) => { const k = dkey(dateOfWd(i)); const l = S.logs[k]; return a + (sessionDone(k) && P[l?.wd ?? i] ? P[l?.wd ?? i].mins : 0); }, 0);
-  let next = null; for (let i = 1; i <= 7; i++) { const wd = (today + i) % 7; if (P[wd]) { next = {wd, ...P[wd]}; break; } }
-  const done = sessionDone(tk);
-  const workoutCard = w ? `
-    <div class="card hero">
-      <div class="row between"><span class="eyebrow">Današnji trening</span>${done ? `<span class="pill" style="background:var(--ink);color:var(--accent)">${ic('check')} Opravljeno</span>` : `<span class="small muted">~${w.mins} min</span>`}</div>
-      <div class="stack-s"><h2 style="font-size:26px">Danes na vrsti: ${esc(w.focus)}</h2><p class="muted">${w.items.length} ${plural(w.items.length, 'vaja', 'vaji', 'vaje', 'vaj')} · ${w.items.reduce((a, it) => a + it.rx.s, 0)} serij</p></div>
-      <p style="background:rgba(11,12,10,.07);border-radius:14px;padding:12px 14px;font-size:14.5px">${esc(todayHint(w, tk))}</p>
-      <button class="btn dark block" data-a="nav" data-r="trening">${done ? 'Poglej trening' : 'Začni trening'} ${ic('right')}</button>
-    </div>` : `
-    <div class="card outline">
-      <span class="eyebrow">Danes</span><h2>Dan počitka</h2>
-      <p class="muted">Lahkotna hoja ali raztezanje pospešita regeneracijo.${next ? ` Naslednji trening bo v ${DAYS_IN[next.wd]}: <b style="color:var(--fg)">${esc(next.focus)}</b>.` : ''}</p>
-      <button class="btn small" data-a="nav" data-r="trening" style="align-self:flex-start">Vseeno treniraj danes</button>
-    </div>`;
   let mealCard;
   if (S.nutrition.enabled) {
     const menu = dayMenu(today), wm = weekMenu(), eaten = S.eaten[tk] || {};
@@ -864,7 +835,6 @@ function vHome() {
   }
   return `
     <div class="greet"><span class="eyebrow">${DAYS_FULL[today]}, ${longDate(tk)}</span><h1>${greet}.</h1></div>
-    ${workoutCard}
     <div class="card">
       <div class="row between"><div class="stack-s"><span class="eyebrow">Treningi ta teden</span><h2>${ws.done} od ${ws.planned}</h2></div>${ring(ws.planned ? ws.done / ws.planned : 0, Math.round(ws.planned ? ws.done / ws.planned * 100 : 0) + '%')}</div>
       <div class="week">${DAYS.map((n, i) => { const k = dkey(dateOfWd(i)), dn = sessionDone(k); return `<div class="d">${n}<span class="dot ${dn ? 'done' : P[i] ? 'plan' : ''} ${i === today ? 'today' : ''}">${dn ? ic('check') : ''}</span></div>`; }).join('')}</div>
