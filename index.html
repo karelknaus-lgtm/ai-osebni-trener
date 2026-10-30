@@ -383,12 +383,12 @@ const ROLE = {
   core2: {home: 'trup', gym: 'trup'}, arms: {home: 'sklece_klop', gym: 'biceps'}, cond: {home: 'intervali', gym: 'intervali'}, deadbug: {home: 'mrtvi_hrosc', gym: 'mrtvi_hrosc'}
 };
 const TPL = {
-  fullA: {n: 'Celo telo A', roles: ['squat', 'pushH', 'pullH', 'bridge', 'core']},
-  fullB: {n: 'Celo telo B', roles: ['hinge', 'pushV', 'pullV', 'lunge', 'core2']},
-  fullC: {n: 'Celo telo C', roles: ['lunge', 'pushH', 'pullV', 'bridge', 'deadbug']},
-  upper: {n: 'Zgornji del', roles: ['pushH', 'pullH', 'pushV', 'pullV', 'arms', 'core']},
-  lower: {n: 'Spodnji del', roles: ['squat', 'hinge', 'lunge', 'bridge', 'core2']},
-  cond: {n: 'Kondicija in trup', roles: ['cond', 'core', 'deadbug', 'core2']}
+  fullA: {n: 'Celo telo A', f: 'celo telo', roles: ['squat', 'pushH', 'pullH', 'bridge', 'core']},
+  fullB: {n: 'Celo telo B', f: 'celo telo', roles: ['hinge', 'pushV', 'pullV', 'lunge', 'core2']},
+  fullC: {n: 'Celo telo C', f: 'celo telo', roles: ['lunge', 'pushH', 'pullV', 'bridge', 'deadbug']},
+  upper: {n: 'Zgornji del', f: 'prsi, hrbet in ramena', roles: ['pushH', 'pullH', 'pushV', 'pullV', 'arms', 'core']},
+  lower: {n: 'Spodnji del', f: 'noge in zadnjica', roles: ['squat', 'hinge', 'lunge', 'bridge', 'core2']},
+  cond: {n: 'Kondicija in trup', f: 'kondicija in trup', roles: ['cond', 'core', 'deadbug', 'core2']}
 };
 const SPLIT = {2: ['fullA', 'fullB'], 3: ['fullA', 'fullB', 'fullC'], 4: ['upper', 'lower', 'upper', 'lower'], 5: ['upper', 'lower', 'cond', 'upper', 'lower'], 6: ['upper', 'lower', 'cond', 'upper', 'lower', 'fullC']};
 const SCHED = {2: [1, 4], 3: [0, 2, 4], 4: [0, 1, 3, 4], 5: [0, 1, 2, 3, 4], 6: [0, 1, 2, 3, 4, 5]};
@@ -555,21 +555,21 @@ function plan() {
   const sched = SCHED[days], split = SPLIT[days];
   // Indexes 0–6 are the weekdays; TEST_WD holds the optional test workout, which is never scheduled.
   const out = Array(8).fill(null);
-  const build = (wd, name, ids, testDay) => {
+  const build = (wd, name, ids, testDay, focus) => {
     const items = ids.map((id, k) => {
       const ov = S.overrides[wd + ':' + k];
       const rid = ov && EX[ov] ? ov : resolveEx(id, inj);
       return {id: rid, rx: rxFor(rid, p.goal, p.exp, testDay)};
     });
     const mins = Math.round(items.reduce((a, it) => a + it.rx.s * ((EX[it.id].type === 'cardio' ? 75 : 40) + it.rx.rest), 0) / 60) + 8;
-    out[wd] = {wd, name, items, mins, testDay};
+    out[wd] = {wd, name, items, mins, testDay, focus};
   };
   sched.forEach((wd, i) => {
     const roles = [...TPL[split[i]].roles];
     if ((p.goal === 'hujsanje' || p.goal === 'kondicija' || p.goal === 'test') && split[i].startsWith('full') && !roles.includes('cond')) roles.push('cond');
-    build(wd, TPL[split[i]].n, roles.map(r => { let id = ROLE[r][eq]; if (r === 'squat' && eq === 'gym' && p.exp === 'zacetnik') id = 'goblet'; if (r === 'pushH' && eq === 'home' && p.exp === 'zacetnik') id = 'sklece_klop'; return id; }), false);
+    build(wd, TPL[split[i]].n, roles.map(r => { let id = ROLE[r][eq]; if (r === 'squat' && eq === 'gym' && p.exp === 'zacetnik') id = 'goblet'; if (r === 'pushH' && eq === 'home' && p.exp === 'zacetnik') id = 'sklece_klop'; return id; }), false, TPL[split[i]].f);
   });
-  if (S.test.type) build(TEST_WD, 'Trening za test: ' + TESTS[S.test.type].n, [...TESTS[S.test.type].ex], true);
+  if (S.test.type) build(TEST_WD, 'Trening za test: ' + TESTS[S.test.type].n, [...TESTS[S.test.type].ex], true, 'discipline testa');
   return out;
 }
 function sessionDone(k) { const s = S.logs[k]; if (!s) return false; if (s.done) return true; return Object.values(s.items || {}).some(it => it.sets.some(x => x.d)); }
@@ -813,6 +813,20 @@ function vOnboarding() {
 }
 
 /* --- home --- */
+const kgLabel = v => fmtN(v, v % 1 ? 1 : 0);
+// One useful line for today's workout: a weight to aim for from the last session, or a technique cue.
+function todayHint(w, k) {
+  for (const it of w.items) {
+    const e = EX[it.id]; if (!e.w) continue;
+    const prev = prevSet(it.id, k); if (!prev || !prev.w) continue;
+    const pw = Number(String(prev.w).replace(',', '.')), pr = Number(prev.r) || 0;
+    const m = String(it.rx.r).match(/^(\d+)(?:–(\d+))?/), top = m ? Number(m[2] || m[1]) : 0;
+    const up = top && pr >= top ? pw + 2.5 : 0;
+    return `Zadnjič: ${e.n.toLowerCase()}, ${kgLabel(pw)} kg × ${pr}. ${up ? `Danes poskusi ${kgLabel(up)} kg.` : 'Danes poskusi z isto težo narediti eno ponovitev več.'}`;
+  }
+  const e = EX[w.items[0].id], cue = e.cues[new Date().getDate() % e.cues.length];
+  return `Nasvet za ${e.n.toLowerCase()}: ${cue.charAt(0).toLowerCase() + cue.slice(1)}.`;
+}
 function vHome() {
   const h = new Date().getHours(), greet = h < 10 ? 'Dobro jutro' : h < 18 ? 'Dober dan' : 'Dober večer';
   const P = plan(), today = dow(), tk = dkey();
@@ -825,12 +839,13 @@ function vHome() {
   const workoutCard = w ? `
     <div class="card hero">
       <div class="row between"><span class="eyebrow">Današnji trening</span>${done ? `<span class="pill" style="background:var(--ink);color:var(--accent)">${ic('check')} Opravljeno</span>` : `<span class="small muted">~${w.mins} min</span>`}</div>
-      <div class="stack-s"><h2 style="font-size:28px">${esc(w.name)}</h2><p class="muted">${w.items.length} ${plural(w.items.length, 'vaja', 'vaji', 'vaje', 'vaj')}: ${w.items.slice(0, 3).map(i => esc(EX[i.id].n)).join(', ')}${w.items.length > 3 ? ' …' : ''}</p></div>
+      <div class="stack-s"><h2 style="font-size:26px">Danes na vrsti: ${esc(w.focus)}</h2><p class="muted">${w.items.length} ${plural(w.items.length, 'vaja', 'vaji', 'vaje', 'vaj')} · ${w.items.reduce((a, it) => a + it.rx.s, 0)} serij</p></div>
+      <p style="background:rgba(11,12,10,.07);border-radius:14px;padding:12px 14px;font-size:14.5px">${esc(todayHint(w, tk))}</p>
       <button class="btn dark block" data-a="nav" data-r="trening">${done ? 'Poglej trening' : 'Začni trening'} ${ic('right')}</button>
     </div>` : `
     <div class="card outline">
       <span class="eyebrow">Danes</span><h2>Dan počitka</h2>
-      <p class="muted">Lahkotna hoja ali raztezanje pospešita regeneracijo.${next ? ` Naslednji trening: <b style="color:var(--fg)">${esc(next.name)}</b> v ${DAYS_IN[next.wd]}.` : ''}</p>
+      <p class="muted">Lahkotna hoja ali raztezanje pospešita regeneracijo.${next ? ` Naslednji trening bo v ${DAYS_IN[next.wd]}: <b style="color:var(--fg)">${esc(next.focus)}</b>.` : ''}</p>
       <button class="btn small" data-a="nav" data-r="trening" style="align-self:flex-start">Vseeno treniraj danes</button>
     </div>`;
   let mealCard;
