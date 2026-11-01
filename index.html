@@ -264,6 +264,13 @@ table.week-t{width:100%;border-collapse:collapse;font-size:14px;min-width:520px}
 .opt .grow span{font-size:13.5px;color:var(--muted)}
 .opt[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-dim)}
 .opt .tick{width:26px;height:26px}
+.stylegrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stylebox{text-align:left;background:var(--surface);border:1.5px solid transparent;border-radius:18px;padding:10px 12px 14px;display:flex;flex-direction:column;gap:6px;transition:border-color .15s,background .15s}
+.stylebox[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-dim)}
+.stylebox b{font-size:16px;font-weight:800;line-height:1.15}
+.stylebox > span:last-child{font-size:12.5px;line-height:1.35;color:var(--muted)}
+.stylefig{height:62px;display:flex;justify-content:center;align-items:center;background:var(--surface-2);border-radius:12px;overflow:hidden}
+.stylefig svg{height:100%;width:auto}
 .opt[aria-pressed="true"] .tick{background:var(--accent);border-color:var(--accent);color:var(--ink)}
 .bignum{display:flex;align-items:center;justify-content:center;gap:18px;padding:24px 0}
 .bignum .num{font-size:84px;line-height:1;min-width:3ch;text-align:center}
@@ -353,37 +360,41 @@ const I = {
 const ic = (n, cls = 'ico') => `<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">${I[n]}</svg>`;
 
 /* ---------- exercise library ---------- */
+// HIIT intervals get longer and rests shorter with experience.
+const HIIT_RX = {zacetnik: {s: 3, r: '20 s', rest: 40}, srednji: {s: 4, r: '30 s', rest: 30}, izkusen: {s: 5, r: '40 s', rest: 20}};
+// Exercise fields: p = stick-figure pattern, st = training styles it belongs to (none means strength only),
+// rx = fixed dose, rxExp = dose by experience, beg = easier version for beginners in the style plans, yt = YouTube search.
 const EX = {
-  pocep: {n: 'Počep z lastno težo', p: 'squat', m: 'Noge, zadnjica', eq: 'both', avoid: ['koleno'], alt: 'most', w: false, cues: ['Stopala v širini ramen, prsti rahlo navzven', 'Boki gredo nazaj in dol, kolena sledijo prstom', 'Pete ostanejo na tleh, hrbet nevtralen']},
+  pocep: {n: 'Počep z lastno težo', p: 'squat', m: 'Noge, zadnjica', eq: 'both', avoid: ['koleno'], alt: 'most', w: false, st: ['moc', 'kalistenika'], cues: ['Stopala v širini ramen, prsti rahlo navzven', 'Boki gredo nazaj in dol, kolena sledijo prstom', 'Pete ostanejo na tleh, hrbet nevtralen']},
   goblet: {n: 'Goblet počep', p: 'squat', m: 'Noge, zadnjica', eq: 'gym', avoid: ['koleno'], alt: 'hip_thrust', w: true, cues: ['Ročko drži ob prsnici, komolci navzdol', 'Spusti se med kolena, trup pokonci', 'Odrini se skozi celo stopalo']},
-  pocep_drog: {n: 'Počep z drogom', p: 'squat', m: 'Noge, zadnjica, trup', eq: 'gym', avoid: ['koleno', 'hrbet'], alt: 'nozna_presa', w: true, cues: ['Drog na zgornjem delu hrbta, lopatice skupaj', 'Vdihni in napni trebuh pred spustom', 'Spusti se vsaj do vzporednice, kolena ven']},
-  nozna_presa: {n: 'Nožna preša', p: 'squat', m: 'Noge, zadnjica', eq: 'gym', avoid: ['koleno'], alt: 'hip_thrust', w: true, cues: ['Stopala na sredini plošče v širini bokov', 'Križ ostane prislonjen na naslon', 'Kolen na vrhu ne zakleni']},
-  izpadni: {n: 'Izpadni koraki', p: 'lunge', m: 'Noge, zadnjica', eq: 'both', avoid: ['koleno'], alt: 'most', w: false, cues: ['Dolg korak naprej, trup pokonci', 'Zadnje koleno se skoraj dotakne tal', 'Odrini se s sprednjo peto']},
-  izpadni_rocke: {n: 'Izpadni koraki z ročkami', p: 'lunge', m: 'Noge, zadnjica', eq: 'gym', avoid: ['koleno'], alt: 'hip_thrust', w: true, cues: ['Ročki ob telesu, ramena sproščena', 'Sprednje koleno nad stopalom', 'Nadzorovan spust, eksploziven dvig']},
-  most: {n: 'Glutealni most', p: 'bridge', m: 'Zadnjica, zadnja loža', eq: 'both', avoid: [], w: false, st: ['moc', 'pilates'], cues: ['Stopala blizu zadnjice', 'Dvigni boke, da so kolena, boki in ramena v liniji', 'Na vrhu stisni zadnjico 1 sekundo']},
-  most_eno: {n: 'Enonožni glutealni most', p: 'bridge', m: 'Zadnjica, zadnja loža', eq: 'both', avoid: [], w: false, cues: ['Ena noga iztegnjena v zraku', 'Boki ostanejo poravnani', 'Počasen spust']},
-  hip_thrust: {n: 'Hip thrust z drogom', p: 'bridge', m: 'Zadnjica', eq: 'gym', avoid: [], w: true, cues: ['Lopatice na klopi, drog na bokih z blazinico', 'Brado drži rahlo navzdol', 'Na vrhu poln izteg bokov']},
-  rdl_eno: {n: 'Enonožni mrtvi dvig', p: 'hinge', m: 'Zadnja loža, zadnjica', eq: 'both', avoid: ['hrbet'], alt: 'most_eno', w: false, cues: ['Rahlo pokrčeno stojno koleno', 'Trup in zadnja noga se gibljeta kot ena linija', 'Boki ostanejo vzporedni s tlemi']},
-  rdl: {n: 'Romunski mrtvi dvig', p: 'hinge', m: 'Zadnja loža, zadnjica', eq: 'gym', avoid: ['hrbet'], alt: 'hip_thrust', w: true, cues: ['Drog drsi tik ob stegnih', 'Boki nazaj, hrbet raven, kolena rahlo pokrčena', 'Spusti se do občutka raztega zadnje lože']},
-  sklece: {n: 'Sklece', p: 'pushup', m: 'Prsi, tricepsi, ramena', eq: 'both', avoid: ['zapestje', 'rama'], alt: 'sklece_klop', w: false, cues: ['Dlani malo širše od ramen', 'Telo v ravni liniji od glave do pet', 'Prsi do tal, komolci pod kotom okoli 45°']},
-  sklece_klop: {n: 'Sklece z rokami na povišanem', p: 'pushup', m: 'Prsi, tricepsi', eq: 'both', avoid: [], w: false, cues: ['Roke na klopi, stolu ali robu mize', 'Telo v liniji, trebuh napet', 'Višja opora pomeni lažjo izvedbo']},
-  bench: {n: 'Potisk s prsi', p: 'bench', m: 'Prsi, tricepsi, ramena', eq: 'gym', avoid: ['rama'], alt: 'bench_rocke', w: true, cues: ['Lopatice skupaj in navzdol', 'Drog spusti na spodnji del prsnice', 'Stopala trdno na tleh']},
-  bench_rocke: {n: 'Potisk ročk z nevtralnim prijemom', p: 'bench', m: 'Prsi, tricepsi', eq: 'gym', avoid: [], w: true, cues: ['Dlani obrnjeni ena proti drugi', 'Komolci blizu telesa', 'Nadzorovan spust do prsi']},
-  pike: {n: 'Pike sklece', p: 'pushup', m: 'Ramena, tricepsi', eq: 'both', avoid: ['rama', 'zapestje'], alt: 'sklece_klop', w: false, cues: ['Boki visoko, telo v obliki črke V', 'Glavo spusti med dlani', 'Odrini se nazaj gor']},
-  ohp: {n: 'Potisk nad glavo', p: 'press', m: 'Ramena, tricepsi', eq: 'gym', avoid: ['rama', 'hrbet'], alt: 'landmine', w: true, cues: ['Napni zadnjico in trebuh', 'Drog potiskaj navpično, glava se umakne nazaj', 'Na vrhu drog nad sredino stopal']},
-  landmine: {n: 'Enoročni potisk landmine', p: 'press', m: 'Ramena, prsi', eq: 'gym', avoid: [], w: true, cues: ['Konec droga drži ob rami', 'Potisni naprej in gor', 'Trup ostane miren']},
-  zgibe: {n: 'Zgibe', p: 'pullup', m: 'Hrbet, bicepsi', eq: 'both', avoid: ['rama'], alt: 'veslanje_miza', w: false, cues: ['Začni iz polne vese', 'Lopatice najprej navzdol, nato vleci komolce k rebrom', 'Brada nad drog, nadzorovan spust']},
-  latpull: {n: 'Poteg na prsi', p: 'pullup', m: 'Hrbet, bicepsi', eq: 'gym', avoid: [], w: true, cues: ['Prijem malo širši od ramen', 'Drog vleci do zgornjega dela prsi', 'Ne zibaj se s trupom']},
-  veslanje_miza: {n: 'Inverzno veslanje pod mizo', p: 'row', m: 'Hrbet, bicepsi', eq: 'home', avoid: [], w: false, cues: ['Uleži se pod trdno mizo in primi rob', 'Telo v liniji, prsi vleci k robu', 'Na vrhu stisni lopatice']},
-  veslanje_kabel: {n: 'Veslanje na kablu sede', p: 'row', m: 'Hrbet, bicepsi', eq: 'gym', avoid: [], w: true, cues: ['Hrbet pokonci, prsi naprej', 'Ročaj vleci proti popku', 'Lopatice skupaj, nato počasi izteg']},
-  veslanje_drog: {n: 'Veslanje z drogom v predklonu', p: 'row', m: 'Hrbet, bicepsi', eq: 'gym', avoid: ['hrbet'], alt: 'veslanje_kabel', w: true, cues: ['Trup naklonjen okoli 45°', 'Drog vleci proti spodnjim rebrom', 'Hrbet raven ves čas']},
-  biceps: {n: 'Upogib za biceps z ročkami', p: 'curl', m: 'Bicepsi', eq: 'gym', avoid: [], w: true, cues: ['Komolci ob telesu', 'Brez zibanja trupa', 'Počasen spust v 2 sekundah']},
-  deska: {n: 'Deska na podlahteh', p: 'plank', m: 'Trup', eq: 'both', avoid: [], w: false, st: ['moc', 'joga', 'pilates'], type: 'time', rx: {s: 3, r: '30–45 s', rest: 45}, cues: ['Komolci pod rameni', 'Stisni zadnjico in trebuh', 'Boki ne smejo pasti ali štrleti']},
-  trup: {n: 'Dviganje trupa', p: 'situp', m: 'Trebušne mišice', eq: 'both', avoid: ['hrbet'], alt: 'mrtvi_hrosc', w: false, rx: {s: 3, r: '15–20', rest: 45}, cues: ['Kolena pokrčena, stopala na tleh', 'Dvigni trup do pokončnega položaja', 'Nadzorovano nazaj do lopatic']},
-  mrtvi_hrosc: {n: 'Mrtvi hrošč', p: 'deadbug', m: 'Globoke trebušne mišice', eq: 'both', avoid: [], w: false, st: ['moc', 'pilates'], rx: {s: 3, r: '8–10 na stran', rest: 45}, cues: ['Križ pritisnjen v tla', 'Iztegni nasprotno roko in nogo', 'Počasi, z izdihom']},
-  intervali: {n: 'Tekaški intervali', p: 'run', m: 'Kondicija', eq: 'both', avoid: ['koleno'], alt: 'hitra_hoja', w: false, type: 'cardio', rx: {s: 6, r: '1 min hitro + 1 min hoje', rest: 0}, cues: ['5 minut lahkotnega ogrevanja', 'Hitri del pri 8/10 napora', 'Med intervali hodi, ne stoj']},
-  hitra_hoja: {n: 'Hitra hoja v klanec', p: 'run', m: 'Kondicija', eq: 'both', avoid: [], w: false, type: 'cardio', rx: {s: 4, r: '5 min hitro', rest: 60}, cues: ['Pokončna drža', 'Tempo, pri katerem težko govoriš v povedih', 'Roke aktivno nihajo']},
-  sprint: {n: 'Šprinti na 60 m', p: 'run', m: 'Hitrost', eq: 'both', avoid: ['koleno'], alt: 'hitra_hoja', w: false, type: 'cardio', rx: {s: 6, r: '60 m s polno hitrostjo', rest: 150}, cues: ['Temeljito ogrevanje in nekaj stopnjevanj', 'Nizek start, prvi koraki kratki in hitri', 'Polni odmor med ponovitvami']},
+  pocep_drog: {n: 'Počep z drogom', p: 'squat', m: 'Noge, zadnjica, trup', eq: 'gym', avoid: ['koleno', 'hrbet'], alt: 'nozna_presa', w: true, st: ['moc', 'bodybuilding'], cues: ['Drog na zgornjem delu hrbta, lopatice skupaj', 'Vdihni in napni trebuh pred spustom', 'Spusti se vsaj do vzporednice, kolena ven']},
+  nozna_presa: {n: 'Nožna preša', p: 'squat', m: 'Noge, zadnjica', eq: 'gym', avoid: ['koleno'], alt: 'hip_thrust', w: true, st: ['moc', 'bodybuilding'], cues: ['Stopala na sredini plošče v širini bokov', 'Križ ostane prislonjen na naslon', 'Kolen na vrhu ne zakleni']},
+  izpadni: {n: 'Izpadni koraki', p: 'lunge', m: 'Noge, zadnjica', eq: 'both', avoid: ['koleno'], alt: 'most', w: false, st: ['moc', 'kalistenika'], cues: ['Dolg korak naprej, trup pokonci', 'Zadnje koleno se skoraj dotakne tal', 'Odrini se s sprednjo peto']},
+  izpadni_rocke: {n: 'Izpadni koraki z ročkami', p: 'lunge', m: 'Noge, zadnjica', eq: 'gym', avoid: ['koleno'], alt: 'hip_thrust', w: true, st: ['moc', 'bodybuilding'], cues: ['Ročki ob telesu, ramena sproščena', 'Sprednje koleno nad stopalom', 'Nadzorovan spust, eksploziven dvig']},
+  most: {n: 'Glutealni most', p: 'bridge', m: 'Zadnjica, zadnja loža', eq: 'both', avoid: [], w: false, st: ['moc', 'pilates', 'kalistenika', 'hiit', 'tek', 'bodybuilding'], cues: ['Stopala blizu zadnjice', 'Dvigni boke, da so kolena, boki in ramena v liniji', 'Na vrhu stisni zadnjico 1 sekundo']},
+  most_eno: {n: 'Enonožni glutealni most', p: 'bridge', m: 'Zadnjica, zadnja loža', eq: 'both', avoid: [], w: false, st: ['moc', 'kalistenika'], cues: ['Ena noga iztegnjena v zraku', 'Boki ostanejo poravnani', 'Počasen spust']},
+  hip_thrust: {n: 'Hip thrust z drogom', p: 'bridge', m: 'Zadnjica', eq: 'gym', avoid: [], w: true, st: ['moc', 'bodybuilding'], cues: ['Lopatice na klopi, drog na bokih z blazinico', 'Brado drži rahlo navzdol', 'Na vrhu poln izteg bokov']},
+  rdl_eno: {n: 'Enonožni mrtvi dvig', p: 'hinge', m: 'Zadnja loža, zadnjica', eq: 'both', avoid: ['hrbet'], alt: 'most_eno', w: false, st: ['moc', 'kalistenika'], cues: ['Rahlo pokrčeno stojno koleno', 'Trup in zadnja noga se gibljeta kot ena linija', 'Boki ostanejo vzporedni s tlemi']},
+  rdl: {n: 'Romunski mrtvi dvig', p: 'hinge', m: 'Zadnja loža, zadnjica', eq: 'gym', avoid: ['hrbet'], alt: 'hip_thrust', w: true, st: ['moc', 'bodybuilding'], cues: ['Drog drsi tik ob stegnih', 'Boki nazaj, hrbet raven, kolena rahlo pokrčena', 'Spusti se do občutka raztega zadnje lože']},
+  sklece: {n: 'Sklece', p: 'pushup', m: 'Prsi, tricepsi, ramena', eq: 'both', avoid: ['zapestje', 'rama'], alt: 'sklece_klop', w: false, st: ['moc', 'kalistenika', 'hiit'], cues: ['Dlani malo širše od ramen', 'Telo v ravni liniji od glave do pet', 'Prsi do tal, komolci pod kotom okoli 45°']},
+  sklece_klop: {n: 'Sklece z rokami na povišanem', p: 'pushup', m: 'Prsi, tricepsi', eq: 'both', avoid: [], w: false, st: ['moc', 'kalistenika'], cues: ['Roke na klopi, stolu ali robu mize', 'Telo v liniji, trebuh napet', 'Višja opora pomeni lažjo izvedbo']},
+  bench: {n: 'Potisk s prsi', p: 'bench', m: 'Prsi, tricepsi, ramena', eq: 'gym', avoid: ['rama'], alt: 'bench_rocke', w: true, st: ['moc', 'bodybuilding'], cues: ['Lopatice skupaj in navzdol', 'Drog spusti na spodnji del prsnice', 'Stopala trdno na tleh']},
+  bench_rocke: {n: 'Potisk ročk z nevtralnim prijemom', p: 'bench', m: 'Prsi, tricepsi', eq: 'gym', avoid: [], w: true, st: ['moc', 'bodybuilding'], cues: ['Dlani obrnjeni ena proti drugi', 'Komolci blizu telesa', 'Nadzorovan spust do prsi']},
+  pike: {n: 'Pike sklece', p: 'pushup', m: 'Ramena, tricepsi', eq: 'both', avoid: ['rama', 'zapestje'], alt: 'sklece_klop', w: false, st: ['moc', 'kalistenika'], cues: ['Boki visoko, telo v obliki črke V', 'Glavo spusti med dlani', 'Odrini se nazaj gor']},
+  ohp: {n: 'Potisk nad glavo', p: 'press', m: 'Ramena, tricepsi', eq: 'gym', avoid: ['rama', 'hrbet'], alt: 'landmine', w: true, st: ['moc', 'bodybuilding'], cues: ['Napni zadnjico in trebuh', 'Drog potiskaj navpično, glava se umakne nazaj', 'Na vrhu drog nad sredino stopal']},
+  landmine: {n: 'Enoročni potisk landmine', p: 'press', m: 'Ramena, prsi', eq: 'gym', avoid: [], w: true, st: ['moc', 'bodybuilding'], cues: ['Konec droga drži ob rami', 'Potisni naprej in gor', 'Trup ostane miren']},
+  zgibe: {n: 'Zgibe', p: 'pullup', m: 'Hrbet, bicepsi', eq: 'both', avoid: ['rama'], alt: 'veslanje_miza', w: false, beg: 'zgibe_neg', st: ['moc', 'kalistenika'], cues: ['Začni iz polne vese', 'Lopatice najprej navzdol, nato vleci komolce k rebrom', 'Brada nad drog, nadzorovan spust']},
+  latpull: {n: 'Poteg na prsi', p: 'pullup', m: 'Hrbet, bicepsi', eq: 'gym', avoid: [], w: true, st: ['moc', 'bodybuilding'], cues: ['Prijem malo širši od ramen', 'Drog vleci do zgornjega dela prsi', 'Ne zibaj se s trupom']},
+  veslanje_miza: {n: 'Inverzno veslanje pod mizo', p: 'row', m: 'Hrbet, bicepsi', eq: 'home', avoid: [], w: false, st: ['moc', 'kalistenika'], cues: ['Uleži se pod trdno mizo in primi rob', 'Telo v liniji, prsi vleci k robu', 'Na vrhu stisni lopatice']},
+  veslanje_kabel: {n: 'Veslanje na kablu sede', p: 'row', m: 'Hrbet, bicepsi', eq: 'gym', avoid: [], w: true, st: ['moc', 'bodybuilding'], cues: ['Hrbet pokonci, prsi naprej', 'Ročaj vleci proti popku', 'Lopatice skupaj, nato počasi izteg']},
+  veslanje_drog: {n: 'Veslanje z drogom v predklonu', p: 'row', m: 'Hrbet, bicepsi', eq: 'gym', avoid: ['hrbet'], alt: 'veslanje_kabel', w: true, st: ['moc', 'bodybuilding'], cues: ['Trup naklonjen okoli 45°', 'Drog vleci proti spodnjim rebrom', 'Hrbet raven ves čas']},
+  biceps: {n: 'Upogib za biceps z ročkami', p: 'curl', m: 'Bicepsi', eq: 'gym', avoid: [], w: true, st: ['moc', 'bodybuilding'], cues: ['Komolci ob telesu', 'Brez zibanja trupa', 'Počasen spust v 2 sekundah']},
+  deska: {n: 'Deska na podlahteh', p: 'plank', m: 'Trup', eq: 'both', avoid: [], w: false, st: ['moc', 'joga', 'pilates', 'kalistenika', 'hiit', 'tek', 'bodybuilding'], type: 'time', rx: {s: 3, r: '30–45 s', rest: 45}, cues: ['Komolci pod rameni', 'Stisni zadnjico in trebuh', 'Boki ne smejo pasti ali štrleti']},
+  trup: {n: 'Dviganje trupa', p: 'situp', m: 'Trebušne mišice', eq: 'both', avoid: ['hrbet'], alt: 'mrtvi_hrosc', w: false, st: ['moc', 'bodybuilding'], rx: {s: 3, r: '15–20', rest: 45}, cues: ['Kolena pokrčena, stopala na tleh', 'Dvigni trup do pokončnega položaja', 'Nadzorovano nazaj do lopatic']},
+  mrtvi_hrosc: {n: 'Mrtvi hrošč', p: 'deadbug', m: 'Globoke trebušne mišice', eq: 'both', avoid: [], w: false, st: ['moc', 'pilates', 'kalistenika', 'hiit', 'bodybuilding'], rx: {s: 3, r: '8–10 na stran', rest: 45}, cues: ['Križ pritisnjen v tla', 'Iztegni nasprotno roko in nogo', 'Počasi, z izdihom']},
+  intervali: {n: 'Tekaški intervali', p: 'run', m: 'Kondicija', eq: 'both', avoid: ['koleno'], alt: 'hitra_hoja', w: false, st: ['moc', 'tek', 'hiit'], type: 'cardio', rx: {s: 6, r: '1 min hitro + 1 min hoje', rest: 0}, cues: ['5 minut lahkotnega ogrevanja', 'Hitri del pri 8/10 napora', 'Med intervali hodi, ne stoj']},
+  hitra_hoja: {n: 'Hitra hoja v klanec', p: 'run', m: 'Kondicija', eq: 'both', avoid: [], w: false, st: ['moc', 'tek'], type: 'cardio', rx: {s: 4, r: '5 min hitro', rest: 60}, cues: ['Pokončna drža', 'Tempo, pri katerem težko govoriš v povedih', 'Roke aktivno nihajo']},
+  sprint: {n: 'Šprinti na 60 m', p: 'run', m: 'Hitrost', eq: 'both', avoid: ['koleno'], alt: 'hitra_hoja', w: false, st: ['moc', 'tek'], type: 'cardio', rx: {s: 6, r: '60 m s polno hitrostjo', rest: 150}, cues: ['Temeljito ogrevanje in nekaj stopnjevanj', 'Nizek start, prvi koraki kratki in hitri', 'Polni odmor med ponovitvami']},
   skok: {n: 'Skok v daljino z mesta', p: 'squat', m: 'Eksplozivna moč nog', eq: 'both', avoid: ['koleno'], alt: 'most', w: false, rx: {s: 4, r: '4 skoki', rest: 90}, cues: ['Zamah z rokami nazaj, nato močno naprej', 'Odriv z obema nogama hkrati', 'Pristani mehko, ne pade nazaj']},
   ovire: {n: 'Tek nazaj in agilnost', p: 'run', m: 'Agilnost', eq: 'both', avoid: ['koleno'], alt: 'hitra_hoja', w: false, type: 'cardio', rx: {s: 6, r: '15 m tek nazaj + plazenje pod oviro', rest: 60}, cues: ['Težišče nizko, pogled čez ramo', 'Kratki hitri koraki', 'Vadi prehode čez in pod oviro']},
   cooper: {n: 'Tempo tek za 2400 m', p: 'run', m: 'Vzdržljivost', eq: 'both', avoid: ['koleno'], alt: 'hitra_hoja', w: false, type: 'cardio', rx: {s: 3, r: '800 m v ciljnem tempu', rest: 120}, cues: ['Tempo izračunaj iz ciljnega časa', 'Prvih 200 m ne začni prehitro', 'Enakomerno dihanje']},
@@ -409,7 +420,25 @@ const EX = {
   upogibalke: {n: 'Raztezanje upogibalk kolka (vsaka stran)', p: 'upogibalke', m: 'Upogibalke kolka', eq: 'both', avoid: ['koleno'], alt: 'meca', w: false, type: 'time', rx: {s: 2, r: '30 s', rest: 0}, st: ['raztezanje'], yt: 'kneeling hip flexor stretch', cues: ['Zadnje koleno na mehki podlagi, sprednje stopalo naprej', 'Stisni zadnjico zadnje noge', 'Boke potiskaj naprej, trup pokonci']},
   meca: {n: 'Raztezanje meč ob steni (vsaka noga)', p: 'meca', m: 'Meča', eq: 'both', avoid: [], w: false, type: 'time', rx: {s: 2, r: '30 s', rest: 0}, st: ['raztezanje'], yt: 'calf stretch wall', cues: ['Dlani na steni v višini ramen', 'Zadnja noga iztegnjena, peta na tleh', 'Pokrči sprednje koleno in se nagni k steni']},
   prsni: {n: 'Raztezanje prsnih mišic ob steni (vsaka roka)', p: 'prsni', m: 'Prsi, ramena', eq: 'both', avoid: ['rama'], alt: 'macka', w: false, type: 'time', rx: {s: 2, r: '30 s', rest: 0}, st: ['raztezanje'], yt: 'wall chest stretch', cues: ['Dlan in podlaket položi na steno v višini ramen', 'Telo počasi obrni stran od roke', 'Ramena spuščena, brez bolečine v rami']},
-  triceps: {n: 'Raztezanje tricepsa nad glavo (vsaka roka)', p: 'triceps', m: 'Tricepsi, ramena', eq: 'both', avoid: ['rama'], alt: 'macka', w: false, type: 'time', rx: {s: 2, r: '30 s', rest: 0}, st: ['raztezanje'], yt: 'overhead triceps stretch', cues: ['Dvigni roko in dlan spusti za glavo', 'Z drugo roko nežno potiskaj komolec', 'Glava ostane pokonci, trebuh rahlo napet']}
+  triceps: {n: 'Raztezanje tricepsa nad glavo (vsaka roka)', p: 'triceps', m: 'Tricepsi, ramena', eq: 'both', avoid: ['rama'], alt: 'macka', w: false, type: 'time', rx: {s: 2, r: '30 s', rest: 0}, st: ['raztezanje'], yt: 'overhead triceps stretch', cues: ['Dvigni roko in dlan spusti za glavo', 'Z drugo roko nežno potiskaj komolec', 'Glava ostane pokonci, trebuh rahlo napet']},
+  // Bodybuilding, calisthenics, HIIT and running.
+  triceps_kabel: {n: 'Potisk na kablu za tricepse', p: 'pushdown', m: 'Tricepsi', eq: 'gym', avoid: [], w: true, rx: {s: 3, r: '10–15', rest: 60}, st: ['moc', 'bodybuilding'], yt: 'triceps pushdown cable', cues: ['Komolci ob telesu ostanejo pri miru', 'Ročaj potisni navzdol do iztegnjenih rok', 'Počasi nazaj do kota 90° v komolcu']},
+  veslanje_rocka: {n: 'Enoročno veslanje z ročko', p: 'row', m: 'Hrbet, bicepsi', eq: 'gym', avoid: [], w: true, st: ['moc', 'bodybuilding'], yt: 'one arm dumbbell row', cues: ['Koleno in dlan nasloni na klop, hrbet raven', 'Ročko vleci proti boku, komolec ob telesu', 'Na vrhu stisni lopatico, počasen spust']},
+  kladivo: {n: 'Kladivo upogib z ročkami', p: 'curl', m: 'Bicepsi, podlakti', eq: 'gym', avoid: [], w: true, rx: {s: 3, r: '10–12', rest: 60}, st: ['moc', 'bodybuilding'], yt: 'hammer curl', cues: ['Dlani obrnjeni ena proti drugi', 'Komolci ob telesu', 'Brez zibanja trupa']},
+  izteg_nog: {n: 'Izteg nog na napravi', p: 'legext', m: 'Sprednja stegenska mišica', eq: 'gym', avoid: ['koleno'], alt: 'hip_thrust', w: true, rx: {s: 3, r: '12–15', rest: 60}, st: ['moc', 'bodybuilding'], yt: 'leg extension machine', cues: ['Os naprave poravnaj s kolenom', 'Nogi iztegni do konca in za trenutek zadrži', 'Počasen spust brez udarca uteži']},
+  upogib_nog: {n: 'Upogib nog leže na napravi', p: 'legcurl', m: 'Zadnja loža', eq: 'gym', avoid: [], w: true, rx: {s: 3, r: '10–15', rest: 60}, st: ['moc', 'bodybuilding'], yt: 'lying leg curl machine', cues: ['Blazinica tik nad petami', 'Boki ostanejo pritisnjeni na klop', 'Peti pritegni k zadnjici, nato počasi nazaj']},
+  meca_dvig: {n: 'Dvig na prste', p: 'calf', m: 'Meča', eq: 'both', avoid: [], w: true, rx: {s: 3, r: '12–20', rest: 45}, st: ['moc', 'bodybuilding'], yt: 'standing calf raise', cues: ['Stoj na robu stopnice ali na tleh', 'Dvigni se čim višje na prste', 'Počasi spusti pete pod višino stopnice']},
+  dipi: {n: 'Dipi na bradlji', p: 'dip', m: 'Prsi, tricepsi, ramena', eq: 'both', avoid: ['rama', 'zapestje'], alt: 'sklece', w: false, beg: 'sklece_klop', st: ['moc', 'kalistenika'], yt: 'parallel bar dips', cues: ['Začni z iztegnjenimi rokami, ramena stran od ušes', 'Spuščaj se, dokler nadlaket ni vzporedna s tlemi', 'Potisni se nazaj gor brez zibanja']},
+  zgibe_neg: {n: 'Negativne zgibe', p: 'pullup', m: 'Hrbet, bicepsi', eq: 'both', avoid: ['rama'], alt: 'veslanje_miza', w: false, rx: {s: 3, r: '3–5', rest: 90}, st: ['kalistenika'], yt: 'negative pull ups', cues: ['Skoči ali stopi v zgornji položaj z brado nad drogom', 'Spuščaj se počasi, 3 do 5 sekund', 'Ko zmoreš 3 × 5, poskusi prave zgibe']},
+  dvig_nog: {n: 'Dvig nog v vesi', p: 'legraise', m: 'Trebušne mišice, upogibalke kolka', eq: 'both', avoid: ['rama'], alt: 'mrtvi_hrosc', w: false, rx: {s: 3, r: '8–12', rest: 60}, st: ['moc', 'kalistenika'], yt: 'hanging leg raise', cues: ['Visi na drogu z iztegnjenimi rokami', 'Nogi dvigni do višine bokov, začetniki pokrčena kolena', 'Brez zibanja, počasen spust']},
+  burpee: {n: 'Burpees', p: 'burpee', m: 'Celo telo, kondicija', eq: 'both', avoid: ['koleno', 'zapestje'], alt: 'visoka_kolena', w: false, type: 'time', rxExp: HIIT_RX, st: ['hiit'], yt: 'burpee exercise', cues: ['Počep in dlani na tla', 'Noge odskoči nazaj v desko', 'Noge nazaj k dlanem in poskok z rokami nad glavo']},
+  pocep_skok: {n: 'Počep s poskokom', p: 'jumpsquat', m: 'Noge, eksplozivnost', eq: 'both', avoid: ['koleno'], alt: 'most', w: false, type: 'time', rxExp: HIIT_RX, st: ['hiit'], yt: 'jump squat', cues: ['Spusti se v počep', 'Eksplozivno poskoči, roke zamahnejo gor', 'Mehko pristani in takoj v naslednji počep']},
+  plezalec: {n: 'Plezalec', p: 'plezalec', m: 'Trup, ramena, kondicija', eq: 'both', avoid: ['zapestje'], alt: 'deska', w: false, type: 'time', rxExp: HIIT_RX, st: ['hiit'], yt: 'mountain climbers exercise', cues: ['Opora na dlaneh, telo v ravni liniji', 'Izmenično hitro vleci kolena proti prsim', 'Boki ostanejo nizko']},
+  visoka_kolena: {n: 'Tek na mestu z visokimi koleni', p: 'kolena', m: 'Kondicija, noge', eq: 'both', avoid: ['koleno'], alt: 'plezalec', w: false, type: 'time', rxExp: HIIT_RX, st: ['hiit'], yt: 'high knees exercise', cues: ['Tek na mestu na prednjem delu stopala', 'Kolena dvigaj do višine bokov', 'Roke aktivno nihajo']},
+  izpadni_skok: {n: 'Izpadni skoki', p: 'lunge', m: 'Noge, zadnjica, kondicija', eq: 'both', avoid: ['koleno'], alt: 'most', w: false, type: 'time', rxExp: HIIT_RX, st: ['hiit'], yt: 'jumping lunges', cues: ['Začni v izpadnem koraku', 'Poskoči in v zraku zamenjaj nogi', 'Mehak pristanek, sprednje koleno nad stopalom']},
+  lahek_tek: {n: 'Lahkoten tek', p: 'run', m: 'Vzdržljivost', eq: 'both', avoid: ['koleno'], alt: 'hitra_hoja', w: false, type: 'cardio', rxExp: {zacetnik: {s: 6, r: '2 min teka + 1 min hoje', rest: 0}, srednji: {s: 1, r: '30 min v pogovornem tempu', rest: 0}, izkusen: {s: 1, r: '40 min v pogovornem tempu', rest: 0}}, st: ['tek'], yt: 'easy run pace beginner', cues: ['Tempo, pri katerem lahko govoriš v celih povedih', 'Kratki, lahkotni koraki', 'Če se zadihaš, upočasni ali hodi']},
+  tempo_tek: {n: 'Tempo tek', p: 'run', m: 'Tempo in vzdržljivost', eq: 'both', avoid: ['koleno'], alt: 'hitra_hoja', w: false, type: 'cardio', rxExp: {zacetnik: {s: 3, r: '5 min hitreje + 2 min hoje', rest: 0}, srednji: {s: 1, r: '20 min v hitrejšem tempu', rest: 0}, izkusen: {s: 1, r: '30 min v hitrejšem tempu', rest: 0}}, st: ['tek'], yt: 'tempo run explained', cues: ['10 minut lahkotnega ogrevanja', 'Tempo, pri katerem lahko rečeš le nekaj besed', 'Na koncu 5 minut lahkotno']},
+  dolgi_tek: {n: 'Dolgi tek', p: 'run', m: 'Vzdržljivost', eq: 'both', avoid: ['koleno'], alt: 'hitra_hoja', w: false, type: 'cardio', rxExp: {zacetnik: {s: 8, r: '3 min teka + 1 min hoje', rest: 0}, srednji: {s: 1, r: '50 min lahkotno', rest: 0}, izkusen: {s: 1, r: '70 min lahkotno', rest: 0}}, st: ['tek'], yt: 'long run tips beginners', cues: ['Počasneje kot pri lahkotnem teku', 'S sabo imej vodo, če tečeš več kot uro', 'Dolžino podaljšuj postopno, največ 10 % na teden']}
 };
 const ROLE = {
   squat: {home: 'pocep', gym: 'pocep_drog'}, hinge: {home: 'rdl_eno', gym: 'rdl'}, lunge: {home: 'izpadni', gym: 'izpadni_rocke'},
@@ -433,19 +462,54 @@ const TPL = {
   pilC: {n: 'Pilates: hrbet in drža', f: 'hrbet, ramena in drža', ex: ['rollup', 'plavanje', 'enonozni', ['most', {s: 2, r: '10', rest: 20}], 'otrok']},
   razA: {n: 'Raztezanje: noge in boki', f: 'noge in boki', ex: ['stegenska', 'upogibalke', 'meca', 'predklon', 'otrok']},
   razB: {n: 'Raztezanje: ramena in hrbet', f: 'ramena, prsi in hrbet', ex: ['prsni', 'triceps', 'macka', 'kobra', 'otrok']},
-  razC: {n: 'Raztezanje: celo telo', f: 'celo telo', ex: ['macka', 'pes', 'upogibalke', 'stegenska', 'prsni', 'predklon']}
+  razC: {n: 'Raztezanje: celo telo', f: 'celo telo', ex: ['macka', 'pes', 'upogibalke', 'stegenska', 'prsni', 'predklon']},
+  bbPush: {n: 'Bodybuilding: prsi, ramena in tricepsi', f: 'prsi, ramena in tricepsi', ex: ['bench', 'bench_rocke', 'ohp', 'landmine', 'triceps_kabel']},
+  bbPull: {n: 'Bodybuilding: hrbet in bicepsi', f: 'hrbet in bicepsi', ex: ['latpull', 'veslanje_drog', 'veslanje_rocka', 'veslanje_kabel', 'biceps', 'kladivo']},
+  bbLegs: {n: 'Bodybuilding: noge', f: 'noge in zadnjica', ex: ['pocep_drog', 'nozna_presa', 'rdl', 'izteg_nog', 'upogib_nog', 'meca_dvig']},
+  bbUpper: {n: 'Bodybuilding: zgornji del', f: 'prsi, hrbet, ramena in roke', ex: ['bench', 'latpull', 'ohp', 'veslanje_kabel', 'biceps', 'triceps_kabel']},
+  bbLower: {n: 'Bodybuilding: spodnji del', f: 'noge, zadnjica in trup', ex: ['pocep_drog', 'rdl', 'nozna_presa', 'upogib_nog', 'meca_dvig', 'trup']},
+  kalA: {n: 'Kalistenika: zgibe in sklece', f: 'hrbet, prsi in trup', ex: ['zgibe', 'sklece', 'veslanje_miza', 'dipi', 'dvig_nog']},
+  kalB: {n: 'Kalistenika: noge in trup', f: 'noge, zadnjica in trup', ex: ['pocep', 'izpadni', 'most_eno', 'deska', 'mrtvi_hrosc']},
+  kalC: {n: 'Kalistenika: celo telo', f: 'ramena, hrbet in noge', ex: ['pike', 'zgibe', 'dipi', 'pocep', 'dvig_nog']},
+  hiitA: {n: 'HIIT: celo telo', f: 'celo telo in kondicija', ex: ['burpee', 'pocep_skok', 'plezalec', 'visoka_kolena', ['sklece', {s: 4, r: '10', rest: 30}]]},
+  hiitB: {n: 'HIIT: noge in kondicija', f: 'noge in kondicija', ex: ['pocep_skok', 'izpadni_skok', 'visoka_kolena', 'burpee', 'deska']},
+  hiitC: {n: 'HIIT: trup in moč', f: 'trup, ramena in kondicija', ex: ['plezalec', 'burpee', ['sklece', {s: 4, r: '10', rest: 30}], 'deska', 'mrtvi_hrosc']},
+  tekA: {n: 'Tek: lahkoten tek', f: 'osnovna vzdržljivost', ex: ['lahek_tek', ['most', {s: 2, r: '12', rest: 30}]]},
+  tekB: {n: 'Tek: intervali', f: 'hitrost in kondicija', ex: ['intervali', ['deska', {s: 2, r: '30 s', rest: 30}]]},
+  tekC: {n: 'Tek: dolgi tek', f: 'vzdržljivost', ex: ['dolgi_tek']},
+  tekD: {n: 'Tek: tempo', f: 'tempo in vzdržljivost', ex: ['tempo_tek']}
 };
-const STYLES = {moc: {n: 'Moč in fitnes', d: 'Uteži ali lastna teža, doma ali v fitnesu'}, joga: {n: 'Joga', d: 'Gibljivost, ravnotežje in sprostitev'}, pilates: {n: 'Pilates', d: 'Močan trup in boljša drža'}, raztezanje: {n: 'Raztezanje in mobilnost', d: 'Gibljivost in hitrejša regeneracija'}};
-const STYLE_TPL = {joga: ['jogaA', 'jogaB', 'jogaC'], pilates: ['pilA', 'pilB', 'pilC'], raztezanje: ['razA', 'razB', 'razC']};
-// Test preparation always uses strength training, and so do profiles from before styles existed.
-const styleOf = (p = S.profile) => p.goal !== 'test' && STYLE_TPL[p.style] ? p.style : 'moc';
+// d: one sentence on what the style gives you. goals: the goals that fit it, in the order shown.
+// spare: safe exercises an injury swap may use when the style's own ones are already in the session.
+const STYLES = {
+  moc: {n: 'Moč in fitnes', d: 'Močnejše telo in več energije s klasičnim treningom z utežmi ali lastno težo.', fig: 'squat', goals: ['hujsanje', 'misice', 'moc', 'kondicija', 'test'], days: 'Priporočamo 3 do 4 dni s počitkom vmes.'},
+  bodybuilding: {n: 'Bodybuilding', d: 'Večje in bolj oblikovane mišice z več serijami za vsako mišično skupino.', fig: 'curl', goals: ['misice', 'hujsanje', 'moc'], days: 'Priporočamo 3 do 5 dni; vsaka mišična skupina pride na vrsto enkrat ali dvakrat na teden.', spare: ['most', 'mrtvi_hrosc', 'deska']},
+  kalistenika: {n: 'Kalistenika', d: 'Moč in nadzor nad lastnim telesom z zgibami, sklecami in dipi, brez fitnesa.', fig: 'pullup', goals: ['misice', 'moc', 'hujsanje', 'kondicija', 'test'], days: 'Priporočamo 3 do 4 dni s počitkom vmes.', spare: ['most', 'mrtvi_hrosc', 'deska']},
+  hiit: {n: 'HIIT', d: 'Največ porabljenih kalorij v najmanj časa s kratkimi, intenzivnimi intervali.', fig: 'burpee', goals: ['hujsanje', 'kondicija', 'test'], days: 'Priporočamo 2 do 4 dni, ker je HIIT zelo naporen.', spare: ['most', 'mrtvi_hrosc', 'deska']},
+  tek: {n: 'Tek', d: 'Boljša vzdržljivost in zdravo srce s postopnim tekaškim načrtom.', fig: 'run', goals: ['kondicija', 'hujsanje', 'test'], days: 'Začetnikom priporočamo 3 dni teka na teden.', spare: ['hitra_hoja', 'most', 'deska']},
+  joga: {n: 'Joga', d: 'Gibljivost, ravnotežje in manj stresa z mirnimi, nadzorovanimi položaji.', fig: 'drevo', goals: ['gibljivost', 'kondicija', 'hujsanje'], days: 'Joga je primerna tudi za več dni zapored.', spare: ['most_joga', 'gora', 'savasana']},
+  pilates: {n: 'Pilates', d: 'Močan trup in pokončna drža z natančnimi vajami na podlogi.', fig: 'teaser', goals: ['gibljivost', 'kondicija', 'hujsanje'], days: 'Pilates je primeren tudi za več dni zapored.', spare: ['most_joga', 'gora', 'savasana']},
+  raztezanje: {n: 'Raztezanje in mobilnost', d: 'Manj napetosti in hitrejša regeneracija z rednim raztezanjem.', fig: 'predklon', goals: ['gibljivost', 'kondicija'], days: 'Raztezanje je primerno tudi za vsak dan.', spare: ['most_joga', 'gora', 'savasana']}
+};
+// Sessions per style: a list that repeats through the week, or the sessions for each number of training days.
+const STYLE_TPL = {
+  joga: ['jogaA', 'jogaB', 'jogaC'], pilates: ['pilA', 'pilB', 'pilC'], raztezanje: ['razA', 'razB', 'razC'],
+  kalistenika: ['kalA', 'kalB', 'kalC'], hiit: ['hiitA', 'hiitB', 'hiitC'],
+  bodybuilding: {2: ['bbUpper', 'bbLower'], 3: ['bbPush', 'bbPull', 'bbLegs'], 4: ['bbUpper', 'bbLower', 'bbUpper', 'bbLower'], 5: ['bbPush', 'bbPull', 'bbLegs', 'bbUpper', 'bbLower'], 6: ['bbPush', 'bbPull', 'bbLegs', 'bbPush', 'bbPull', 'bbLegs']},
+  tek: {2: ['tekA', 'tekB'], 3: ['tekA', 'tekB', 'tekC'], 4: ['tekA', 'tekB', 'tekA', 'tekC'], 5: ['tekA', 'tekB', 'tekA', 'tekD', 'tekC'], 6: ['tekA', 'tekB', 'tekA', 'tekD', 'tekA', 'tekC']}
+};
+const styleSplit = (st, days) => { const t = STYLE_TPL[st]; return Array.isArray(t) ? Array.from({length: days}, (_, i) => t[i % t.length]) : t[days]; };
+// Profiles from before styles existed train strength.
+const styleOf = (p = S.profile) => STYLES[p.style] ? p.style : 'moc';
+// Bodybuilding always happens in a gym; other styles without an equipment question count as home training.
+const equipOf = (p = S.profile) => styleOf(p) === 'bodybuilding' ? 'gym' : p.equip || 'home';
 const exStyles = e => e.st || ['moc'];
-const stylePool = st => [...new Set(STYLE_TPL[st].flatMap(t => TPL[t].ex.map(e => Array.isArray(e) ? e[0] : e)))];
+const stylePool = st => { const t = STYLE_TPL[st], ids = Array.isArray(t) ? t : Object.values(t).flat(); return [...new Set(ids.flatMap(id => TPL[id].ex.map(e => Array.isArray(e) ? e[0] : e)))]; };
 const SPLIT = {2: ['fullA', 'fullB'], 3: ['fullA', 'fullB', 'fullC'], 4: ['upper', 'lower', 'upper', 'lower'], 5: ['upper', 'lower', 'cond', 'upper', 'lower'], 6: ['upper', 'lower', 'cond', 'upper', 'lower', 'fullC']};
 const SCHED = {2: [1, 4], 3: [0, 2, 4], 4: [0, 1, 3, 4], 5: [0, 1, 2, 3, 4], 6: [0, 1, 2, 3, 4, 5]};
 const GOALRX = {hujsanje: {s: 3, r: '12–15', rest: 60}, misice: {s: 4, r: '8–12', rest: 90}, moc: {s: 4, r: '4–6', rest: 150}, kondicija: {s: 3, r: '12–15', rest: 45}, test: {s: 3, r: '8–12', rest: 75}};
 const TEST_RX = {sklece: {s: 4, r: '60 % maksimuma', rest: 60}, trup: {s: 4, r: '60 % maksimuma', rest: 60}, zgibe: {s: 5, r: '2 manj od maksimuma', rest: 120}};
-const GOALS = {hujsanje: 'Izguba maščobe', misice: 'Pridobivanje mišic', moc: 'Več moči', kondicija: 'Boljša kondicija', test: 'Priprava na fizični test'};
+const GOALS = {hujsanje: 'Izguba maščobe', misice: 'Pridobivanje mišic', moc: 'Več moči', kondicija: 'Boljša kondicija', gibljivost: 'Gibljivost in počutje', test: 'Priprava na fizični test'};
 const EXPS = {zacetnik: 'Začetnik', srednji: 'Srednje izkušen', izkusen: 'Izkušen'};
 const INJ = {koleno: 'Koleno', rama: 'Rama', hrbet: 'Spodnji del hrbta', zapestje: 'Zapestje'};
 
@@ -691,7 +755,7 @@ async function callCoach(context, messages, signal) {
 /* ---------- derived ---------- */
 function targets(p = S.profile, w = latestWeight()) {
   const bmr = 10 * w + 6.25 * p.height - 5 * p.age + (p.sex === 'z' ? -161 : 5);
-  const tdee = bmr * (1.2 + ({joga: 0.05, raztezanje: 0.03}[styleOf(p)] ?? 0.075) * p.days);
+  const tdee = bmr * (1.2 + ({joga: 0.05, pilates: 0.06, raztezanje: 0.03, hiit: 0.09, tek: 0.09}[styleOf(p)] ?? 0.075) * p.days);
   const adj = {hujsanje: -0.2, misice: 0.1, moc: 0.05}[p.goal] || 0;
   const kcal = Math.round(tdee * (1 + adj) / 10) * 10;
   const prot = Math.round(w * (p.goal === 'hujsanje' ? 2.0 : 1.8));
@@ -705,6 +769,7 @@ function resolveEx(id, inj) { let guard = 0; while (EX[id].avoid.some(a => inj.i
 function rxFor(id, goal, exp, testDay) {
   const e = EX[id];
   if (testDay && TEST_RX[id]) return {...TEST_RX[id]};
+  if (e.rxExp) return {...(e.rxExp[exp] || e.rxExp.srednji)};
   if (e.rx) return {...e.rx};
   const g = GOALRX[goal] || GOALRX.kondicija;
   let s = Math.max(2, g.s - (exp === 'zacetnik' ? 1 : 0));
@@ -714,7 +779,7 @@ function rxFor(id, goal, exp, testDay) {
 }
 const TEST_WD = 7;
 function plan() {
-  const p = S.profile, eq = p.equip || 'home', inj = p.injuries || [];
+  const p = S.profile, eq = equipOf(p), inj = p.injuries || [];
   const days = clamp(p.days || 3, 2, 6);
   const sched = SCHED[days], split = SPLIT[days];
   // Indexes 0–6 are the weekdays; TEST_WD holds the optional test workout, which is never scheduled.
@@ -725,19 +790,23 @@ function plan() {
       const [id, rx] = Array.isArray(entry) ? entry : [entry];
       const ov = S.overrides[wd + ':' + k];
       let rid = ov && EX[ov] ? ov : resolveEx(id, inj);
+      if (st !== 'moc' && !ov && p.exp === 'zacetnik' && EX[rid].beg) rid = EX[rid].beg;
       // In yoga, pilates and stretching an injury swap picks another safe exercise of the style instead of repeating one from the session.
       if (st !== 'moc' && !ov && rid !== id && (used.has(rid) || list.some(e => exId(e) === rid)))
-        rid = [...stylePool(st), 'most_joga', 'gora', 'savasana'].find(x => !used.has(x) && !list.some(e => exId(e) === x) && !EX[x].avoid.some(a => inj.includes(a))) || rid;
+        rid = [...stylePool(st), ...STYLES[st].spare].find(x => !used.has(x) && !list.some(e => exId(e) === x) && !EX[x].avoid.some(a => inj.includes(a))) || rid;
       used.add(rid);
       return {id: rid, rx: rx && rid === id ? {...rx} : rxFor(rid, p.goal, p.exp, testDay)};
     });
-    const secs = it => EX[it.id].type === 'cardio' ? 75 : EX[it.id].type === 'time' ? (parseInt(it.rx.r) || 30) + 10 : 40;
+    const secs = it => {
+      const r = String(it.rx.r), min = [...r.matchAll(/(\d+) min/g)].reduce((a, m) => a + Number(m[1]), 0);
+      return min ? min * 60 : EX[it.id].type === 'cardio' ? 75 : EX[it.id].type === 'time' ? (parseInt(r) || 30) + 10 : 40;
+    };
     const mins = Math.round(items.reduce((a, it) => a + it.rx.s * (secs(it) + it.rx.rest), 0) / 60) + 8;
     out[wd] = {wd, name, items, mins, testDay, focus};
   };
   const st = styleOf(p);
   sched.forEach((wd, i) => {
-    if (st !== 'moc') { const t = TPL[STYLE_TPL[st][i % 3]]; build(wd, t.n, t.ex, false, t.f); return; }
+    if (st !== 'moc') { const t = TPL[styleSplit(st, days)[i]]; build(wd, t.n, t.ex, false, t.f); return; }
     const roles = [...TPL[split[i]].roles];
     if ((p.goal === 'hujsanje' || p.goal === 'kondicija' || p.goal === 'test') && split[i].startsWith('full') && !roles.includes('cond')) roles.push('cond');
     build(wd, TPL[split[i]].n, roles.map(r => { let id = ROLE[r][eq]; if (r === 'squat' && eq === 'gym' && p.exp === 'zacetnik') id = 'goblet'; if (r === 'pushH' && eq === 'home' && p.exp === 'zacetnik') id = 'sklece_klop'; return id; }), false, TPL[split[i]].f);
@@ -761,7 +830,7 @@ function nextWorkout(fromK, P = plan()) {
   return null;
 }
 function firstSessions(prof, startK, n = 3) {
-  const st = styleOf(prof), sched = SCHED[prof.days], tids = st === 'moc' ? SPLIT[prof.days] : sched.map((_, i) => STYLE_TPL[st][i % 3]), out = [];
+  const st = styleOf(prof), sched = SCHED[prof.days], tids = st === 'moc' ? SPLIT[prof.days] : styleSplit(st, prof.days), out = [];
   for (let d = parseD(startK), i = 0; out.length < n && i < 21; i++, d = addDays(d, 1)) { const j = sched.indexOf(dow(d)); if (j >= 0) out.push({k: dkey(d), n: TPL[tids[j]].n}); }
   return out;
 }
@@ -854,7 +923,7 @@ const POSE = {
   curl: [{...STAND, E: [100, 50], W: [100, 68]}, {...STAND, E: [100, 50], W: [114, 38]}],
   bench: [{H: [48, 90], S: [62, 94], E: [62, 77], W: [62, 60], P: [100, 94], K: [126, 96], A: [132, 124], T: [143, 125]}, {H: [48, 90], S: [62, 94], E: [50, 100], W: [60, 84], P: [100, 94], K: [126, 96], A: [132, 124], T: [143, 125]}],
   run: [{H: [106, 20], S: [104, 32], E: [92, 48], W: [100, 60], P: [100, 70], K: [118, 86], A: [110, 110], T: [120, 108], K2: [94, 96], A2: [80, 114], T2: [86, 121]}, {H: [106, 20], S: [104, 32], E: [114, 46], W: [124, 36], P: [100, 70], K: [94, 96], A: [80, 114], T: [86, 121], K2: [118, 86], A2: [110, 110], T2: [120, 108]}],
-  // Yoga, pilates and stretching. Big movements use several keyframes so limbs keep their length in between.
+  // Poses for the other training styles. Big movements use several keyframes so limbs keep their length in between.
   gora: [{H: [102, 18], S: [100, 32], P: [100, 70], K: [100, 97], A: [100, 125], E: [100, 50], W: [100, 68]}, {H: [102, 18], S: [100, 32], P: [100, 70], K: [100, 97], A: [100, 125], E: [113, 45], W: [125, 58]}, {H: [102, 18], S: [100, 32], P: [100, 70], K: [100, 97], A: [100, 125], E: [118, 32], W: [136, 33]}, {H: [102, 18], S: [100, 32], P: [100, 70], K: [100, 97], A: [100, 125], E: [113, 20], W: [126, 7]}, {H: [102, 18], S: [100, 32], P: [100, 70], K: [100, 97], A: [100, 125], E: [101, 14], W: [101, -4]}],
   pes: [{W: [52, 125], E: [65, 113], S: [78, 101], H: [75, 112], P: [106, 75], K: [121, 97], A: [136, 121], T: [126, 126]}, {W: [52, 125], E: [66, 113], S: [79, 101], H: [76, 113], P: [108, 77], K: [121, 100], A: [134, 125], T: [124, 126]}],
   kobra: [{P: [88, 121], K: [61, 122], A: [33, 123], T: [24, 126], S: [126, 121], H: [139, 118], E: [109, 115], W: [124, 125]}, {P: [88, 121], K: [61, 122], A: [33, 123], T: [24, 126], S: [121, 102], H: [128, 91], E: [109, 115], W: [124, 125]}],
@@ -874,9 +943,19 @@ const POSE = {
   upogibalke: [{P: [97, 101], S: [97, 63], H: [98, 49], K: [124, 98], A: [132, 125], K2: [81, 123], A2: [53, 124], T2: [43, 126], E: [103, 80], W: [113, 95]}, {P: [104, 104], S: [104, 66], H: [105, 52], K: [130, 97], A: [132, 125], K2: [85, 123], A2: [57, 124], T2: [47, 126], E: [109, 83], W: [118, 99]}],
   meca: [{P: [100, 78], S: [118, 44], H: [126, 33], K: [119, 97], A: [122, 125], K2: [86, 101], A2: [72, 125], T2: [83, 126], E: [133, 54], W: [149, 46]}, {P: [104, 80], S: [122, 46], H: [130, 35], K: [125, 97], A: [122, 125], K2: [88, 102], A2: [72, 125], T2: [83, 126], E: [135, 59], W: [149, 48]}],
   prsni: [{H: [102, 18], S: [100, 32], P: [100, 70], K: [100, 97], A: [100, 125], E: [100, 50], W: [100, 68]}, {H: [102, 18], S: [100, 32], P: [100, 70], K: [100, 97], A: [100, 125], E: [87, 45], W: [75, 57]}, {H: [102, 18], S: [100, 32], P: [100, 70], K: [100, 97], A: [100, 125], E: [82, 32], W: [64, 32]}, {H: [106, 19], S: [103, 33], P: [100, 70], K: [100, 97], A: [100, 125], E: [85, 33], W: [67, 33]}],
-  triceps: [{H: [109, 21], S: [100, 32], P: [100, 70], K: [100, 97], A: [100, 125], E: [96, 15], W: [93, 32]}, {H: [109, 21], S: [100, 32], P: [100, 70], K: [100, 97], A: [100, 125], E: [95, 15], W: [91, 32]}]
+  triceps: [{H: [109, 21], S: [100, 32], P: [100, 70], K: [100, 97], A: [100, 125], E: [96, 15], W: [93, 32]}, {H: [109, 21], S: [100, 32], P: [100, 70], K: [100, 97], A: [100, 125], E: [95, 15], W: [91, 32]}],
+  pushdown: [{P: [100, 70], S: [104, 32], H: [106, 18], K: [100, 97], A: [100, 125], E: [103, 50], W: [119, 41]}, {P: [100, 70], S: [104, 32], H: [106, 18], K: [100, 97], A: [100, 125], E: [103, 50], W: [119, 59]}, {P: [100, 70], S: [104, 32], H: [106, 18], K: [100, 97], A: [100, 125], E: [103, 50], W: [103, 68]}],
+  legext: [{P: [80, 92], S: [77, 54], H: [77, 40], E: [80, 72], W: [89, 87], K: [107, 92], A: [105, 120], T: [115, 121]}, {P: [80, 92], S: [77, 54], H: [77, 40], E: [80, 72], W: [89, 87], K: [107, 92], A: [127, 112], T: [134, 105]}, {P: [80, 92], S: [77, 54], H: [77, 40], E: [80, 72], W: [89, 87], K: [107, 92], A: [135, 92], T: [135, 82]}],
+  legcurl: [{P: [88, 96], S: [126, 96], H: [139, 93], E: [131, 113], W: [146, 104], K: [61, 96], A: [33, 96], T: [33, 106]}, {P: [88, 96], S: [126, 96], H: [139, 93], E: [131, 113], W: [146, 104], K: [61, 96], A: [41, 76], T: [34, 83]}, {P: [88, 96], S: [126, 96], H: [139, 93], E: [131, 113], W: [146, 104], K: [61, 96], A: [60, 68], T: [50, 68]}],
+  calf: [{H: [102, 18], S: [100, 32], E: [100, 50], W: [100, 68], P: [100, 70], K: [100, 97], A: [100, 125], T: [110, 126]}, {H: [102, 11], S: [100, 25], E: [100, 43], W: [100, 61], P: [100, 63], K: [100, 90], A: [100, 118], T: [110, 126]}],
+  dip: [{W: [100, 58], E: [94, 41], S: [100, 24], H: [101, 10], P: [95, 62], K: [84, 86], A: [56, 89], T: [51, 97]}, {W: [100, 58], E: [82, 54], S: [96, 42], H: [97, 28], P: [91, 80], K: [80, 104], A: [52, 107], T: [47, 115]}],
+  legraise: [{W: [100, -6], E: [100, 10], S: [100, 26], H: [106, 16], P: [100, 64], K: [100, 91], A: [100, 119], T: [110, 119]}, {W: [100, -6], E: [100, 10], S: [100, 26], H: [106, 16], P: [100, 64], K: [119, 83], A: [139, 103], T: [146, 96]}, {W: [100, -6], E: [100, 10], S: [100, 26], H: [106, 16], P: [100, 64], K: [127, 65], A: [155, 66], T: [155, 56]}],
+  burpee: [{H: [102, 4], S: [100, 18], E: [104, 0], W: [107, -18], P: [100, 56], K: [100, 83], A: [100, 111], T: [104, 121]}, {H: [102, 18], S: [100, 32], P: [100, 70], K: [100, 97], A: [100, 125], E: [118, 32], W: [136, 32]}, {P: [86, 108], S: [119, 89], H: [131, 93], E: [124, 106], W: [124, 124], K: [112, 100], A: [100, 125]}, {S: [120, 89], H: [133, 86], E: [122, 107], W: [124, 125], P: [84, 101], K: [58, 110], A: [32, 119], T: [36, 126]}],
+  jumpsquat: [{P: [84, 98], S: [104, 66], H: [113, 55], K: [111, 99], A: [100, 125], E: [97, 82], W: [89, 98]}, {P: [92, 84], S: [102, 47], H: [108, 35], K: [113, 100], A: [100, 125], E: [115, 60], W: [128, 73]}, {P: [100, 70], S: [100, 32], H: [102, 18], K: [103, 97], A: [100, 125], E: [117, 26], W: [134, 20]}, {H: [102, 6], S: [100, 20], P: [100, 58], K: [100, 85], A: [100, 113], T: [104, 122], E: [103, 2], W: [106, -15]}],
+  plezalec: [{S: [120, 89], H: [133, 86], E: [122, 107], W: [124, 125], P: [84, 101], K: [111, 106], A: [86, 120], T: [90, 126], K2: [58, 110], A2: [32, 119], T2: [36, 125]}, {S: [120, 89], H: [133, 86], E: [122, 107], W: [124, 125], P: [84, 101], K: [61, 115], A: [34, 122], T: [38, 126], K2: [61, 115], A2: [34, 122], T2: [38, 126]}, {S: [120, 89], H: [133, 86], E: [122, 107], W: [124, 125], P: [84, 101], K: [58, 110], A: [32, 119], T: [36, 125], K2: [111, 106], A2: [86, 120], T2: [90, 126]}],
+  kolena: [{P: [100, 70], S: [103, 32], H: [105, 18], K: [127, 69], A: [126, 97], T: [131, 106], K2: [99, 97], A2: [98, 125], T2: [108, 126], E: [92, 47], W: [95, 65], E2: [114, 46], W2: [126, 32]}, {P: [100, 66], S: [103, 28], H: [105, 14], K: [121, 83], A: [118, 111], T: [123, 120], K2: [121, 83], A2: [118, 111], T2: [123, 120], E: [102, 46], W: [116, 58], E2: [102, 46], W2: [116, 58]}, {P: [100, 70], S: [103, 32], H: [105, 18], K: [99, 97], A: [98, 125], T: [108, 126], K2: [127, 69], A2: [126, 97], T2: [131, 106], E: [114, 46], W: [126, 32], E2: [92, 47], W2: [95, 65]}]
 };
-const SPEED = {run: 700, pullup: 2600, plank: 3200, gora: 5000, pes: 4000, kobra: 4000, otrok: 5000, macka: 3600, bojevnik: 5000, drevo: 6000, stol: 4500, predklon: 5000, savasana: 5000, stotica: 600, rollup: 5000, enonozni: 1400, plavanje: 800, teaser: 3000, stegenska: 4000, upogibalke: 4000, meca: 4000, prsni: 4500, triceps: 4000};
+const SPEED = {run: 700, pullup: 2600, plank: 3200, gora: 5000, pes: 4000, kobra: 4000, otrok: 5000, macka: 3600, bojevnik: 5000, drevo: 6000, stol: 4500, predklon: 5000, savasana: 5000, stotica: 600, rollup: 5000, enonozni: 1400, plavanje: 800, teaser: 3000, stegenska: 4000, upogibalke: 4000, meca: 4000, prsni: 4500, triceps: 4000, pushdown: 2200, legext: 2600, legcurl: 2600, calf: 2000, dip: 2600, legraise: 3000, burpee: 2600, jumpsquat: 1600, plezalec: 700, kolena: 600};
 const SEGS = [['S', 'E2'], ['E2', 'W2'], ['S', 'P'], ['P', 'K2'], ['K2', 'A2'], ['A2', 'T2'], ['S', 'E'], ['E', 'W'], ['P', 'K'], ['K', 'A'], ['A', 'T'], ['S', 'H']];
 function figSVG(pat, cls = '') {
   let props = '<line class="ground" x1="16" y1="128" x2="184" y2="128"/>';
@@ -884,6 +963,11 @@ function figSVG(pat, cls = '') {
   if (pat === 'bench') props += '<path class="prop" d="M40 99h76M50 99v28M106 99v28"/>';
   if (pat === 'meca') props += '<line class="prop" x1="152" y1="-14" x2="152" y2="128"/>';
   if (pat === 'prsni') props += '<line class="prop" x1="60" y1="-14" x2="60" y2="128"/>';
+  if (pat === 'pushdown') props += '<line class="prop" x1="146" y1="-14" x2="146" y2="128"/>';
+  if (pat === 'legext') props += '<path class="prop" d="M64 98h44M70 98V50M86 98v30"/>';
+  if (pat === 'legcurl') props += '<path class="prop" d="M30 103h112M44 103v25M128 103v25"/>';
+  if (pat === 'dip') props += '<path class="prop" d="M70 61h60M76 61v67M124 61v67"/>';
+  if (pat === 'legraise') props = '<line class="prop" x1="62" y1="-6" x2="138" y2="-6"/>';
   const lines = SEGS.map((s, i) => `<line data-s="${i}"${s[0].endsWith('2') || s[1].endsWith('2') ? ' class="back"' : ''}/>`).join('');
   return `<svg class="fig ${cls}" data-pat="${pat}" viewBox="0 -22 200 156" aria-hidden="true">${props}${lines}<circle class="head" r="9"/></svg>`;
 }
@@ -1018,16 +1102,17 @@ function vAuth() {
 const vLoading = () => `<div class="ob auth"><div class="logo"><span class="logo-mark">AI</span>osebni trener</div><div class="ob-q"><p class="muted" role="status">Nalagam tvoje podatke …</p></div></div>`;
 
 /* --- onboarding --- */
+const GOAL_OPTS = [['hujsanje', 'Izguba maščobe', 'Manj kilogramov in več energije'], ['misice', 'Pridobivanje mišic', 'Večja mišična masa'], ['moc', 'Več moči', 'Močnejše mišice in težje različice vaj'], ['kondicija', 'Boljša kondicija', 'Vzdržljivost in splošno zdravje'], ['gibljivost', 'Gibljivost in počutje', 'Manj napetosti, boljša drža in sprostitev'], ['test', 'Priprava na fizični test', 'Policija ali Slovenska vojska']];
 const Q = [
-  {k: 'goal', t: 'Kaj je tvoj glavni cilj?', type: 'choice', o: [['hujsanje', 'Izguba maščobe', 'Manj kilogramov in več energije'], ['misice', 'Pridobivanje mišic', 'Večja mišična masa'], ['moc', 'Več moči', 'Težje uteži pri osnovnih vajah'], ['kondicija', 'Boljša kondicija', 'Vzdržljivost in splošno zdravje'], ['test', 'Priprava na fizični test', 'Policija ali Slovenska vojska']]},
+  {k: 'style', t: 'Kakšen trening ti je najbolj všeč?', sub: 'Izberi en stil. Spremeniš ga lahko kadar koli v profilu.', type: 'styles'},
+  {k: 'goal', t: 'Kaj je tvoj glavni cilj?', type: 'choice', o: d => STYLES[styleOf(d)].goals.map(g => GOAL_OPTS.find(o => o[0] === g))},
   {k: 'sex', t: 'Spol', sub: 'Potrebujemo ga za izračun dnevne porabe energije.', type: 'choice', o: [['m', 'Moški'], ['z', 'Ženska']]},
   {k: 'age', t: 'Koliko let imaš?', type: 'num', u: 'let', min: 15, max: 80, step: 1},
   {k: 'height', t: 'Tvoja višina', type: 'num', u: 'cm', min: 140, max: 215, step: 1},
   {k: 'weight', t: 'Tvoja trenutna teža', type: 'num', u: 'kg', min: 40, max: 200, step: 0.5},
   {k: 'exp', t: 'Koliko izkušenj imaš s treningom?', type: 'choice', o: [['zacetnik', 'Začetnik', 'Manj kot 6 mesecev'], ['srednji', 'Srednje izkušen', '6 mesecev do 2 leti'], ['izkusen', 'Izkušen', 'Več kot 2 leti rednega treninga']]},
-  {k: 'style', t: 'Kakšen trening ti je najbolj všeč?', sub: 'Kmalu dodamo še kalisteniko, bodybuilding, HIIT in tek.', type: 'choice', o: Object.entries(STYLES).map(([v, x]) => [v, x.n, x.d]), skip: d => d.goal === 'test'},
   {k: 'equip', t: 'Kje želiš trenirati?', skip: d => styleOf(d) !== 'moc', type: 'choice', o: [['home', 'Doma', 'Lastna teža, po želji drog za zgibe'], ['gym', 'V fitnesu', 'Drogovi, ročke in naprave']]},
-  {k: 'days', t: 'Koliko dni na teden lahko treniraš?', sub: d => styleOf(d) === 'moc' ? 'Priporočamo 3 do 4 dni s počitkom vmes.' : 'Joga, pilates in raztezanje so primerni tudi za več dni zapored.', type: 'days'},
+  {k: 'days', t: 'Koliko dni na teden lahko treniraš?', sub: d => STYLES[styleOf(d)].days, type: 'days'},
   {k: 'injuries', t: 'Imaš kakšno poškodbo ali bolečino?', sub: 'Vaje, ki ta del obremenjujejo, bomo zamenjali z varnejšimi.', type: 'multi', o: Object.entries(INJ)},
   {k: 'mealplan', t: 'Želiš tudi jedilnik?', sub: 'Lahko ga vklopiš ali izklopiš kadar koli.', type: 'choice', o: [['da', 'Da, pripravi mi jedilnik', 'Izbereš obroke in koliko želiš porabiti'], ['ne', 'Ne, samo trening', 'Jedilnik lahko dodaš kasneje']]}
 ];
@@ -1043,7 +1128,7 @@ function vOnboarding() {
       <div class="card"><div class="row between"><div><div class="eyebrow">Dnevni cilj</div><div class="num" style="font-size:40px">${fmtN(t.kcal)} <span class="small muted">kcal</span></div></div>${ring(1, d.days + '×')}</div>
         <div class="grid3"><div class="stat"><span class="num">${t.prot} g</span><span class="small muted">beljakovin</span></div><div class="stat"><span class="num">${t.carb} g</span><span class="small muted">ogljikovih hidratov</span></div><div class="stat"><span class="num">${t.fat} g</span><span class="small muted">maščob</span></div></div></div>
       <div class="card"><div class="eyebrow">Tedenski razpored</div><div class="week">${DAYS.map((n, i) => `<div class="d">${n}<span class="dot ${P.includes(i) ? 'plan' : ''}">${P.includes(i) ? ic('dumbbell') : ''}</span></div>`).join('')}</div>
-        <p class="small muted">${STYLES[styleOf(d)].n}${styleOf(d) === 'moc' ? (d.equip === 'gym' ? ', v fitnesu' : ', doma') : ''}${(d.injuries || []).length ? ', prilagojeno za: ' + d.injuries.map(x => INJ[x].toLowerCase()).join(', ') : ''}.</p></div>
+        <p class="small muted">${STYLES[styleOf(d)].n}${styleOf(d) === 'moc' ? (d.equip === 'gym' ? ', v fitnesu' : ', doma') : styleOf(d) === 'bodybuilding' ? ', v fitnesu' : ''}${(d.injuries || []).length ? ', prilagojeno za: ' + d.injuries.map(x => INJ[x].toLowerCase()).join(', ') : ''}.</p></div>
       ${ob.edit ? '' : `<div class="card"><div class="eyebrow">Začetek</div>
         ${dow() ? `<div class="seg" role="group" aria-label="Začetek"><button data-a="ob-start" data-v="danes" aria-pressed="${d.start !== 'pon'}">Od danes</button><button data-a="ob-start" data-v="pon" aria-pressed="${d.start === 'pon'}">Od ponedeljka</button></div>` : ''}
         <div><span class="small muted">Prvi treningi</span>${firstSessions(d, obStart(d)).map(x => `<div class="kv"><span>${dayLabel(x.k)}</span><b>${esc(x.n)}</b></div>`).join('')}</div></div>`}
@@ -1051,9 +1136,13 @@ function vOnboarding() {
   }
   const q = Q[st - 1], pct = Math.round(st / (Q.length + 1) * 100);
   let body = '', canNext = true;
-  if (q.type === 'choice') {
-    body = `<div class="opts">${q.o.map(([v, l, s]) => `<button class="opt" data-a="ob-pick" data-v="${v}" aria-pressed="${d[q.k] === v}"><div class="grow"><b>${l}</b>${s ? `<span>${s}</span>` : ''}</div><span class="tick">${ic('check')}</span></button>`).join('')}</div>`;
-    canNext = !!d[q.k];
+  if (q.type === 'styles') {
+    body = `<div class="stylegrid">${Object.entries(STYLES).map(([v, x]) => `<button class="stylebox" data-a="ob-pick" data-v="${v}" aria-pressed="${d.style === v}"><span class="stylefig">${figSVG(x.fig)}</span><b>${x.n}</b><span>${x.d}</span></button>`).join('')}</div>`;
+    canNext = !!STYLES[d.style];
+  } else if (q.type === 'choice') {
+    const opts = typeof q.o === 'function' ? q.o(d) : q.o;
+    body = `<div class="opts">${opts.map(([v, l, s]) => `<button class="opt" data-a="ob-pick" data-v="${v}" aria-pressed="${d[q.k] === v}"><div class="grow"><b>${l}</b>${s ? `<span>${s}</span>` : ''}</div><span class="tick">${ic('check')}</span></button>`).join('')}</div>`;
+    canNext = opts.some(([v]) => v === d[q.k]);
   } else if (q.type === 'num') {
     body = `<div class="bignum"><button class="iconbtn" data-a="ob-num" data-dir="-1" aria-label="Manj">${ic('minus')}</button><span class="num" id="obnum">${fmtN(d[q.k], q.step < 1 ? 1 : 0)}</span><span class="u">${q.u}</span><button class="iconbtn" data-a="ob-num" data-dir="1" aria-label="Več">${ic('plus')}</button></div>
       <input type="range" id="ob-range" data-in="ob-range" min="${q.min}" max="${q.max}" step="${q.step}" value="${d[q.k]}" aria-label="${esc(q.t)}">`;
@@ -1075,6 +1164,8 @@ function vHome() {
   const h = new Date().getHours(), greet = h < 10 ? 'Dobro jutro' : h < 18 ? 'Dober dan' : 'Dober večer';
   const P = plan(), today = dow(), tk = dkey();
   const ws = weekStats();
+  // Before the first workout (a later start, or a start after this week's last training day) show when it is.
+  const first = !ws.planned && !ws.done ? nextWorkout(tk, P) : null;
   const totalDone = Object.keys(S.logs).filter(sessionDone).length;
   const weekMins = DAYS.reduce((a, _, i) => { const k = dkey(dateOfWd(i)); const l = S.logs[k]; return a + (sessionDone(k) && P[l?.wd ?? i] ? P[l?.wd ?? i].mins : 0); }, 0);
   let mealCard;
@@ -1094,9 +1185,9 @@ function vHome() {
   return `
     <div class="greet"><span class="eyebrow">${DAYS_FULL[today]}, ${longDate(tk)}</span><h1>${greet}${userName() ? ', ' + esc(userName()) : ''}.</h1></div>
     <div class="card">
-      <div class="row between"><div class="stack-s"><span class="eyebrow">Treningi ta teden</span><h2>${planStart() > tk && !ws.done ? 'Začneš v ' + DAYS_IN[dow(parseD(planStart()))] : ws.done + ' od ' + ws.planned}</h2></div>${ring(ws.planned ? ws.done / ws.planned : 0, Math.round(ws.planned ? ws.done / ws.planned * 100 : 0) + '%')}</div>
+      <div class="row between"><div class="stack-s"><span class="eyebrow">Treningi ta teden</span><h2>${first ? 'Začneš v ' + DAYS_IN[dow(parseD(first.k))] : ws.done + ' od ' + ws.planned}</h2></div>${ring(ws.planned ? ws.done / ws.planned : 0, Math.round(ws.planned ? ws.done / ws.planned * 100 : 0) + '%')}</div>
       <div class="week">${DAYS.map((n, i) => { const k = dkey(dateOfWd(i)), dn = sessionDone(k); return `<div class="d">${n}<span class="dot ${dn ? 'done' : plannedWd(k, P) != null ? 'plan' : ''} ${i === today ? 'today' : ''}">${dn ? ic('check') : ''}</span></div>`; }).join('')}</div>
-      ${planStart() > tk ? `<p class="small muted">Tvoj načrt se začne ${dayIn(planStart())}</p>` : ''}
+      ${first ? `<p class="small muted">Prvi trening je ${dayIn(first.k)}</p>` : ''}
       <div class="statrow"><div class="stat"><span class="num">${streak()}</span><span class="small muted">v nizu</span></div><div class="stat"><span class="num">${weekMins}</span><span class="small muted">minut</span></div><div class="stat"><span class="num">${totalDone}</span><span class="small muted">skupaj</span></div></div>
     </div>
     ${mealCard}`;
@@ -1267,7 +1358,7 @@ Pravila:
 - Pri vprašanjih o policijskem testu ali testu Slovenske vojske povej, da uradne kriterije objavita policija (gov.si) in Slovenska vojska (postanivojak.si).
 TOOLS_LINE`;
 function coachContext() {
-  const p = S.profile, t = targets(), P = plan(), eq = p.equip || 'home';
+  const p = S.profile, t = targets(), P = plan(), eq = equipOf();
   const lines = [];
   lines.push(`Danes: ${DAYS_FULL[dow()]}, ${dkey()}.`);
   if (userName()) lines.push(`Ime uporabnika: ${userName()}.`);
@@ -1290,7 +1381,7 @@ function coachContext() {
   return lines.join('\n');
 }
 function coachTools() {
-  const eq = S.profile.equip || 'home';
+  const eq = equipOf();
   return [
     {name: 'zamenjaj_vajo', description: 'Zamenja vajo v uporabnikovem tedenskem načrtu. Vrne potrditev. Uporabi, ko uporabnik želi drugo vajo (npr. zaradi bolečine, opreme ali želje).', inputSchema: {type: 'object', properties: {weekday: {type: 'integer', description: '0 = ponedeljek … 6 = nedelja'}, iz: {type: 'string', description: 'id obstoječe vaje na ta dan'}, v: {type: 'string', description: 'id nove vaje iz knjižnice'}}, required: ['weekday', 'iz', 'v']},
       execute: (inp) => {
@@ -1522,7 +1613,7 @@ function openSheet(html) {
 }
 function closeSheet() { const o = $('#overlay'); if (o) o.remove(); document.body.style.overflow = ''; clearInterval(testTimer.iv); testTimer = {mode: testTimer.mode, start: 0, acc: 0, run: false, iv: null}; }
 function openDemo(id, i) {
-  const e = EX[id], c = workoutCtx(), eq = S.profile.equip || 'home', inj = S.profile.injuries || [];
+  const e = EX[id], c = workoutCtx(), eq = equipOf(), inj = S.profile.injuries || [];
   const alts = i != null && c.w && !c.isFuture ? Object.entries(EX).filter(([k, x]) => k !== id && x.p === e.p && (x.eq === 'both' || x.eq === eq) && exStyles(x).includes(styleOf()) && !x.avoid.some(a => inj.includes(a))).slice(0, 4) : [];
   const yt = 'https://www.youtube.com/results?search_query=' + encodeURIComponent(e.yt || e.n + ' pravilna izvedba');
   openSheet(`<div class="row between"><div class="stack-s"><span class="eyebrow">${esc(e.m)}</span><h2>${esc(e.n)}</h2></div><button class="iconbtn" data-a="sheet-close" aria-label="Zapri">${ic('x')}</button></div>
