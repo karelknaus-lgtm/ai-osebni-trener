@@ -360,7 +360,7 @@ const EX = {
   nozna_presa: {n: 'Nožna preša', p: 'squat', m: 'Noge, zadnjica', eq: 'gym', avoid: ['koleno'], alt: 'hip_thrust', w: true, cues: ['Stopala na sredini plošče v širini bokov', 'Križ ostane prislonjen na naslon', 'Kolen na vrhu ne zakleni']},
   izpadni: {n: 'Izpadni koraki', p: 'lunge', m: 'Noge, zadnjica', eq: 'both', avoid: ['koleno'], alt: 'most', w: false, cues: ['Dolg korak naprej, trup pokonci', 'Zadnje koleno se skoraj dotakne tal', 'Odrini se s sprednjo peto']},
   izpadni_rocke: {n: 'Izpadni koraki z ročkami', p: 'lunge', m: 'Noge, zadnjica', eq: 'gym', avoid: ['koleno'], alt: 'hip_thrust', w: true, cues: ['Ročki ob telesu, ramena sproščena', 'Sprednje koleno nad stopalom', 'Nadzorovan spust, eksploziven dvig']},
-  most: {n: 'Glutealni most', p: 'bridge', m: 'Zadnjica, zadnja loža', eq: 'both', avoid: [], w: false, cues: ['Stopala blizu zadnjice', 'Dvigni boke, da so kolena, boki in ramena v liniji', 'Na vrhu stisni zadnjico 1 sekundo']},
+  most: {n: 'Glutealni most', p: 'bridge', m: 'Zadnjica, zadnja loža', eq: 'both', avoid: [], w: false, st: ['moc', 'pilates'], cues: ['Stopala blizu zadnjice', 'Dvigni boke, da so kolena, boki in ramena v liniji', 'Na vrhu stisni zadnjico 1 sekundo']},
   most_eno: {n: 'Enonožni glutealni most', p: 'bridge', m: 'Zadnjica, zadnja loža', eq: 'both', avoid: [], w: false, cues: ['Ena noga iztegnjena v zraku', 'Boki ostanejo poravnani', 'Počasen spust']},
   hip_thrust: {n: 'Hip thrust z drogom', p: 'bridge', m: 'Zadnjica', eq: 'gym', avoid: [], w: true, cues: ['Lopatice na klopi, drog na bokih z blazinico', 'Brado drži rahlo navzdol', 'Na vrhu poln izteg bokov']},
   rdl_eno: {n: 'Enonožni mrtvi dvig', p: 'hinge', m: 'Zadnja loža, zadnjica', eq: 'both', avoid: ['hrbet'], alt: 'most_eno', w: false, cues: ['Rahlo pokrčeno stojno koleno', 'Trup in zadnja noga se gibljeta kot ena linija', 'Boki ostanejo vzporedni s tlemi']},
@@ -378,16 +378,38 @@ const EX = {
   veslanje_kabel: {n: 'Veslanje na kablu sede', p: 'row', m: 'Hrbet, bicepsi', eq: 'gym', avoid: [], w: true, cues: ['Hrbet pokonci, prsi naprej', 'Ročaj vleci proti popku', 'Lopatice skupaj, nato počasi izteg']},
   veslanje_drog: {n: 'Veslanje z drogom v predklonu', p: 'row', m: 'Hrbet, bicepsi', eq: 'gym', avoid: ['hrbet'], alt: 'veslanje_kabel', w: true, cues: ['Trup naklonjen okoli 45°', 'Drog vleci proti spodnjim rebrom', 'Hrbet raven ves čas']},
   biceps: {n: 'Upogib za biceps z ročkami', p: 'curl', m: 'Bicepsi', eq: 'gym', avoid: [], w: true, cues: ['Komolci ob telesu', 'Brez zibanja trupa', 'Počasen spust v 2 sekundah']},
-  deska: {n: 'Deska na podlahteh', p: 'plank', m: 'Trup', eq: 'both', avoid: [], w: false, type: 'time', rx: {s: 3, r: '30–45 s', rest: 45}, cues: ['Komolci pod rameni', 'Stisni zadnjico in trebuh', 'Boki ne smejo pasti ali štrleti']},
+  deska: {n: 'Deska na podlahteh', p: 'plank', m: 'Trup', eq: 'both', avoid: [], w: false, st: ['moc', 'joga', 'pilates'], type: 'time', rx: {s: 3, r: '30–45 s', rest: 45}, cues: ['Komolci pod rameni', 'Stisni zadnjico in trebuh', 'Boki ne smejo pasti ali štrleti']},
   trup: {n: 'Dviganje trupa', p: 'situp', m: 'Trebušne mišice', eq: 'both', avoid: ['hrbet'], alt: 'mrtvi_hrosc', w: false, rx: {s: 3, r: '15–20', rest: 45}, cues: ['Kolena pokrčena, stopala na tleh', 'Dvigni trup do pokončnega položaja', 'Nadzorovano nazaj do lopatic']},
-  mrtvi_hrosc: {n: 'Mrtvi hrošč', p: 'deadbug', m: 'Globoke trebušne mišice', eq: 'both', avoid: [], w: false, rx: {s: 3, r: '8–10 na stran', rest: 45}, cues: ['Križ pritisnjen v tla', 'Iztegni nasprotno roko in nogo', 'Počasi, z izdihom']},
+  mrtvi_hrosc: {n: 'Mrtvi hrošč', p: 'deadbug', m: 'Globoke trebušne mišice', eq: 'both', avoid: [], w: false, st: ['moc', 'pilates'], rx: {s: 3, r: '8–10 na stran', rest: 45}, cues: ['Križ pritisnjen v tla', 'Iztegni nasprotno roko in nogo', 'Počasi, z izdihom']},
   intervali: {n: 'Tekaški intervali', p: 'run', m: 'Kondicija', eq: 'both', avoid: ['koleno'], alt: 'hitra_hoja', w: false, type: 'cardio', rx: {s: 6, r: '1 min hitro + 1 min hoje', rest: 0}, cues: ['5 minut lahkotnega ogrevanja', 'Hitri del pri 8/10 napora', 'Med intervali hodi, ne stoj']},
   hitra_hoja: {n: 'Hitra hoja v klanec', p: 'run', m: 'Kondicija', eq: 'both', avoid: [], w: false, type: 'cardio', rx: {s: 4, r: '5 min hitro', rest: 60}, cues: ['Pokončna drža', 'Tempo, pri katerem težko govoriš v povedih', 'Roke aktivno nihajo']},
   sprint: {n: 'Šprinti na 60 m', p: 'run', m: 'Hitrost', eq: 'both', avoid: ['koleno'], alt: 'hitra_hoja', w: false, type: 'cardio', rx: {s: 6, r: '60 m s polno hitrostjo', rest: 150}, cues: ['Temeljito ogrevanje in nekaj stopnjevanj', 'Nizek start, prvi koraki kratki in hitri', 'Polni odmor med ponovitvami']},
   skok: {n: 'Skok v daljino z mesta', p: 'squat', m: 'Eksplozivna moč nog', eq: 'both', avoid: ['koleno'], alt: 'most', w: false, rx: {s: 4, r: '4 skoki', rest: 90}, cues: ['Zamah z rokami nazaj, nato močno naprej', 'Odriv z obema nogama hkrati', 'Pristani mehko, ne pade nazaj']},
   ovire: {n: 'Tek nazaj in agilnost', p: 'run', m: 'Agilnost', eq: 'both', avoid: ['koleno'], alt: 'hitra_hoja', w: false, type: 'cardio', rx: {s: 6, r: '15 m tek nazaj + plazenje pod oviro', rest: 60}, cues: ['Težišče nizko, pogled čez ramo', 'Kratki hitri koraki', 'Vadi prehode čez in pod oviro']},
   cooper: {n: 'Tempo tek za 2400 m', p: 'run', m: 'Vzdržljivost', eq: 'both', avoid: ['koleno'], alt: 'hitra_hoja', w: false, type: 'cardio', rx: {s: 3, r: '800 m v ciljnem tempu', rest: 120}, cues: ['Tempo izračunaj iz ciljnega časa', 'Prvih 200 m ne začni prehitro', 'Enakomerno dihanje']},
-  tek3200: {n: 'Tempo tek za 3200 m', p: 'run', m: 'Vzdržljivost', eq: 'both', avoid: ['koleno'], alt: 'hitra_hoja', w: false, type: 'cardio', rx: {s: 4, r: '1000 m v ciljnem tempu', rest: 120}, cues: ['Ogrevanje 10 minut', 'Ciljni tempo: čas ÷ 3,2 km', 'Zadnjo ponovitev pospeši']}
+  tek3200: {n: 'Tempo tek za 3200 m', p: 'run', m: 'Vzdržljivost', eq: 'both', avoid: ['koleno'], alt: 'hitra_hoja', w: false, type: 'cardio', rx: {s: 4, r: '1000 m v ciljnem tempu', rest: 120}, cues: ['Ogrevanje 10 minut', 'Ciljni tempo: čas ÷ 3,2 km', 'Zadnjo ponovitev pospeši']},
+  // Yoga, pilates and stretching. st lists the training styles an exercise belongs to (none means strength only).
+  gora: {n: 'Gora z dvigom rok', p: 'gora', m: 'Drža, dihanje', eq: 'both', avoid: [], w: false, type: 'time', rx: {s: 1, r: '30 s', rest: 0}, st: ['joga'], yt: 'mountain pose yoga tadasana', cues: ['Stopala skupaj, teža enakomerno na obeh', 'Z vdihom dvigni roke nad glavo', 'Ramena stran od ušes, pogled naravnost']},
+  macka: {n: 'Mačka in krava', p: 'macka', m: 'Hrbtenica, trup', eq: 'both', avoid: ['zapestje', 'koleno'], alt: 'gora', w: false, type: 'time', rx: {s: 1, r: '60 s', rest: 0}, st: ['joga', 'raztezanje'], yt: 'cat cow pose yoga', cues: ['Dlani pod rameni, kolena pod boki', 'Z vdihom spusti trebuh in dvigni pogled', 'Z izdihom zaokroži hrbet in brado približaj prsim']},
+  pes: {n: 'Pes z glavo navzdol', p: 'pes', m: 'Zadnja loža, meča, ramena', eq: 'both', avoid: ['zapestje', 'rama'], alt: 'stol', w: false, type: 'time', rx: {s: 2, r: '30 s', rest: 15}, st: ['joga', 'raztezanje'], yt: 'downward dog pose yoga', cues: ['Dlani v širini ramen, prsti razprti', 'Boke potisni gor in nazaj, telo v obliki črke V', 'Kolena so lahko rahlo pokrčena, pete proti tlom']},
+  kobra: {n: 'Kobra', p: 'kobra', m: 'Hrbet, prsi, trebušne mišice', eq: 'both', avoid: ['hrbet', 'zapestje'], alt: 'otrok', w: false, type: 'time', rx: {s: 2, r: '20 s', rest: 15}, st: ['joga', 'raztezanje'], yt: 'cobra pose yoga', cues: ['Dlani ob prsih, komolci ob telesu', 'Prsi dvigni z močjo hrbta, ne samo z rokami', 'Medenica ostane na tleh, ramena sproščena']},
+  otrok: {n: 'Položaj otroka', p: 'otrok', m: 'Hrbet, boki', eq: 'both', avoid: ['koleno'], alt: 'savasana', w: false, type: 'time', rx: {s: 1, r: '60 s', rest: 0}, st: ['joga', 'pilates', 'raztezanje'], yt: 'child pose yoga', cues: ['Sedi na pete, kolena narazen', 'Trup spusti med stegna, čelo na tla', 'Roke iztegni naprej in mirno dihaj']},
+  bojevnik: {n: 'Bojevnik II (vsaka stran)', p: 'bojevnik', m: 'Noge, zadnjica, ramena', eq: 'both', avoid: ['koleno'], alt: 'drevo', w: false, type: 'time', rx: {s: 2, r: '30 s', rest: 10}, st: ['joga'], yt: 'warrior 2 pose yoga', cues: ['Širok razkorak, sprednje stopalo naprej, zadnje rahlo navznoter', 'Sprednje koleno nad gležnjem, pokrčeno do 90°', 'Roke v višini ramen, pogled čez sprednjo roko']},
+  drevo: {n: 'Drevo (vsaka noga)', p: 'drevo', m: 'Ravnotežje, noge, trup', eq: 'both', avoid: [], w: false, type: 'time', rx: {s: 2, r: '30 s', rest: 0}, st: ['joga'], yt: 'tree pose yoga', cues: ['Stopalo položi na notranjo stran meč ali stegna, ne na koleno', 'Pogled usmeri v točko pred sabo', 'Roke dvigni nad glavo, trebuh rahlo napet']},
+  stol: {n: 'Stol', p: 'stol', m: 'Noge, zadnjica, ramena', eq: 'both', avoid: ['koleno'], alt: 'gora', w: false, type: 'time', rx: {s: 2, r: '30 s', rest: 15}, st: ['joga'], yt: 'chair pose yoga utkatasana', cues: ['Boke potisni nazaj, kot da sedeš na stol', 'Kolena ostanejo za prsti', 'Roke v podaljšku trupa, hrbet raven']},
+  predklon: {n: 'Sedeči predklon', p: 'predklon', m: 'Zadnja loža, hrbet', eq: 'both', avoid: ['hrbet'], alt: 'otrok', w: false, type: 'time', rx: {s: 2, r: '30 s', rest: 0}, st: ['joga', 'pilates', 'raztezanje'], yt: 'seated forward fold yoga', cues: ['Sedi z iztegnjenimi nogami, prsti proti stropu', 'Predkloni se iz bokov, hrbet čim bolj raven', 'Primi golenice ali stopala, brez sunkov']},
+  savasana: {n: 'Sprostitev na hrbtu', p: 'savasana', m: 'Sprostitev', eq: 'both', avoid: [], w: false, type: 'time', rx: {s: 1, r: '120 s', rest: 0}, st: ['joga'], yt: 'savasana relaxation yoga', cues: ['Uleži se na hrbet, roke ob telesu z dlanmi navzgor', 'Zapri oči in sprosti obraz, ramena in trebuh', 'Dihaj počasi skozi nos']},
+  most_joga: {n: 'Most', p: 'bridge', m: 'Zadnjica, hrbet', eq: 'both', avoid: [], w: false, type: 'time', rx: {s: 2, r: '30 s', rest: 15}, st: ['joga'], yt: 'bridge pose yoga', cues: ['Stopala v širini bokov blizu zadnjice', 'Dvigni boke in odpri prsni koš', 'Teža na stopalih in ramenih, ne na vratu']},
+  stotica: {n: 'Stotica', p: 'stotica', m: 'Trebušne mišice', eq: 'both', avoid: ['hrbet'], alt: 'mrtvi_hrosc', w: false, type: 'time', rx: {s: 1, r: '60 s', rest: 20}, st: ['pilates'], yt: 'pilates hundred exercise', cues: ['Glavo in ramena dvigni s tal, pogled proti trebuhu', 'Noge iztegnjene pod kotom ali pokrčene v položaju mize', 'Roke hitro in nizko utripajo: 5 udarcev vdih, 5 izdih']},
+  rollup: {n: 'Zvijanje navzgor (roll-up)', p: 'rollup', m: 'Trebušne mišice, gibljivost hrbtenice', eq: 'both', avoid: ['hrbet'], alt: 'mrtvi_hrosc', w: false, rx: {s: 2, r: '6', rest: 20}, st: ['pilates'], yt: 'pilates roll up exercise', cues: ['Začni leže z rokami nad glavo', 'Vretence za vretencem se zvij v sed in seži čez prste', 'Enako počasi se odvij nazaj na tla']},
+  enonozni: {n: 'Raztezanje ene noge', p: 'enonozni', m: 'Trebušne mišice', eq: 'both', avoid: [], w: false, rx: {s: 2, r: '10 na stran', rest: 20}, st: ['pilates'], yt: 'pilates single leg stretch', cues: ['Glava in ramena dvignjena, križ na tleh', 'Eno koleno pritegni k prsim, drugo nogo iztegni', 'Nogi menjaj v ritmu dihanja']},
+  plavanje: {n: 'Plavanje', p: 'plavanje', m: 'Hrbet, zadnjica, ramena', eq: 'both', avoid: ['hrbet'], alt: 'mrtvi_hrosc', w: false, type: 'time', rx: {s: 2, r: '30 s', rest: 20}, st: ['pilates'], yt: 'pilates swimming exercise', cues: ['Uleži se na trebuh, roke iztegni naprej', 'Dvigni prsi, roke in noge nad tla', 'Izmenično hitro dvigaj nasprotno roko in nogo']},
+  teaser: {n: 'Teaser (V-sed)', p: 'teaser', m: 'Trebušne mišice, upogibalke kolka', eq: 'both', avoid: ['hrbet'], alt: 'mrtvi_hrosc', w: false, rx: {s: 2, r: '5', rest: 30}, st: ['pilates'], yt: 'pilates teaser exercise', cues: ['Uravnoteži se na sednicah, telo v obliki črke V', 'Roke vzporedno z nogami', 'Nadzorovano se spusti malo nazaj in se vrni']},
+  stegenska: {n: 'Raztezanje sprednje stegenske mišice (vsaka noga)', p: 'stegenska', m: 'Sprednja stegenska mišica', eq: 'both', avoid: ['koleno'], alt: 'meca', w: false, type: 'time', rx: {s: 2, r: '30 s', rest: 0}, st: ['raztezanje'], yt: 'standing quad stretch', cues: ['Stoj na eni nogi, po potrebi se primi za steno', 'Peto pritegni proti zadnjici, kolena skupaj', 'Boke potisni rahlo naprej']},
+  upogibalke: {n: 'Raztezanje upogibalk kolka (vsaka stran)', p: 'upogibalke', m: 'Upogibalke kolka', eq: 'both', avoid: ['koleno'], alt: 'meca', w: false, type: 'time', rx: {s: 2, r: '30 s', rest: 0}, st: ['raztezanje'], yt: 'kneeling hip flexor stretch', cues: ['Zadnje koleno na mehki podlagi, sprednje stopalo naprej', 'Stisni zadnjico zadnje noge', 'Boke potiskaj naprej, trup pokonci']},
+  meca: {n: 'Raztezanje meč ob steni (vsaka noga)', p: 'meca', m: 'Meča', eq: 'both', avoid: [], w: false, type: 'time', rx: {s: 2, r: '30 s', rest: 0}, st: ['raztezanje'], yt: 'calf stretch wall', cues: ['Dlani na steni v višini ramen', 'Zadnja noga iztegnjena, peta na tleh', 'Pokrči sprednje koleno in se nagni k steni']},
+  prsni: {n: 'Raztezanje prsnih mišic ob steni (vsaka roka)', p: 'prsni', m: 'Prsi, ramena', eq: 'both', avoid: ['rama'], alt: 'macka', w: false, type: 'time', rx: {s: 2, r: '30 s', rest: 0}, st: ['raztezanje'], yt: 'wall chest stretch', cues: ['Dlan in podlaket položi na steno v višini ramen', 'Telo počasi obrni stran od roke', 'Ramena spuščena, brez bolečine v rami']},
+  triceps: {n: 'Raztezanje tricepsa nad glavo (vsaka roka)', p: 'triceps', m: 'Tricepsi, ramena', eq: 'both', avoid: ['rama'], alt: 'macka', w: false, type: 'time', rx: {s: 2, r: '30 s', rest: 0}, st: ['raztezanje'], yt: 'overhead triceps stretch', cues: ['Dvigni roko in dlan spusti za glavo', 'Z drugo roko nežno potiskaj komolec', 'Glava ostane pokonci, trebuh rahlo napet']}
 };
 const ROLE = {
   squat: {home: 'pocep', gym: 'pocep_drog'}, hinge: {home: 'rdl_eno', gym: 'rdl'}, lunge: {home: 'izpadni', gym: 'izpadni_rocke'},
@@ -401,8 +423,24 @@ const TPL = {
   fullC: {n: 'Celo telo C', f: 'celo telo', roles: ['lunge', 'pushH', 'pullV', 'bridge', 'deadbug']},
   upper: {n: 'Zgornji del', f: 'prsi, hrbet in ramena', roles: ['pushH', 'pullH', 'pushV', 'pullV', 'arms', 'core']},
   lower: {n: 'Spodnji del', f: 'noge in zadnjica', roles: ['squat', 'hinge', 'lunge', 'bridge', 'core2']},
-  cond: {n: 'Kondicija in trup', f: 'kondicija in trup', roles: ['cond', 'core', 'deadbug', 'core2']}
+  cond: {n: 'Kondicija in trup', f: 'kondicija in trup', roles: ['cond', 'core', 'deadbug', 'core2']},
+  // ex: exercise ids in order, or [id, rx] when the session needs a different dose than the exercise default.
+  jogaA: {n: 'Joga: jutranji tok', f: 'hrbtenica in boki', ex: ['gora', 'macka', 'pes', 'kobra', 'otrok', 'savasana']},
+  jogaB: {n: 'Joga: moč in ravnotežje', f: 'noge, ravnotežje in trup', ex: ['gora', 'stol', 'bojevnik', 'drevo', ['deska', {s: 2, r: '30 s', rest: 15}], 'savasana']},
+  jogaC: {n: 'Joga: gibljivost in sprostitev', f: 'gibljivost in sprostitev', ex: ['macka', 'pes', 'predklon', 'most_joga', 'otrok', 'savasana']},
+  pilA: {n: 'Pilates: trup', f: 'trebušne mišice in globoki trup', ex: ['stotica', 'rollup', 'enonozni', ['mrtvi_hrosc', {s: 2, r: '8 na stran', rest: 20}], ['deska', {s: 2, r: '30 s', rest: 20}]]},
+  pilB: {n: 'Pilates: celo telo', f: 'trup, zadnjica in hrbet', ex: ['stotica', ['most', {s: 2, r: '10', rest: 20}], 'plavanje', 'teaser', 'predklon']},
+  pilC: {n: 'Pilates: hrbet in drža', f: 'hrbet, ramena in drža', ex: ['rollup', 'plavanje', 'enonozni', ['most', {s: 2, r: '10', rest: 20}], 'otrok']},
+  razA: {n: 'Raztezanje: noge in boki', f: 'noge in boki', ex: ['stegenska', 'upogibalke', 'meca', 'predklon', 'otrok']},
+  razB: {n: 'Raztezanje: ramena in hrbet', f: 'ramena, prsi in hrbet', ex: ['prsni', 'triceps', 'macka', 'kobra', 'otrok']},
+  razC: {n: 'Raztezanje: celo telo', f: 'celo telo', ex: ['macka', 'pes', 'upogibalke', 'stegenska', 'prsni', 'predklon']}
 };
+const STYLES = {moc: {n: 'Moč in fitnes', d: 'Uteži ali lastna teža, doma ali v fitnesu'}, joga: {n: 'Joga', d: 'Gibljivost, ravnotežje in sprostitev'}, pilates: {n: 'Pilates', d: 'Močan trup in boljša drža'}, raztezanje: {n: 'Raztezanje in mobilnost', d: 'Gibljivost in hitrejša regeneracija'}};
+const STYLE_TPL = {joga: ['jogaA', 'jogaB', 'jogaC'], pilates: ['pilA', 'pilB', 'pilC'], raztezanje: ['razA', 'razB', 'razC']};
+// Test preparation always uses strength training, and so do profiles from before styles existed.
+const styleOf = (p = S.profile) => p.goal !== 'test' && STYLE_TPL[p.style] ? p.style : 'moc';
+const exStyles = e => e.st || ['moc'];
+const stylePool = st => [...new Set(STYLE_TPL[st].flatMap(t => TPL[t].ex.map(e => Array.isArray(e) ? e[0] : e)))];
 const SPLIT = {2: ['fullA', 'fullB'], 3: ['fullA', 'fullB', 'fullC'], 4: ['upper', 'lower', 'upper', 'lower'], 5: ['upper', 'lower', 'cond', 'upper', 'lower'], 6: ['upper', 'lower', 'cond', 'upper', 'lower', 'fullC']};
 const SCHED = {2: [1, 4], 3: [0, 2, 4], 4: [0, 1, 3, 4], 5: [0, 1, 2, 3, 4], 6: [0, 1, 2, 3, 4, 5]};
 const GOALRX = {hujsanje: {s: 3, r: '12–15', rest: 60}, misice: {s: 4, r: '8–12', rest: 90}, moc: {s: 4, r: '4–6', rest: 150}, kondicija: {s: 3, r: '12–15', rest: 45}, test: {s: 3, r: '8–12', rest: 75}};
@@ -465,7 +503,7 @@ const TESTS = {
 const LS_KEY = 'aitrener:v1', LS_PHOTOS = 'aitrener:photos:v1';
 const lsGet = k => { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } };
 const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } };
-const freshState = () => ({v: 1, onboarded: false, profile: {goal: null, sex: null, age: 28, height: 175, weight: 75, exp: null, equip: null, days: 3, injuries: []},
+const freshState = () => ({v: 1, onboarded: false, profile: {goal: null, sex: null, age: 28, height: 175, weight: 75, exp: null, style: null, equip: null, days: 3, injuries: []},
   startDate: null, logs: {}, weights: [], eaten: {}, shop: {}, chat: [], overrides: {},
   nutrition: {enabled: false, meals: ['zajtrk', 'kosilo', 'malica', 'vecerja'], budget: {amount: null, period: 'teden'}}, test: {type: null, date: null, targets: {}, mocks: []}, sub: {plan: 'trial'}, example: false, updatedAt: 0});
 const migrate = s => Object.assign(freshState(), s || {});
@@ -653,7 +691,7 @@ async function callCoach(context, messages, signal) {
 /* ---------- derived ---------- */
 function targets(p = S.profile, w = latestWeight()) {
   const bmr = 10 * w + 6.25 * p.height - 5 * p.age + (p.sex === 'z' ? -161 : 5);
-  const tdee = bmr * (1.2 + 0.075 * p.days);
+  const tdee = bmr * (1.2 + ({joga: 0.05, raztezanje: 0.03}[styleOf(p)] ?? 0.075) * p.days);
   const adj = {hujsanje: -0.2, misice: 0.1, moc: 0.05}[p.goal] || 0;
   const kcal = Math.round(tdee * (1 + adj) / 10) * 10;
   const prot = Math.round(w * (p.goal === 'hujsanje' ? 2.0 : 1.8));
@@ -681,16 +719,25 @@ function plan() {
   const sched = SCHED[days], split = SPLIT[days];
   // Indexes 0–6 are the weekdays; TEST_WD holds the optional test workout, which is never scheduled.
   const out = Array(8).fill(null);
-  const build = (wd, name, ids, testDay, focus) => {
-    const items = ids.map((id, k) => {
+  const build = (wd, name, list, testDay, focus) => {
+    const exId = e => Array.isArray(e) ? e[0] : e, used = new Set();
+    const items = list.map((entry, k) => {
+      const [id, rx] = Array.isArray(entry) ? entry : [entry];
       const ov = S.overrides[wd + ':' + k];
-      const rid = ov && EX[ov] ? ov : resolveEx(id, inj);
-      return {id: rid, rx: rxFor(rid, p.goal, p.exp, testDay)};
+      let rid = ov && EX[ov] ? ov : resolveEx(id, inj);
+      // In yoga, pilates and stretching an injury swap picks another safe exercise of the style instead of repeating one from the session.
+      if (st !== 'moc' && !ov && rid !== id && (used.has(rid) || list.some(e => exId(e) === rid)))
+        rid = [...stylePool(st), 'most_joga', 'gora', 'savasana'].find(x => !used.has(x) && !list.some(e => exId(e) === x) && !EX[x].avoid.some(a => inj.includes(a))) || rid;
+      used.add(rid);
+      return {id: rid, rx: rx && rid === id ? {...rx} : rxFor(rid, p.goal, p.exp, testDay)};
     });
-    const mins = Math.round(items.reduce((a, it) => a + it.rx.s * ((EX[it.id].type === 'cardio' ? 75 : 40) + it.rx.rest), 0) / 60) + 8;
+    const secs = it => EX[it.id].type === 'cardio' ? 75 : EX[it.id].type === 'time' ? (parseInt(it.rx.r) || 30) + 10 : 40;
+    const mins = Math.round(items.reduce((a, it) => a + it.rx.s * (secs(it) + it.rx.rest), 0) / 60) + 8;
     out[wd] = {wd, name, items, mins, testDay, focus};
   };
+  const st = styleOf(p);
   sched.forEach((wd, i) => {
+    if (st !== 'moc') { const t = TPL[STYLE_TPL[st][i % 3]]; build(wd, t.n, t.ex, false, t.f); return; }
     const roles = [...TPL[split[i]].roles];
     if ((p.goal === 'hujsanje' || p.goal === 'kondicija' || p.goal === 'test') && split[i].startsWith('full') && !roles.includes('cond')) roles.push('cond');
     build(wd, TPL[split[i]].n, roles.map(r => { let id = ROLE[r][eq]; if (r === 'squat' && eq === 'gym' && p.exp === 'zacetnik') id = 'goblet'; if (r === 'pushH' && eq === 'home' && p.exp === 'zacetnik') id = 'sklece_klop'; return id; }), false, TPL[split[i]].f);
@@ -700,16 +747,22 @@ function plan() {
 }
 // The weekly plan runs on real dates from the day the user chose to start; earlier days have no workouts.
 const planStart = () => S.planStart || S.startDate || dkey();
-const planWeek = k => Math.floor(daysBetween(dkey(monday(parseD(planStart()))), dkey(monday(parseD(k)))) / 7) + 1;
+// Week 1 is the week of the first workout: a start late in the week with no workouts left counts from the next Monday.
+function planWeek(k) {
+  const st = parseD(planStart()), P = plan();
+  let m0 = monday(st);
+  if (!P.slice(dow(st), 7).some(Boolean)) m0 = addDays(m0, 7);
+  return Math.floor(daysBetween(dkey(m0), dkey(monday(parseD(k)))) / 7) + 1;
+}
 function plannedWd(k, P = plan()) { const wd = dow(parseD(k)); return k >= planStart() && P[wd] ? wd : null; }
 // First planned workout on or after fromK that is not done yet.
 function nextWorkout(fromK, P = plan()) {
   for (let d = parseD(fromK), i = 0; i < 21; i++, d = addDays(d, 1)) { const k = dkey(d), wd = plannedWd(k, P); if (wd != null && !sessionDone(k)) return {k, w: P[wd]}; }
   return null;
 }
-function firstSessions(days, startK, n = 3) {
-  const sched = SCHED[days], split = SPLIT[days], out = [];
-  for (let d = parseD(startK), i = 0; out.length < n && i < 21; i++, d = addDays(d, 1)) { const j = sched.indexOf(dow(d)); if (j >= 0) out.push({k: dkey(d), n: TPL[split[j]].n}); }
+function firstSessions(prof, startK, n = 3) {
+  const st = styleOf(prof), sched = SCHED[prof.days], tids = st === 'moc' ? SPLIT[prof.days] : sched.map((_, i) => STYLE_TPL[st][i % 3]), out = [];
+  for (let d = parseD(startK), i = 0; out.length < n && i < 21; i++, d = addDays(d, 1)) { const j = sched.indexOf(dow(d)); if (j >= 0) out.push({k: dkey(d), n: TPL[tids[j]].n}); }
   return out;
 }
 function sessionDone(k) { const s = S.logs[k]; if (!s) return false; if (s.done) return true; return Object.values(s.items || {}).some(it => it.sets.some(x => x.d)); }
@@ -800,19 +853,45 @@ const POSE = {
   press: [{...STAND, E: [112, 42], W: [110, 26]}, {...STAND, E: [102, 16], W: [102, -2]}],
   curl: [{...STAND, E: [100, 50], W: [100, 68]}, {...STAND, E: [100, 50], W: [114, 38]}],
   bench: [{H: [48, 90], S: [62, 94], E: [62, 77], W: [62, 60], P: [100, 94], K: [126, 96], A: [132, 124], T: [143, 125]}, {H: [48, 90], S: [62, 94], E: [50, 100], W: [60, 84], P: [100, 94], K: [126, 96], A: [132, 124], T: [143, 125]}],
-  run: [{H: [106, 20], S: [104, 32], E: [92, 48], W: [100, 60], P: [100, 70], K: [118, 86], A: [110, 110], T: [120, 108], K2: [94, 96], A2: [80, 114], T2: [86, 121]}, {H: [106, 20], S: [104, 32], E: [114, 46], W: [124, 36], P: [100, 70], K: [94, 96], A: [80, 114], T: [86, 121], K2: [118, 86], A2: [110, 110], T2: [120, 108]}]
+  run: [{H: [106, 20], S: [104, 32], E: [92, 48], W: [100, 60], P: [100, 70], K: [118, 86], A: [110, 110], T: [120, 108], K2: [94, 96], A2: [80, 114], T2: [86, 121]}, {H: [106, 20], S: [104, 32], E: [114, 46], W: [124, 36], P: [100, 70], K: [94, 96], A: [80, 114], T: [86, 121], K2: [118, 86], A2: [110, 110], T2: [120, 108]}],
+  // Yoga, pilates and stretching. Big movements use several keyframes so limbs keep their length in between.
+  gora: [{H: [102, 18], S: [100, 32], P: [100, 70], K: [100, 97], A: [100, 125], E: [100, 50], W: [100, 68]}, {H: [102, 18], S: [100, 32], P: [100, 70], K: [100, 97], A: [100, 125], E: [113, 45], W: [125, 58]}, {H: [102, 18], S: [100, 32], P: [100, 70], K: [100, 97], A: [100, 125], E: [118, 32], W: [136, 33]}, {H: [102, 18], S: [100, 32], P: [100, 70], K: [100, 97], A: [100, 125], E: [113, 20], W: [126, 7]}, {H: [102, 18], S: [100, 32], P: [100, 70], K: [100, 97], A: [100, 125], E: [101, 14], W: [101, -4]}],
+  pes: [{W: [52, 125], E: [65, 113], S: [78, 101], H: [75, 112], P: [106, 75], K: [121, 97], A: [136, 121], T: [126, 126]}, {W: [52, 125], E: [66, 113], S: [79, 101], H: [76, 113], P: [108, 77], K: [121, 100], A: [134, 125], T: [124, 126]}],
+  kobra: [{P: [88, 121], K: [61, 122], A: [33, 123], T: [24, 126], S: [126, 121], H: [139, 118], E: [109, 115], W: [124, 125]}, {P: [88, 121], K: [61, 122], A: [33, 123], T: [24, 126], S: [121, 102], H: [128, 91], E: [109, 115], W: [124, 125]}],
+  otrok: [{P: [80, 111], S: [118, 116], H: [130, 118], K: [104, 123], A: [76, 124], T: [66, 126], E: [136, 118], W: [152, 124]}, {P: [80, 109], S: [118, 111], H: [131, 113], K: [104, 123], A: [76, 124], T: [66, 126], E: [135, 115], W: [151, 123]}],
+  macka: [{P: [80, 95], S: [118, 89], H: [127, 81], E: [117, 107], W: [117, 125], K: [80, 123], A: [52, 124], T: [42, 126]}, {P: [80, 97], S: [117, 89], H: [123, 100], E: [117, 107], W: [117, 125], K: [80, 123], A: [52, 124], T: [42, 126]}],
+  bojevnik: [{P: [103, 84], S: [103, 46], H: [104, 32], K: [123, 102], A: [140, 125], T: [151, 126], K2: [85, 104], A2: [66, 125], T2: [57, 126], E: [103, 64], W: [103, 82], E2: [103, 64], W2: [103, 82]}, {P: [108, 91], S: [108, 53], H: [109, 39], K: [134, 98], A: [140, 125], T: [151, 126], K2: [87, 108], A2: [66, 125], T2: [57, 126], E: [121, 65], W: [133, 78], E2: [95, 65], W2: [83, 78]}, {P: [113, 97], S: [113, 59], H: [114, 45], K: [140, 97], A: [140, 125], T: [151, 126], K2: [90, 111], A2: [66, 125], T2: [57, 126], E: [131, 59], W: [149, 59], E2: [95, 59], W2: [77, 59]}, {P: [113, 97], S: [113, 59], H: [114, 45], K: [140, 97], A: [140, 125], T: [151, 126], K2: [90, 111], A2: [66, 125], T2: [57, 126], E: [131, 59], W: [149, 59], E2: [95, 59], W2: [77, 59]}],
+  drevo: [{H: [102, 18], S: [100, 32], P: [100, 70], K: [100, 97], A: [100, 125], K2: [100, 97], A2: [100, 125], T2: [111, 126], E: [100, 50], W: [100, 68]}, {H: [102, 18], S: [100, 32], P: [100, 70], K: [100, 97], A: [100, 125], K2: [112, 94], A2: [101, 115], T2: [106, 120], E: [113, 45], W: [125, 58]}, {H: [102, 18], S: [100, 32], P: [100, 70], K: [100, 97], A: [100, 125], K2: [121, 87], A2: [101, 105], T2: [100, 114], E: [118, 32], W: [136, 33]}, {H: [102, 18], S: [100, 32], P: [100, 70], K: [100, 97], A: [100, 125], K2: [121, 87], A2: [101, 105], T2: [100, 114], E: [113, 20], W: [126, 7]}, {H: [102, 18], S: [100, 32], P: [100, 70], K: [100, 97], A: [100, 125], K2: [121, 87], A2: [101, 105], T2: [100, 114], E: [101, 14], W: [101, -4]}, {H: [102, 18], S: [100, 32], P: [100, 70], K: [100, 97], A: [100, 125], K2: [121, 87], A2: [101, 105], T2: [100, 114], E: [101, 14], W: [101, -4]}],
+  stol: [{P: [100, 70], S: [100, 32], H: [102, 18], K: [103, 97], A: [100, 125], E: [100, 14], W: [100, -4]}, {P: [93, 81], S: [102, 43], H: [109, 31], K: [112, 100], A: [100, 125], E: [104, 26], W: [107, 8]}, {P: [86, 91], S: [103, 57], H: [114, 48], K: [112, 100], A: [100, 125], E: [108, 40], W: [114, 23]}, {P: [86, 91], S: [103, 57], H: [114, 48], K: [112, 100], A: [100, 125], E: [108, 40], W: [114, 23]}],
+  predklon: [{P: [70, 121], K: [97, 122], A: [125, 123], T: [126, 113], S: [70, 83], H: [71, 69], E: [82, 96], W: [90, 112]}, {P: [70, 121], K: [97, 122], A: [125, 123], T: [126, 113], S: [85, 86], H: [92, 74], E: [97, 99], W: [103, 116]}, {P: [70, 121], K: [97, 122], A: [125, 123], T: [126, 113], S: [97, 94], H: [109, 87], E: [115, 98], W: [114, 116]}, {P: [70, 121], K: [97, 122], A: [125, 123], T: [126, 113], S: [105, 107], H: [119, 106], E: [121, 98], W: [124, 116]}, {P: [70, 121], K: [97, 122], A: [125, 123], T: [126, 113], S: [105, 107], H: [119, 106], E: [121, 98], W: [124, 116]}],
+  savasana: [{H: [34, 117], S: [48, 120], E: [66, 124], W: [84, 125], P: [86, 120], K: [113, 121], A: [141, 122], T: [143, 112]}, {H: [34, 115], S: [48, 118], E: [66, 124], W: [84, 125], P: [86, 120], K: [113, 121], A: [141, 122], T: [143, 112]}],
+  stotica: [{P: [86, 120], S: [50, 107], H: [39, 102], K: [107, 103], A: [129, 86], T: [137, 80], E: [68, 104], W: [86, 102]}, {P: [86, 120], S: [50, 107], H: [39, 102], K: [107, 103], A: [129, 86], T: [137, 80], E: [67, 101], W: [84, 95]}],
+  rollup: [{P: [86, 120], K: [113, 121], A: [141, 122], T: [143, 112], S: [48, 120], H: [35, 117], E: [30, 120], W: [12, 120]}, {P: [86, 120], K: [113, 121], A: [141, 122], T: [143, 112], S: [52, 104], H: [41, 96], E: [38, 92], W: [24, 81]}, {P: [86, 120], K: [113, 121], A: [141, 122], T: [143, 112], S: [62, 91], H: [56, 79], E: [58, 73], W: [55, 55]}, {P: [86, 120], K: [113, 121], A: [141, 122], T: [143, 112], S: [79, 83], H: [80, 70], E: [88, 67], W: [97, 51]}, {P: [86, 120], K: [113, 121], A: [141, 122], T: [143, 112], S: [102, 86], H: [110, 75], E: [119, 79], W: [136, 73]}, {P: [86, 120], K: [113, 121], A: [141, 122], T: [143, 112], S: [120, 104], H: [133, 101], E: [138, 106], W: [156, 107]}],
+  enonozni: [{P: [86, 120], S: [50, 107], H: [39, 102], K: [73, 96], A: [101, 102], T: [110, 104], K2: [111, 110], A2: [137, 99], T2: [146, 96], E: [68, 110], W: [82, 98]}, {P: [86, 120], S: [50, 107], H: [39, 102], K: [95, 95], A: [123, 92], T: [133, 91], K2: [95, 95], A2: [123, 92], T2: [133, 91], E: [68, 105], W: [85, 98]}, {P: [86, 120], S: [50, 107], H: [39, 102], K: [111, 110], A: [137, 99], T: [146, 96], K2: [73, 96], A2: [101, 102], T2: [110, 104], E: [68, 110], W: [82, 98]}],
+  plavanje: [{P: [90, 121], S: [128, 119], H: [141, 113], E: [145, 115], W: [163, 110], E2: [146, 120], W2: [164, 120], K2: [63, 122], A2: [36, 123], T2: [26, 125], K: [64, 116], A: [38, 111], T: [28, 109]}, {P: [90, 121], S: [128, 119], H: [141, 113], E2: [145, 115], W2: [163, 110], E: [146, 120], W: [164, 120], K: [63, 122], A: [36, 123], T: [26, 125], K2: [64, 116], A2: [38, 111], T2: [28, 109]}],
+  teaser: [{P: [86, 120], S: [62, 91], H: [54, 80], K: [107, 103], A: [128, 85], T: [136, 78], E: [75, 78], W: [87, 66]}, {P: [86, 120], S: [56, 97], H: [47, 88], K: [110, 107], A: [135, 94], T: [143, 89], E: [71, 87], W: [87, 78]}],
+  stegenska: [{H: [103, 18], S: [100, 32], P: [100, 70], K: [100, 97], A: [100, 125], K2: [97, 97], A2: [90, 70], T2: [82, 66], E2: [93, 49], W2: [90, 66], E: [118, 35], W: [136, 35]}, {H: [103, 18], S: [100, 32], P: [100, 70], K: [100, 97], A: [100, 125], K2: [96, 97], A2: [88, 70], T2: [79, 66], E2: [92, 48], W2: [88, 66], E: [118, 33], W: [136, 33]}],
+  upogibalke: [{P: [97, 101], S: [97, 63], H: [98, 49], K: [124, 98], A: [132, 125], K2: [81, 123], A2: [53, 124], T2: [43, 126], E: [103, 80], W: [113, 95]}, {P: [104, 104], S: [104, 66], H: [105, 52], K: [130, 97], A: [132, 125], K2: [85, 123], A2: [57, 124], T2: [47, 126], E: [109, 83], W: [118, 99]}],
+  meca: [{P: [100, 78], S: [118, 44], H: [126, 33], K: [119, 97], A: [122, 125], K2: [86, 101], A2: [72, 125], T2: [83, 126], E: [133, 54], W: [149, 46]}, {P: [104, 80], S: [122, 46], H: [130, 35], K: [125, 97], A: [122, 125], K2: [88, 102], A2: [72, 125], T2: [83, 126], E: [135, 59], W: [149, 48]}],
+  prsni: [{H: [102, 18], S: [100, 32], P: [100, 70], K: [100, 97], A: [100, 125], E: [100, 50], W: [100, 68]}, {H: [102, 18], S: [100, 32], P: [100, 70], K: [100, 97], A: [100, 125], E: [87, 45], W: [75, 57]}, {H: [102, 18], S: [100, 32], P: [100, 70], K: [100, 97], A: [100, 125], E: [82, 32], W: [64, 32]}, {H: [106, 19], S: [103, 33], P: [100, 70], K: [100, 97], A: [100, 125], E: [85, 33], W: [67, 33]}],
+  triceps: [{H: [109, 21], S: [100, 32], P: [100, 70], K: [100, 97], A: [100, 125], E: [96, 15], W: [93, 32]}, {H: [109, 21], S: [100, 32], P: [100, 70], K: [100, 97], A: [100, 125], E: [95, 15], W: [91, 32]}]
 };
-const SPEED = {run: 700, pullup: 2600, plank: 3200};
-const SEGS = [['S', 'P'], ['P', 'K2'], ['K2', 'A2'], ['A2', 'T2'], ['S', 'E'], ['E', 'W'], ['P', 'K'], ['K', 'A'], ['A', 'T'], ['S', 'H']];
+const SPEED = {run: 700, pullup: 2600, plank: 3200, gora: 5000, pes: 4000, kobra: 4000, otrok: 5000, macka: 3600, bojevnik: 5000, drevo: 6000, stol: 4500, predklon: 5000, savasana: 5000, stotica: 600, rollup: 5000, enonozni: 1400, plavanje: 800, teaser: 3000, stegenska: 4000, upogibalke: 4000, meca: 4000, prsni: 4500, triceps: 4000};
+const SEGS = [['S', 'E2'], ['E2', 'W2'], ['S', 'P'], ['P', 'K2'], ['K2', 'A2'], ['A2', 'T2'], ['S', 'E'], ['E', 'W'], ['P', 'K'], ['K', 'A'], ['A', 'T'], ['S', 'H']];
 function figSVG(pat, cls = '') {
   let props = '<line class="ground" x1="16" y1="128" x2="184" y2="128"/>';
   if (pat === 'pullup') props = '<line class="prop" x1="62" y1="6" x2="138" y2="6"/>';
   if (pat === 'bench') props += '<path class="prop" d="M40 99h76M50 99v28M106 99v28"/>';
+  if (pat === 'meca') props += '<line class="prop" x1="152" y1="-14" x2="152" y2="128"/>';
+  if (pat === 'prsni') props += '<line class="prop" x1="60" y1="-14" x2="60" y2="128"/>';
   const lines = SEGS.map((s, i) => `<line data-s="${i}"${s[0].endsWith('2') || s[1].endsWith('2') ? ' class="back"' : ''}/>`).join('');
   return `<svg class="fig ${cls}" data-pat="${pat}" viewBox="0 -22 200 156" aria-hidden="true">${props}${lines}<circle class="head" r="9"/></svg>`;
 }
+// t runs 0 → 1 → 0; with more than two keyframes the figure passes through each of them in order.
 function poseAt(pat, t) {
-  const [a, b] = POSE[pat], o = {};
+  const fr = POSE[pat], x = t * (fr.length - 1), i = Math.min(fr.length - 2, Math.floor(x));
+  const a = fr[i], b = fr[i + 1], o = {};
+  t = x - i;
   for (const k of new Set([...Object.keys(a), ...Object.keys(b)])) { const pa = a[k] || b[k], pb = b[k] || a[k]; o[k] = [pa[0] + (pb[0] - pa[0]) * t, pa[1] + (pb[1] - pa[1]) * t]; }
   if (!o.T && o.A) o.T = [o.A[0] + 11, o.A[1] + 1];
   if (o.A2 && !o.T2) o.T2 = [o.A2[0] + 11, o.A2[1] + 1];
@@ -946,11 +1025,14 @@ const Q = [
   {k: 'height', t: 'Tvoja višina', type: 'num', u: 'cm', min: 140, max: 215, step: 1},
   {k: 'weight', t: 'Tvoja trenutna teža', type: 'num', u: 'kg', min: 40, max: 200, step: 0.5},
   {k: 'exp', t: 'Koliko izkušenj imaš s treningom?', type: 'choice', o: [['zacetnik', 'Začetnik', 'Manj kot 6 mesecev'], ['srednji', 'Srednje izkušen', '6 mesecev do 2 leti'], ['izkusen', 'Izkušen', 'Več kot 2 leti rednega treninga']]},
-  {k: 'equip', t: 'Kje želiš trenirati?', type: 'choice', o: [['home', 'Doma', 'Lastna teža, po želji drog za zgibe'], ['gym', 'V fitnesu', 'Drogovi, ročke in naprave']]},
-  {k: 'days', t: 'Koliko dni na teden lahko treniraš?', sub: 'Priporočamo 3 do 4 dni s počitkom vmes.', type: 'days'},
+  {k: 'style', t: 'Kakšen trening ti je najbolj všeč?', sub: 'Kmalu dodamo še kalisteniko, bodybuilding, HIIT in tek.', type: 'choice', o: Object.entries(STYLES).map(([v, x]) => [v, x.n, x.d]), skip: d => d.goal === 'test'},
+  {k: 'equip', t: 'Kje želiš trenirati?', skip: d => styleOf(d) !== 'moc', type: 'choice', o: [['home', 'Doma', 'Lastna teža, po želji drog za zgibe'], ['gym', 'V fitnesu', 'Drogovi, ročke in naprave']]},
+  {k: 'days', t: 'Koliko dni na teden lahko treniraš?', sub: d => styleOf(d) === 'moc' ? 'Priporočamo 3 do 4 dni s počitkom vmes.' : 'Joga, pilates in raztezanje so primerni tudi za več dni zapored.', type: 'days'},
   {k: 'injuries', t: 'Imaš kakšno poškodbo ali bolečino?', sub: 'Vaje, ki ta del obremenjujejo, bomo zamenjali z varnejšimi.', type: 'multi', o: Object.entries(INJ)},
   {k: 'mealplan', t: 'Želiš tudi jedilnik?', sub: 'Lahko ga vklopiš ali izklopiš kadar koli.', type: 'choice', o: [['da', 'Da, pripravi mi jedilnik', 'Izbereš obroke in koliko želiš porabiti'], ['ne', 'Ne, samo trening', 'Jedilnik lahko dodaš kasneje']]}
 ];
+// Moves through the questionnaire, skipping questions that do not apply to the answers so far.
+function obMove(dir) { let st = ob.step + dir; while (st >= 1 && st <= Q.length && Q[st - 1].skip?.(ob.data)) st += dir; ob.step = st; }
 const obStart = d => d.start === 'pon' && dow() ? dkey(addDays(monday(), 7)) : dkey();
 function vOnboarding() {
   const st = ob.step, d = ob.data;
@@ -961,10 +1043,10 @@ function vOnboarding() {
       <div class="card"><div class="row between"><div><div class="eyebrow">Dnevni cilj</div><div class="num" style="font-size:40px">${fmtN(t.kcal)} <span class="small muted">kcal</span></div></div>${ring(1, d.days + '×')}</div>
         <div class="grid3"><div class="stat"><span class="num">${t.prot} g</span><span class="small muted">beljakovin</span></div><div class="stat"><span class="num">${t.carb} g</span><span class="small muted">ogljikovih hidratov</span></div><div class="stat"><span class="num">${t.fat} g</span><span class="small muted">maščob</span></div></div></div>
       <div class="card"><div class="eyebrow">Tedenski razpored</div><div class="week">${DAYS.map((n, i) => `<div class="d">${n}<span class="dot ${P.includes(i) ? 'plan' : ''}">${P.includes(i) ? ic('dumbbell') : ''}</span></div>`).join('')}</div>
-        <p class="small muted">${d.equip === 'gym' ? 'Vadba v fitnesu' : 'Vadba doma'}${(d.injuries || []).length ? ', prilagojeno za: ' + d.injuries.map(x => INJ[x].toLowerCase()).join(', ') : ''}.</p></div>
+        <p class="small muted">${STYLES[styleOf(d)].n}${styleOf(d) === 'moc' ? (d.equip === 'gym' ? ', v fitnesu' : ', doma') : ''}${(d.injuries || []).length ? ', prilagojeno za: ' + d.injuries.map(x => INJ[x].toLowerCase()).join(', ') : ''}.</p></div>
       ${ob.edit ? '' : `<div class="card"><div class="eyebrow">Začetek</div>
         ${dow() ? `<div class="seg" role="group" aria-label="Začetek"><button data-a="ob-start" data-v="danes" aria-pressed="${d.start !== 'pon'}">Od danes</button><button data-a="ob-start" data-v="pon" aria-pressed="${d.start === 'pon'}">Od ponedeljka</button></div>` : ''}
-        <div><span class="small muted">Prvi treningi</span>${firstSessions(d.days, obStart(d)).map(x => `<div class="kv"><span>${dayLabel(x.k)}</span><b>${esc(x.n)}</b></div>`).join('')}</div></div>`}
+        <div><span class="small muted">Prvi treningi</span>${firstSessions(d, obStart(d)).map(x => `<div class="kv"><span>${dayLabel(x.k)}</span><b>${esc(x.n)}</b></div>`).join('')}</div></div>`}
       <div class="ob-foot"><button class="btn primary block" data-a="ob-finish">${ob.edit ? 'Shrani spremembe' : 'Začni 7-dnevni brezplačni preizkus'}</button></div></div>`;
   }
   const q = Q[st - 1], pct = Math.round(st / (Q.length + 1) * 100);
@@ -984,7 +1066,7 @@ function vOnboarding() {
       <button class="opt" data-a="ob-noinj" aria-pressed="${!inj.length}"><div class="grow"><b>Nimam poškodb</b></div><span class="tick">${ic('check')}</span></button></div>`;
   }
   return `<div class="ob"><div class="ob-top"><button class="iconbtn" data-a="ob-back" aria-label="Nazaj" ${st > 1 || ob.edit ? '' : 'style="visibility:hidden"'}>${ic('left')}</button><div class="bar grow"><i style="width:${pct}%"></i></div><span class="small muted num" style="font-size:13px">${st}/${Q.length}</span></div>
-    <div class="ob-q"><h1>${q.t}</h1>${q.sub ? `<p class="muted">${q.sub}</p>` : ''}</div>${body}
+    <div class="ob-q"><h1>${q.t}</h1>${q.sub ? `<p class="muted">${typeof q.sub === 'function' ? q.sub(d) : q.sub}</p>` : ''}</div>${body}
     <div class="ob-foot"><button class="btn primary block" data-a="ob-next" ${canNext ? '' : 'disabled'}>Naprej</button></div></div>`;
 }
 
@@ -1189,21 +1271,22 @@ function coachContext() {
   const lines = [];
   lines.push(`Danes: ${DAYS_FULL[dow()]}, ${dkey()}.`);
   if (userName()) lines.push(`Ime uporabnika: ${userName()}.`);
-  lines.push(`Profil: ${p.sex === 'z' ? 'ženska' : 'moški'}, ${p.age} let, ${p.height} cm, ${fmtN(latestWeight(), 1)} kg. Cilj: ${GOALS[p.goal] || '-'}. Izkušnje: ${EXPS[p.exp] || '-'}. Vadba: ${eq === 'gym' ? 'fitnes' : 'doma'}, ${p.days} dni na teden. Poškodbe: ${(p.injuries || []).map(x => INJ[x]).join(', ') || 'brez'}.`);
+  lines.push(`Profil: ${p.sex === 'z' ? 'ženska' : 'moški'}, ${p.age} let, ${p.height} cm, ${fmtN(latestWeight(), 1)} kg. Cilj: ${GOALS[p.goal] || '-'}. Izkušnje: ${EXPS[p.exp] || '-'}. Stil: ${STYLES[styleOf()].n}${styleOf() === 'moc' ? (eq === 'gym' ? ', fitnes' : ', doma') : ''}, ${p.days} dni na teden. Poškodbe: ${(p.injuries || []).map(x => INJ[x]).join(', ') || 'brez'}.`);
   lines.push(`Prehranski cilj: ${t.kcal} kcal, ${t.prot} g beljakovin, ${t.carb} g OH, ${t.fat} g maščob.`);
   if (S.nutrition.enabled) { const wm = weekMenu(), b = S.nutrition.budget; lines.push(`Jedilnik: obroki ${selectedSlots().join(', ')}; proračun ${b.amount > 0 ? b.amount + ' € ' + periodLabel(b.period) : 'brez omejitve'}; današnji jedilnik: ${dayMenu(dow()).meals.map(m => m.label + ' ' + m.n).join('; ')} (≈ ${fmtEur(dayMenu(dow()).tot.cost)}).${wm.over ? ' Proračun je prenizek za izbrane obroke.' : ''}`); }
   else lines.push('Jedilnik: uporabnik ga nima vklopljenega.');
   if (S.test.type) { const T = TESTS[S.test.type]; lines.push(`Fizični test: ${T.full}${S.test.date ? ', datum ' + S.test.date + ' (čez ' + daysBetween(dkey(), S.test.date) + ' dni)' : ''}. Discipline: ${T.d.map(x => x.n).join(', ')}.`); const lm = S.test.mocks[S.test.mocks.length - 1]; if (lm) lines.push('Zadnji poskusni test (' + lm.d + '): ' + T.d.map(x => x.n + ' ' + (lm.r[x.id] != null ? (x.time ? fmtTime(lm.r[x.id]) : lm.r[x.id]) + ' ' + x.u : '-')).join('; ') + '.'); }
   { const st = planStart(), tk = dkey(), up = [];
     for (let d = new Date(), i = 0; i < 14 && up.length < 4; i++, d = addDays(d, 1)) { const k = dkey(d), wd = plannedWd(k, P); if (wd != null && !sessionDone(k)) up.push(`${DAYS_FULL[wd]} ${k}: ${P[wd].name}`); }
-    lines.push(st > tk ? `Načrt se začne ${st}.` : `Načrt se je začel ${st}; zdaj je ${planWeek(tk)}. teden načrta.`);
+    const wk = planWeek(tk);
+    lines.push(st > tk ? `Načrt se začne ${st}.` : `Načrt se je začel ${st}; ${wk >= 1 ? 'zdaj je ' + wk + '. teden načrta' : 'prvi teden treningov se začne v ponedeljek'}.`);
     lines.push('Naslednji treningi: ' + (up.join('; ') || 'ni načrtovanih') + '.'); }
   lines.push('Tedenski načrt (weekday 0 = ponedeljek):');
   P.forEach((w, wd) => { if (w) lines.push(`- weekday ${wd} (${DAYS_FULL[wd] || 'neobvezen trening za test, ni v razporedu'}): ${w.name} — ` + w.items.map((it, i) => `${i + 1}) ${it.id} "${EX[it.id].n}" ${it.rx.s}×${it.rx.r}`).join(', ')); });
   const recent = Object.keys(S.logs).sort().reverse().slice(0, 5);
   if (recent.length) { lines.push('Zadnji treningi:'); recent.forEach(k => { const l = S.logs[k]; const parts = Object.values(l.items || {}).map(it => { const d = it.sets.filter(x => x.d); if (!d.length) return null; const top = d[d.length - 1]; return `${EX[it.id]?.n || it.id} ${top.w ? top.w + ' kg × ' : ''}${top.r || ''} (${d.length} ser.)`; }).filter(Boolean); lines.push(`- ${k}: ${l.name || ''} ${parts.join('; ')}`); }); }
   const ws = sortedWeights().slice(-5); if (ws.length) lines.push('Teža: ' + ws.map(w => `${w.d} ${w.kg} kg`).join(', ') + '.');
-  lines.push('Knjižnica vaj (id: ime, vzorec, oprema): ' + Object.entries(EX).filter(([, e]) => e.eq === 'both' || e.eq === eq).map(([id, e]) => `${id}: ${e.n} [${e.p}]`).join('; '));
+  lines.push('Knjižnica vaj (id: ime, vzorec, oprema): ' + Object.entries(EX).filter(([, e]) => exStyles(e).includes(styleOf()) && (e.eq === 'both' || e.eq === eq)).map(([id, e]) => `${id}: ${e.n} [${e.p}]`).join('; '));
   return lines.join('\n');
 }
 function coachTools() {
@@ -1215,6 +1298,7 @@ function coachTools() {
         if (!P[wd]) throw new Error('Na ta dan ni treninga.');
         if (!EX[to]) throw new Error('Neznan id vaje: ' + to);
         if (!(EX[to].eq === 'both' || EX[to].eq === eq)) throw new Error('Vaja ni primerna za izbrano opremo.');
+        if (!exStyles(EX[to]).includes(styleOf())) throw new Error('Vaja ni del izbranega stila treninga.');
         const idx = P[wd].items.findIndex(x => x.id === from);
         if (idx < 0) throw new Error('Vaje ' + from + ' ni na ta dan.');
         S.overrides[wd + ':' + idx] = to; save();
@@ -1404,7 +1488,7 @@ function vProfil() {
   const planLbl = {trial: trialLeft > 0 ? `Brezplačni preizkus · še ${dni(trialLeft)}` : 'Preizkus je potekel', mesecno: 'Mesečna naročnina · 9,99 €', letno: 'Letna naročnina · 79,99 €'}[S.sub.plan];
   const kv = (k, v) => `<div class="kv"><span class="muted">${k}</span><b>${v}</b></div>`;
   return `<div class="greet"><span class="eyebrow">Profil</span><h1>Tvoji podatki</h1></div>
-    <section class="card"><div>${kv('Cilj', GOALS[p.goal] || '–')}${kv('Spol', p.sex === 'z' ? 'Ženska' : 'Moški')}${kv('Starost', p.age + ' let')}${kv('Višina', p.height + ' cm')}${kv('Teža', fmtN(latestWeight(), 1) + ' kg')}${kv('Izkušnje', EXPS[p.exp] || '–')}${kv('Oprema', p.equip === 'gym' ? 'Fitnes' : 'Doma')}${kv('Dni na teden', p.days)}${kv('Začetek načrta', longDate(planStart()))}${kv('Poškodbe', (p.injuries || []).map(x => INJ[x]).join(', ') || 'Brez')}${kv('Dnevni cilj', fmtN(t.kcal) + ' kcal · ' + t.prot + ' g beljakovin')}</div>
+    <section class="card"><div>${kv('Cilj', GOALS[p.goal] || '–')}${kv('Spol', p.sex === 'z' ? 'Ženska' : 'Moški')}${kv('Starost', p.age + ' let')}${kv('Višina', p.height + ' cm')}${kv('Teža', fmtN(latestWeight(), 1) + ' kg')}${kv('Izkušnje', EXPS[p.exp] || '–')}${kv('Stil', STYLES[styleOf()].n)}${styleOf() === 'moc' ? kv('Oprema', p.equip === 'gym' ? 'Fitnes' : 'Doma') : ''}${kv('Dni na teden', p.days)}${kv('Začetek načrta', longDate(planStart()))}${kv('Poškodbe', (p.injuries || []).map(x => INJ[x]).join(', ') || 'Brez')}${kv('Dnevni cilj', fmtN(t.kcal) + ' kcal · ' + t.prot + ' g beljakovin')}</div>
       <button class="btn block" data-a="edit-profile">Uredi podatke</button></section>
     <section class="card">
       <div class="stack-s"><span class="eyebrow">Naročnina</span><h2>${planLbl}</h2>${S.sub.plan === 'trial' ? `<div class="bar"><i style="width:${(7 - trialLeft) / 7 * 100}%"></i></div><span class="small muted">Preizkus se je začel ${longDate(start)}.</span>` : ''}</div>
@@ -1439,8 +1523,8 @@ function openSheet(html) {
 function closeSheet() { const o = $('#overlay'); if (o) o.remove(); document.body.style.overflow = ''; clearInterval(testTimer.iv); testTimer = {mode: testTimer.mode, start: 0, acc: 0, run: false, iv: null}; }
 function openDemo(id, i) {
   const e = EX[id], c = workoutCtx(), eq = S.profile.equip || 'home', inj = S.profile.injuries || [];
-  const alts = i != null && c.w && !c.isFuture ? Object.entries(EX).filter(([k, x]) => k !== id && x.p === e.p && (x.eq === 'both' || x.eq === eq) && !x.avoid.some(a => inj.includes(a))).slice(0, 4) : [];
-  const yt = 'https://www.youtube.com/results?search_query=' + encodeURIComponent(e.n + ' pravilna izvedba');
+  const alts = i != null && c.w && !c.isFuture ? Object.entries(EX).filter(([k, x]) => k !== id && x.p === e.p && (x.eq === 'both' || x.eq === eq) && exStyles(x).includes(styleOf()) && !x.avoid.some(a => inj.includes(a))).slice(0, 4) : [];
+  const yt = 'https://www.youtube.com/results?search_query=' + encodeURIComponent(e.yt || e.n + ' pravilna izvedba');
   openSheet(`<div class="row between"><div class="stack-s"><span class="eyebrow">${esc(e.m)}</span><h2>${esc(e.n)}</h2></div><button class="iconbtn" data-a="sheet-close" aria-label="Zapri">${ic('x')}</button></div>
     <div class="demo">${figSVG(e.p)}</div>
     <ol class="cues">${e.cues.map(x => `<li>${esc(x)}</li>`).join('')}</ol>
@@ -1483,21 +1567,21 @@ const ACT = {
   'del-ask': () => { confirmDel = true; render(); },
   'del-cancel': () => { confirmDel = false; render(); },
   'del-do': () => { confirmDel = false; deleteAccount(); },
-  'ob-next': () => { ob.step++; render(); window.scrollTo(0, 0); },
-  'ob-back': () => { if (ob.step <= 1) { if (ob.edit) { ob = null; go('profil'); } return; } ob.step--; render(); },
-  'ob-pick': a => { const q = Q[ob.step - 1]; ob.data[q.k] = a.dataset.v; render(); setTimeout(() => { if (ob && Q[ob.step - 1] === q) { ob.step++; render(); } }, 220); },
+  'ob-next': () => { obMove(1); render(); window.scrollTo(0, 0); },
+  'ob-back': () => { if (ob.step <= 1) { if (ob.edit) { ob = null; go('profil'); } return; } obMove(-1); render(); },
+  'ob-pick': a => { const q = Q[ob.step - 1]; ob.data[q.k] = a.dataset.v; render(); setTimeout(() => { if (ob && Q[ob.step - 1] === q) { obMove(1); render(); } }, 220); },
   'ob-num': a => { const q = Q[ob.step - 1]; ob.data[q.k] = clamp(Math.round((Number(ob.data[q.k]) + Number(a.dataset.dir) * q.step) * 10) / 10, q.min, q.max); $('#obnum').textContent = fmtN(ob.data[q.k], q.step < 1 ? 1 : 0); $('#ob-range').value = ob.data[q.k]; },
   'ob-start': a => { ob.data.start = a.dataset.v; render(); },
   'ob-days': a => { ob.data.days = Number(a.dataset.v); render(); },
   'ob-toggle': a => { const v = a.dataset.v, inj = ob.data.injuries = [...(ob.data.injuries || [])]; const i = inj.indexOf(v); i >= 0 ? inj.splice(i, 1) : inj.push(v); render(); },
   'ob-noinj': () => { ob.data.injuries = []; render(); },
   'ob-finish': () => {
-    const prevDays = S.profile.days, prevEq = S.profile.equip, wasEdit = ob.edit;
+    const prevDays = S.profile.days, prevEq = S.profile.equip, prevStyle = styleOf(), wasEdit = ob.edit;
     const {mealplan, start, ...prof} = ob.data;
     S.profile = {...prof, injuries: [...(prof.injuries || [])]};
     if (mealplan) S.nutrition.enabled = mealplan === 'da';
     if (S.nutrition.enabled && !wasEdit) nutSetOpen = true;
-    if (prevDays !== S.profile.days || prevEq !== S.profile.equip || !wasEdit) S.overrides = {};
+    if (prevDays !== S.profile.days || prevEq !== S.profile.equip || prevStyle !== styleOf() || !wasEdit) S.overrides = {};
     if (!S.startDate) S.startDate = dkey();
     if (!wasEdit) S.planStart = obStart({start});
     const k = dkey(); const ex = S.weights.find(w => w.d === k);
@@ -1507,7 +1591,7 @@ const ACT = {
     go(wasEdit ? 'profil' : S.nutrition.enabled ? 'prehrana' : S.profile.goal === 'test' ? 'testi' : 'domov');
     if (!wasEdit) toast('Tvoj načrt je pripravljen');
   },
-  'edit-profile': () => { ob = {step: 1, data: {...S.profile, weight: latestWeight(), injuries: [...(S.profile.injuries || [])], mealplan: S.nutrition.enabled ? 'da' : 'ne'}, edit: true}; render(); window.scrollTo(0, 0); },
+  'edit-profile': () => { ob = {step: 1, data: {...S.profile, style: styleOf(), weight: latestWeight(), injuries: [...(S.profile.injuries || [])], mealplan: S.nutrition.enabled ? 'da' : 'ne'}, edit: true}; render(); window.scrollTo(0, 0); },
   'nut-on': () => { S.nutrition.enabled = true; nutSetOpen = true; save(); go('prehrana'); },
   'nut-off': () => { S.nutrition.enabled = false; nutSetOpen = false; save(); render(); toast('Jedilnik je izklopljen'); },
   'nut-set': () => { if (nutSetOpen && !saveBudget()) return; nutSetOpen = !nutSetOpen; save(); render(); },
